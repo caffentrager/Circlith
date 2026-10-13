@@ -26,6 +26,10 @@ button:hover {
   border-color: #147e94;
   background: #edfaff;
 }
+.library button {
+  touch-action: none;
+  user-select: none;
+}
 button:focus-visible,
 input:focus-visible {
   outline: 3px solid #0792b3;

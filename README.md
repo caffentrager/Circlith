@@ -4,7 +4,7 @@
 
 **설계와 구현의 유일한 기준은 [CIRCLITH_MASTER_SPEC.md](docs/CIRCLITH_MASTER_SPEC.md)입니다.** 다른 문서와 충돌하면 Master Spec을 우선합니다.
 
-현재는 첫 편집 프로토타입 단계입니다. AND/Input/Output 배치, 선택, 연결 유지 이동·회전, 핀 사이 직각 배선, Esc, Undo/Redo를 구현했습니다. `CURRENT`는 현재 구현 기준이며, `PROVISIONAL`, `EXPERIMENTAL`, `DEFERRED`는 확정되거나 사용성이 검증된 기능을 뜻하지 않습니다.
+현재는 첫 편집 프로토타입 단계입니다. AND/Input/Output을 옆 부품 패널에서 도면으로 드래그해 배치하고, 접점을 클릭하거나 접점 간 드래그로 배선할 수 있습니다. 선택, 연결 유지 이동·회전, 직각 배선, Esc, Undo/Redo도 제공합니다. `CURRENT`는 현재 구현 기준이며, `PROVISIONAL`, `EXPERIMENTAL`, `DEFERRED`는 확정되거나 사용성이 검증된 기능을 뜻하지 않습니다.
 
 Node.js 22.23.3 이상에서 `npm ci` 후 `npm run dev`로 실행합니다. `npm run build`, `npm test`, `npx playwright install chromium`, `npm run test:browser`로 검증합니다. 현재 회로는 메모리에만 유지되며 파일 저장·시뮬레이션은 후속 단계입니다.
 

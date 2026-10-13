@@ -6,6 +6,8 @@
 
 첫 개발 목표인 Component 배치 → 선택 → Move → Rotate → Wire → bend 변경 → Esc → Undo를 검증할 실행 가능한 프로토타입을 만든다.
 
+2026-10-13 사용자 후속 요청으로 부품 패널 드래그 배치와 도구 전환 없이 접점 클릭/드래그 배선을 추가했다. 도면 밖 부품 drop은 취소하며, 핀까지 wire drag 후 release는 하나의 Wire Command다. 빈 공간에서 release는 초안으로 유지한다. 캡처 상실과 pointercancel은 드래그 초안만 폐기한다. 좌표·접점 후보는 현재 포인터와 viewport로 다시 계산하여 canvas 이탈 후 오래된 hover로 Enter 연결되는 문제를 수정했다.
+
 - DEC-001: Master Spec 우선. 기존 archive는 구현 기준으로 사용하지 않는다.
 - DEC-002: M은 연결 유지 이동. G는 그리드 표시만 변경.
 - DEC-003/004: A 검색, AND/Input/Output만 제공. Q/P 예약 기능 비활성.
@@ -70,7 +72,7 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-2026-10-13 검증: build 성공, 단위 테스트 8개, 브라우저 시나리오 5개 통과. dependency audit에서 보고된 Vitest 취약점은 패키지 업데이트 후 해소했다. 사용성·성능 검증 완료를 뜻하지 않는다.
+2026-10-13 검증: build 성공, 단위 테스트 8개, 브라우저 시나리오 11개 통과. dependency audit에서 보고된 Vitest 취약점은 패키지 업데이트 후 해소했다. 사용성·성능 검증 완료를 뜻하지 않는다.
 
 브라우저 시나리오: 연결된 부품의 pointer 이동·회전 및 정확한 wire Undo, 배치/선택/이동/회전/정확한 Undo·Redo, wire bend/Backspace/commit/복원, text/IME/Tab/autorepeat 보호, Pan 중 Draft 유지 및 pointercancel rollback.
 
@@ -82,4 +84,4 @@ npm run test:browser
 알려진 문제: 범위 밖 명령·플랫폼은 검증하지 않았으며 새 pin 법선 routing은 후속이다.
 설계 판단: snapshot history와 endpoint 기반 연결 분리. PROVISIONAL 결정은 확정 상태로 변경하지 않았다.
 
-Claude 독립 리뷰는 아직 수행하지 않았다. 후속 리뷰 항목은 ACCEPT / PARTIAL ACCEPT / REJECT / NEEDS SPEC DECISION으로 개별 응답한다.
+Claude 독립 리뷰를 로컬 `review/`에서 확인했다. 오래된 hover의 canvas 이탈 재현은 ACCEPT하여 이번 입력 변경에서 수정했다. Pan 시작점에 핀이 있는 재현은 Pan 후 핀이 포인터 아래에 그대로 있으므로 실패 결과만으로 잘못된 접속을 입증하지 못한다. 메뉴 Esc와 연결 검증 보강 등 나머지 항목은 후속 작업이며 이번 드래그 입력 변경에서 완료했다고 주장하지 않는다. 독립 리뷰 원본은 이번 변경에 포함하지 않았다.

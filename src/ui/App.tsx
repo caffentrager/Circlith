@@ -20,8 +20,16 @@ export function App() {
   const space = useRef(false);
   const composing = useRef(false);
   const hover = useRef<Endpoint | undefined>(undefined);
+  const pointer = useRef<{ clientX: number; clientY: number } | null>(null);
+  const paletteDrag = useRef<{
+    kind: Kind;
+    start: Point;
+    active: boolean;
+    inside: boolean;
+  } | null>(null);
+  const suppressPaletteClick = useRef(false);
   const gesture = useRef<{
-    type: "pan" | "move";
+    type: "pan" | "move" | "wire";
     start: Point;
     view: { x: number; y: number };
     moved: boolean;
@@ -30,7 +38,7 @@ export function App() {
   const [menu, setMenu] = useState(false);
   const [grid, setGrid] = useState(true);
   const [message, setMessage] = useState(
-    "부품을 선택하고 도면을 클릭해 배치하세요.",
+    "왼쪽 부품을 도면으로 드래그하세요. 접점을 클릭하거나 드래그하면 배선이 시작됩니다.",
   );
   const [singleKeys, setSingleKeys] = useState(true);
   const screen = (e: { clientX: number; clientY: number }) => {
@@ -46,13 +54,47 @@ export function App() {
     const pin = (e as Element)?.closest("[data-pin]")?.getAttribute("data-pin");
     return pin ? { type: "pin", id: pin } : undefined;
   };
+  const insideCanvas = (e: { clientX: number; clientY: number }) => {
+    const r = svg.current!.getBoundingClientRect();
+    return (
+      e.clientX >= r.left &&
+      e.clientX <= r.right &&
+      e.clientY >= r.top &&
+      e.clientY <= r.bottom
+    );
+  };
+  const hitPin = (
+    e: { clientX: number; clientY: number } | null,
+  ): Endpoint | undefined => {
+    if (!e || !insideCanvas(e)) return undefined;
+    const p = screen(e),
+      v = editor.viewport,
+      circuit = editor.preview();
+    const candidates = Object.keys(circuit.pins).filter((k) => {
+      const pos = pinPosition(circuit, k);
+      return (
+        Math.hypot(pos.x * v.zoom + v.x - p.x, pos.y * v.zoom + v.y - p.y) <= 9
+      );
+    });
+    return candidates.length === 1
+      ? { type: "pin", id: candidates[0] }
+      : undefined;
+  };
   const rollback = () => {
-    if (gesture.current?.type === "move") editor.cancel();
+    if (
+      gesture.current?.type === "move" ||
+      gesture.current?.type === "wire" ||
+      paletteDrag.current?.active
+    )
+      editor.cancel();
     if (gesture.current?.type === "pan") {
       editor.viewport.x = gesture.current.view.x;
       editor.viewport.y = gesture.current.view.y;
     }
     gesture.current = null;
+    paletteDrag.current = null;
+    hover.current = undefined;
+    pointer.current = null;
     editor.transient = "NONE";
     space.current = false;
     refresh();
@@ -156,14 +198,86 @@ export function App() {
           검색 A
         </button>
         {kinds.map((k) => (
-          <button key={k} onClick={() => place(k)}>
+          <button
+            key={k}
+            onPointerDown={(e) => {
+              if (e.button !== 0) return;
+              e.currentTarget.focus();
+              suppressPaletteClick.current = false;
+              paletteDrag.current = {
+                kind: k,
+                start: { x: e.clientX, y: e.clientY },
+                active: false,
+                inside: false,
+              };
+              e.currentTarget.setPointerCapture(e.pointerId);
+            }}
+            onPointerMove={(e) => {
+              const drag = paletteDrag.current;
+              if (!drag) return;
+              if (
+                !drag.active &&
+                Math.hypot(
+                  e.clientX - drag.start.x,
+                  e.clientY - drag.start.y,
+                ) >= 4
+              ) {
+                drag.active = true;
+                editor.place(drag.kind, world(e));
+              }
+              if (drag.active) {
+                drag.inside = insideCanvas(e);
+                editor.update(world(e));
+                hover.current = undefined;
+                refresh();
+              }
+            }}
+            onPointerUp={(e) => {
+              const drag = paletteDrag.current;
+              paletteDrag.current = null;
+              if (drag?.active) {
+                suppressPaletteClick.current = true;
+                if (insideCanvas(e)) {
+                  editor.update(world(e));
+                  editor.confirm();
+                  svg.current?.focus();
+                } else editor.cancel();
+                refresh();
+              }
+              if (e.currentTarget.hasPointerCapture(e.pointerId))
+                e.currentTarget.releasePointerCapture(e.pointerId);
+            }}
+            onPointerCancel={() => {
+              suppressPaletteClick.current = true;
+              rollback();
+            }}
+            onLostPointerCapture={() => {
+              if (paletteDrag.current) rollback();
+            }}
+            onKeyDown={(e) => {
+              if (e.code === "Escape" && paletteDrag.current) {
+                e.preventDefault();
+                suppressPaletteClick.current = true;
+                rollback();
+              }
+            }}
+            onClick={() => {
+              if (suppressPaletteClick.current) {
+                suppressPaletteClick.current = false;
+                return;
+              }
+              place(k);
+            }}
+          >
             {k}
           </button>
         ))}
         <p>
-          핀 → 핀 직각 배선
+          부품을 도면으로 드래그
           <br />
-          이동은 연결을 유지합니다.
+          접점 클릭 → 클릭으로 연결
+          <br />
+          접점 드래그 → 접점에서 놓기
         </p>
         <label>
           <input
@@ -213,6 +327,7 @@ export function App() {
           onPointerDown={(e) => {
             if (e.button === 2) return;
             svg.current?.focus();
+            pointer.current = { clientX: e.clientX, clientY: e.clientY };
             cursor.current = world(e);
             if (e.button === 1 || space.current) {
               e.preventDefault();
@@ -228,7 +343,8 @@ export function App() {
               return;
             }
             if (e.button !== 0) return;
-            const pin = target(e.target) ?? hover.current;
+            const pin = target(e.target) ?? hitPin(e);
+            hover.current = pin;
             if (editor.draft) {
               editor.update(cursor.current);
               if (editor.draft.type === "WIRE_DRAFT" && !pin) editor.waypoint();
@@ -236,11 +352,19 @@ export function App() {
               refresh();
               return;
             }
-            if (editor.tool === "WIRE") {
-              if (pin) editor.startWire(pin);
+            if (pin) {
+              editor.startWire(pin);
+              gesture.current = {
+                type: "wire",
+                start: screen(e),
+                view: { x: 0, y: 0 },
+                moved: false,
+              };
+              e.currentTarget.setPointerCapture(e.pointerId);
               refresh();
               return;
             }
+            if (editor.tool === "WIRE") return;
             const key = (e.target as Element)
               .closest("[data-component]")
               ?.getAttribute("data-component");
@@ -264,30 +388,18 @@ export function App() {
             refresh();
           }}
           onPointerMove={(e) => {
+            pointer.current = { clientX: e.clientX, clientY: e.clientY };
             const g = gesture.current;
             if (g?.type === "pan") {
               const p = screen(e);
               editor.viewport.x = g.view.x + p.x - g.start.x;
               editor.viewport.y = g.view.y + p.y - g.start.y;
+              hover.current = hitPin(e);
             } else {
               cursor.current = world(e);
               const p = screen(e),
                 v = editor.viewport;
-              const candidates = Object.keys(editor.circuit.pins).filter(
-                (k) => {
-                  const pos = pinPosition(editor.circuit, k);
-                  return (
-                    Math.hypot(
-                      pos.x * v.zoom + v.x - p.x,
-                      pos.y * v.zoom + v.y - p.y,
-                    ) <= 9
-                  );
-                },
-              );
-              hover.current =
-                candidates.length === 1
-                  ? { type: "pin", id: candidates[0] }
-                  : undefined;
+              hover.current = hitPin(e);
               editor.update(
                 editor.draft?.type === "WIRE_DRAFT" && hover.current
                   ? pinPosition(editor.circuit, hover.current.id)
@@ -305,12 +417,29 @@ export function App() {
               if (g.moved) editor.confirm();
               else editor.cancel();
             }
+            if (
+              g?.type === "wire" &&
+              g.moved &&
+              editor.draft?.type === "WIRE_DRAFT"
+            ) {
+              if (!insideCanvas(e)) editor.cancel();
+              else {
+                editor.update(world(e));
+                editor.confirm(hitPin(e));
+              }
+            }
+            hover.current = hitPin(e);
             editor.transient = "NONE";
             if (e.currentTarget.hasPointerCapture(e.pointerId))
               e.currentTarget.releasePointerCapture(e.pointerId);
             refresh();
           }}
           onPointerCancel={rollback}
+          onPointerLeave={() => {
+            hover.current = undefined;
+            pointer.current = null;
+            refresh();
+          }}
           onLostPointerCapture={() => {
             if (gesture.current) rollback();
           }}
@@ -324,6 +453,8 @@ export function App() {
             v.x = p.x - ((p.x - v.x) * z) / v.zoom;
             v.y = p.y - ((p.y - v.y) * z) / v.zoom;
             v.zoom = z;
+            pointer.current = { clientX: e.clientX, clientY: e.clientY };
+            hover.current = hitPin(e);
             refresh();
           }}
           onKeyUp={(e) => {
@@ -368,7 +499,7 @@ export function App() {
             ) {
               if (!e.repeat) editor.backspace();
             } else if (e.code === "Enter" && editor.draft) {
-              if (!e.repeat) editor.confirm(hover.current);
+              if (!e.repeat) editor.confirm(hitPin(pointer.current));
             } else if (
               singleKeys &&
               !e.repeat &&
@@ -381,7 +512,8 @@ export function App() {
               } else if (e.code === "KeyW") {
                 if (editor.draft?.type !== "WIRE_DRAFT") {
                   editor.setTool("WIRE");
-                  if (hover.current) editor.startWire(hover.current);
+                  const pin = hitPin(pointer.current);
+                  if (pin) editor.startWire(pin);
                 }
               } else if (e.code === "KeyV") editor.setTool("SELECT");
               else if (e.code === "KeyM") editor.move(cursor.current);
@@ -422,8 +554,8 @@ export function App() {
             <Symbols circuit={preview} selection={editor.selection} />
             {hover.current && (
               <circle
-                cx={pinPosition(editor.circuit, hover.current.id).x}
-                cy={pinPosition(editor.circuit, hover.current.id).y}
+                cx={pinPosition(preview, hover.current.id).x}
+                cy={pinPosition(preview, hover.current.id).y}
                 r={9 / editor.viewport.zoom}
                 fill="none"
                 stroke="#008cab"
@@ -431,9 +563,11 @@ export function App() {
               />
             )}
             <g data-layer="preview" className="preview">
-              {draft?.type === "PLACE" && (
-                <Symbols circuit={ghost} selection={[]} />
-              )}
+              {draft?.type === "PLACE" &&
+                (!paletteDrag.current?.active ||
+                  paletteDrag.current.inside) && (
+                  <Symbols circuit={ghost} selection={[]} />
+                )}
               {draft?.type === "WIRE_DRAFT" && (
                 <polyline points={path(editor.wirePoints())} className="wire" />
               )}
