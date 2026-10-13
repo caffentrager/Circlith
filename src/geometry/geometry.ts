@@ -1,0 +1,99 @@
+import {
+  clone,
+  type Circuit,
+  type Endpoint,
+  type Point,
+} from "../model/circuit";
+export const same = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
+export const snap = (p: Point): Point => ({
+  x: Math.round(p.x / 10) * 10,
+  y: Math.round(p.y / 10) * 10,
+});
+export function rotatePoint(p: Point, degrees: number): Point {
+  const turns = (((degrees / 90) % 4) + 4) % 4;
+  return turns === 0
+    ? { ...p }
+    : turns === 1
+      ? { x: -p.y, y: p.x }
+      : turns === 2
+        ? { x: -p.x, y: -p.y }
+        : { x: p.y, y: -p.x };
+}
+export function pinPosition(c: Circuit, key: string): Point {
+  const pin = c.pins[key],
+    comp = c.components[pin.component],
+    place = c.geometry.components[comp.id];
+  const local =
+    comp.kind === "AND"
+      ? pin.index === 2
+        ? { x: 40, y: 0 }
+        : { x: -40, y: pin.index === 0 ? -10 : 10 }
+      : { x: comp.kind === "Input" ? 40 : -40, y: 0 };
+  const p = rotatePoint(local, place.rotation);
+  return { x: p.x + place.position.x, y: p.y + place.position.y };
+}
+export const endpointPosition = (c: Circuit, e: Endpoint) =>
+  e.type === "pin" ? pinPosition(c, e.id) : c.geometry.junctions[e.id];
+export function clean(points: Point[]): Point[] {
+  const result: Point[] = [];
+  for (const p of points)
+    if (!result.length || !same(result[result.length - 1], p))
+      result.push({ ...p });
+  return result;
+}
+export function route(a: Point, b: Point, horizontal = true): Point[] {
+  return clean([a, horizontal ? { x: b.x, y: a.y } : { x: a.x, y: b.y }, b]);
+}
+// Only the span adjacent to a moving endpoint is rebuilt. Shared junctions remain fixed.
+export function transform(
+  c: Circuit,
+  selection: string[],
+  delta: Point,
+  rotation = 0,
+): Circuit {
+  const next = clone(c);
+  const chosen = new Set(selection.filter((k) => c.components[k]));
+  if (!chosen.size) return next;
+  const positions = [...chosen].map((k) => c.geometry.components[k].position);
+  const center = {
+    x:
+      (Math.min(...positions.map((p) => p.x - 40)) +
+        Math.max(...positions.map((p) => p.x + 40))) /
+      2,
+    y:
+      (Math.min(...positions.map((p) => p.y - 20)) +
+        Math.max(...positions.map((p) => p.y + 20))) /
+      2,
+  };
+  const map = (p: Point) => {
+    const r = rotatePoint({ x: p.x - center.x, y: p.y - center.y }, rotation);
+    return { x: center.x + r.x + delta.x, y: center.y + r.y + delta.y };
+  };
+  for (const key of chosen) {
+    const p = next.geometry.components[key];
+    p.position = map(p.position);
+    p.rotation = (p.rotation + rotation + 360) % 360;
+  }
+  const moving = (e: Endpoint) =>
+    e.type === "pin" && chosen.has(c.pins[e.id].component);
+  for (const w of Object.values(next.geometry.wires)) {
+    const a = moving(w.from),
+      b = moving(w.to);
+    if (a && b) {
+      w.points = clean(w.points.map(map));
+      continue;
+    }
+    const stretch = (points: Point[], e: Endpoint) => {
+      const start = endpointPosition(next, e),
+        fixed = points[1];
+      const horizontal = points[0].y === fixed.y;
+      return clean([
+        ...route(start, fixed, rotation ? !horizontal : horizontal),
+        ...points.slice(2),
+      ]);
+    };
+    if (a) w.points = stretch(w.points, w.from);
+    if (b) w.points = stretch([...w.points].reverse(), w.to).reverse();
+  }
+  return next;
+}

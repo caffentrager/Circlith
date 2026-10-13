@@ -1,0 +1,197 @@
+:root {
+  font-family: Inter, "Segoe UI", sans-serif;
+  color: #203247;
+  background: #eef2f7;
+  font-synthesis: none;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  background: white;
+  border: 1px solid #c5cfdb;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: #203247;
+  cursor: pointer;
+}
+button:hover {
+  border-color: #147e94;
+  background: #edfaff;
+}
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid #0792b3;
+}
+input {
+  padding: 7px;
+  border: 1px solid #c5cfdb;
+  border-radius: 4px;
+}
+.app {
+  display: grid;
+  grid-template-columns: 190px 1fr 230px;
+  grid-template-rows: 64px 1fr 42px;
+  height: 100vh;
+  min-height: 500px;
+}
+header {
+  grid-column: 1/4;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-bottom: 1px solid #cbd4de;
+  background: white;
+}
+header strong {
+  margin-right: 15px;
+  white-space: nowrap;
+}
+small {
+  font-size: 11px;
+  display: block;
+  color: #697e94;
+}
+header input {
+  width: 170px;
+}
+header span {
+  font-size: 12px;
+  color: #617487;
+}
+aside {
+  padding: 20px;
+  background: #f9fbfd;
+}
+aside button {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  text-align: left;
+}
+h2 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin: 0 0 20px;
+}
+aside p,
+aside label {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.note {
+  color: #657a90;
+}
+main {
+  min-width: 0;
+  min-height: 0;
+  border-left: 1px solid #cbd4de;
+  border-right: 1px solid #cbd4de;
+}
+svg {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  touch-action: none;
+  user-select: none;
+  overscroll-behavior: contain;
+}
+svg:focus {
+  outline: 2px solid #2a9db4;
+  outline-offset: -2px;
+}
+.wire {
+  stroke: #346a7a;
+  stroke-width: 2;
+  fill: none;
+}
+.symbol {
+  fill: #f8fcff;
+  stroke: #516d82;
+  stroke-width: 2;
+}
+.selected {
+  stroke: #008cab;
+  stroke-width: 3;
+  stroke-dasharray: 5 2;
+}
+.pin {
+  fill: white;
+  stroke: #147e94;
+  stroke-width: 2;
+  cursor: crosshair;
+}
+.pin:hover {
+  fill: #45cbd5;
+  stroke-width: 4;
+}
+text {
+  font-size: 12px;
+  pointer-events: none;
+  fill: #203247;
+}
+.label {
+  font-size: 10px;
+  fill: #617487;
+}
+.preview {
+  opacity: 0.55;
+  pointer-events: none;
+}
+.preview .wire {
+  stroke: #008cab;
+  stroke-dasharray: 6 3;
+}
+footer {
+  grid-column: 1/4;
+  padding: 12px;
+  font-size: 12px;
+  background: #203247;
+  color: white;
+}
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: #20324755;
+  display: grid;
+  place-items: center;
+}
+.overlay section {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  min-width: 350px;
+  box-shadow: 0 15px 70px #20324744;
+}
+.overlay input,
+.overlay button {
+  display: block;
+  width: 100%;
+  margin: 10px 0;
+}
+@media (max-width: 1100px) {
+  .app {
+    grid-template-columns: 150px 1fr 180px;
+  }
+  header {
+    gap: 5px;
+  }
+  header span {
+    display: none;
+  }
+  header input {
+    width: 120px;
+  }
+  aside {
+    padding: 12px;
+  }
+}
