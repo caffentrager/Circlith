@@ -14,7 +14,7 @@
 - DEC-005: Tool / Operation / Transient / Focus 분리. 검증용 구현이며 결정 상태는 PROVISIONAL 유지.
 - DEC-006: 첨부 개발 지시에서 명시한 2단계 Undo 적용. 첫 Ctrl+Z는 Draft만 취소. Draft 중 Redo 차단.
 - DEC-007: 연결 그래프를 유지하는 최소 orthogonal stretch. 경로 정책은 PROVISIONAL 유지.
-- DEC-008: 우클릭 메뉴, Space/middle drag Pan.
+- DEC-008: 사용자 요청으로 빈 공간 우클릭 drag Pan, 객체 위 우클릭 메뉴, Space/middle drag Pan.
 - DEC-011: 빈 공간 더블클릭 배선 확정 제외.
 - DEC-015: 도면이 포커스를 소유할 때만 도면 키 처리. 아래 표와 브라우저 테스트로 현재 범위를 기록.
 
@@ -40,7 +40,8 @@
 - History snapshot 방식은 정확한 복원을 우선한 초기 선택이다. 큰 회로 메모리 사용과 응답성은 측정하지 않았다.
 - grid=10, pin hit=9 screen px, drag threshold=4 screen px는 검증 전 가설이다. zoom 범위는 프로토타입에서 50–200%로 제한했다.
 - 검색 라이브러리는 세 부품만 포함한다. exact/prefix/부분 문자열 및 in/out 별칭을 제공한다. 결과가 하나면 Enter, 여러 결과는 명시적 버튼 선택. Favorites/recent/fuzzy 확장은 후속이다.
-- 저장·자동 복구·시뮬레이션·분기 UI·box select·삭제·clipboard·Properties·hover 부품 명령·키 재배정·Alt snap은 미구현이다. 새로고침 후 회로는 유지되지 않는다.
+- 저장·자동 복구·시뮬레이션·분기 UI·삭제·clipboard·Properties·hover 부품 명령·키 재배정·Alt snap은 미구현이다. 새로고침 후 회로는 유지되지 않는다.
+- 빈 공간 좌클릭 drag는 BOX_SELECT다. 좌→우는 핀을 포함한 부품 bounds 전체 포함, 우→좌는 교차 부품을 선택한다. 회전과 zoom을 반영하고 Shift는 기존 선택에 추가한다. 현재 box select 대상은 부품이며 wire 선택은 후속이다. 선택은 release에서만 변경하며 취소는 기존 선택을 보존한다. 빈 공간 우클릭 drag는 PAN으로, 안정된 Draft와 selection/history를 유지한다. 단순 빈 공간 좌클릭은 선택 해제다.
 - 4상태 truth/resolution과 feedback stabilization은 DEC-010 확정 전 구현하지 않는다. 시간·계층·Bus·Q Quick Place 등도 활성화하지 않는다.
 
 ## 입력 억제 범위
@@ -72,7 +73,7 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-2026-10-13 검증: build 성공, 단위 테스트 8개, 브라우저 시나리오 11개 통과. dependency audit에서 보고된 Vitest 취약점은 패키지 업데이트 후 해소했다. 사용성·성능 검증 완료를 뜻하지 않는다.
+2026-10-13 검증: build 성공, 단위 테스트 10개, 브라우저 시나리오 14개 통과. dependency audit에서 보고된 Vitest 취약점은 패키지 업데이트 후 해소했다. 사용성·성능 검증 완료를 뜻하지 않는다.
 
 브라우저 시나리오: 연결된 부품의 pointer 이동·회전 및 정확한 wire Undo, 배치/선택/이동/회전/정확한 Undo·Redo, wire bend/Backspace/commit/복원, text/IME/Tab/autorepeat 보호, Pan 중 Draft 유지 및 pointercancel rollback.
 

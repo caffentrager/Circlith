@@ -44,6 +44,32 @@ export function clean(points: Point[]): Point[] {
 export function route(a: Point, b: Point, horizontal = true): Point[] {
   return clean([a, horizontal ? { x: b.x, y: a.y } : { x: a.x, y: b.y }, b]);
 }
+export function boxComponents(c: Circuit, start: Point, end: Point): string[] {
+  const left = Math.min(start.x, end.x),
+    right = Math.max(start.x, end.x);
+  const top = Math.min(start.y, end.y),
+    bottom = Math.max(start.y, end.y);
+  const crossing = end.x < start.x;
+  return Object.keys(c.components).filter((key) => {
+    const placement = c.geometry.components[key];
+    const corners = [
+      { x: -40, y: -20 },
+      { x: 40, y: -20 },
+      { x: 40, y: 20 },
+      { x: -40, y: 20 },
+    ].map((p) => {
+      const r = rotatePoint(p, placement.rotation);
+      return { x: r.x + placement.position.x, y: r.y + placement.position.y };
+    });
+    const x1 = Math.min(...corners.map((p) => p.x)),
+      x2 = Math.max(...corners.map((p) => p.x));
+    const y1 = Math.min(...corners.map((p) => p.y)),
+      y2 = Math.max(...corners.map((p) => p.y));
+    return crossing
+      ? x1 <= right && x2 >= left && y1 <= bottom && y2 >= top
+      : x1 >= left && x2 <= right && y1 >= top && y2 <= bottom;
+  });
+}
 // Only the span adjacent to a moving endpoint is rebuilt. Shared junctions remain fixed.
 export function transform(
   c: Circuit,

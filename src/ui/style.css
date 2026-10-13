@@ -151,6 +151,20 @@ text {
   opacity: 0.55;
   pointer-events: none;
 }
+.selection-box {
+  fill: #008cab18;
+  stroke: #008cab;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.selection-box.crossing {
+  fill: #168b4818;
+  stroke: #168b48;
+  stroke-dasharray: 6 3;
+}
+svg[data-transient="PAN"] {
+  cursor: grabbing;
+}
 .preview .wire {
   stroke: #008cab;
   stroke-dasharray: 6 3;

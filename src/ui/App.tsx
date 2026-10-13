@@ -28,8 +28,9 @@ export function App() {
     inside: boolean;
   } | null>(null);
   const suppressPaletteClick = useRef(false);
+  const suppressRightMenu = useRef(false);
   const gesture = useRef<{
-    type: "pan" | "move" | "wire";
+    type: "pan" | "move" | "wire" | "box";
     start: Point;
     view: { x: number; y: number };
     moved: boolean;
@@ -45,11 +46,13 @@ export function App() {
     const r = svg.current!.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
   };
-  const world = (e: { clientX: number; clientY: number }) => {
+  const drawingPoint = (e: { clientX: number; clientY: number }) => {
     const p = screen(e),
       v = editor.viewport;
-    return snap({ x: (p.x - v.x) / v.zoom, y: (p.y - v.y) / v.zoom });
+    return { x: (p.x - v.x) / v.zoom, y: (p.y - v.y) / v.zoom };
   };
+  const world = (e: { clientX: number; clientY: number }) =>
+    snap(drawingPoint(e));
   const target = (e: EventTarget | null): Endpoint | undefined => {
     const pin = (e as Element)?.closest("[data-pin]")?.getAttribute("data-pin");
     return pin ? { type: "pin", id: pin } : undefined;
@@ -84,6 +87,7 @@ export function App() {
     if (
       gesture.current?.type === "move" ||
       gesture.current?.type === "wire" ||
+      gesture.current?.type === "box" ||
       paletteDrag.current?.active
     )
       editor.cancel();
@@ -278,6 +282,9 @@ export function App() {
           접점 클릭 → 클릭으로 연결
           <br />
           접점 드래그 → 접점에서 놓기
+          <br />
+          빈 공간 좌드래그: 선택박스
+          <br />빈 공간 우드래그: 화면 이동
         </p>
         <label>
           <input
@@ -299,6 +306,7 @@ export function App() {
           aria-label="회로 도면"
           data-operation={editor.operation}
           data-tool={editor.tool}
+          data-transient={editor.transient}
           onFocus={() => {
             editor.focus = "CANVAS";
           }}
@@ -313,6 +321,10 @@ export function App() {
           }}
           onContextMenu={(e) => {
             e.preventDefault();
+            const object = (e.target as Element).closest(
+              '[data-component],[data-pin],[data-wire],[data-layer="junctions"]',
+            );
+            if (suppressRightMenu.current || !object) return;
             if (!editor.draft) {
               const key = (e.target as Element)
                 .closest("[data-component]")
@@ -325,11 +337,22 @@ export function App() {
             refresh();
           }}
           onPointerDown={(e) => {
-            if (e.button === 2) return;
+            const object = (e.target as Element).closest(
+              '[data-component],[data-pin],[data-wire],[data-layer="junctions"]',
+            );
+            const rightPan = e.button === 2 && !object && !hitPin(e);
+            if (e.button === 2) {
+              suppressRightMenu.current = rightPan;
+              if (!rightPan) return;
+            }
             svg.current?.focus();
             pointer.current = { clientX: e.clientX, clientY: e.clientY };
             cursor.current = world(e);
-            if (e.button === 1 || space.current) {
+            if (
+              e.button === 1 ||
+              (e.button === 0 && space.current) ||
+              rightPan
+            ) {
               e.preventDefault();
               gesture.current = {
                 type: "pan",
@@ -384,7 +407,16 @@ export function App() {
                 };
                 e.currentTarget.setPointerCapture(e.pointerId);
               }
-            } else if (!e.shiftKey) editor.selection = [];
+            } else if (!object) {
+              editor.beginBox(drawingPoint(e), e.shiftKey);
+              gesture.current = {
+                type: "box",
+                start: screen(e),
+                view: { x: 0, y: 0 },
+                moved: false,
+              };
+              e.currentTarget.setPointerCapture(e.pointerId);
+            }
             refresh();
           }}
           onPointerMove={(e) => {
@@ -395,6 +427,10 @@ export function App() {
               editor.viewport.x = g.view.x + p.x - g.start.x;
               editor.viewport.y = g.view.y + p.y - g.start.y;
               hover.current = hitPin(e);
+            } else if (g?.type === "box") {
+              editor.updateBox(drawingPoint(e));
+              const p = screen(e);
+              g.moved ||= Math.hypot(p.x - g.start.x, p.y - g.start.y) >= 4;
             } else {
               cursor.current = world(e);
               const p = screen(e),
@@ -413,6 +449,10 @@ export function App() {
           onPointerUp={(e) => {
             const g = gesture.current;
             gesture.current = null;
+            if (g?.type === "box") {
+              editor.updateBox(drawingPoint(e));
+              editor.finishBox(g.moved);
+            }
             if (g?.type === "move") {
               if (g.moved) editor.confirm();
               else editor.cancel();
@@ -472,7 +512,11 @@ export function App() {
               if (gesture.current) rollback();
               return;
             }
-            if (editor.transient === "PAN" && e.code !== "Escape") return;
+            if (
+              (editor.transient === "PAN" || editor.selectionBox) &&
+              e.code !== "Escape"
+            )
+              return;
             if (e.altKey || e.metaKey) return;
             let handled = true;
             if (e.ctrlKey) {
@@ -552,6 +596,31 @@ export function App() {
               />
             )}
             <Symbols circuit={preview} selection={editor.selection} />
+            {editor.selectionBox && (
+              <rect
+                data-layer="selection-box"
+                x={Math.min(
+                  editor.selectionBox.start.x,
+                  editor.selectionBox.end.x,
+                )}
+                y={Math.min(
+                  editor.selectionBox.start.y,
+                  editor.selectionBox.end.y,
+                )}
+                width={Math.abs(
+                  editor.selectionBox.end.x - editor.selectionBox.start.x,
+                )}
+                height={Math.abs(
+                  editor.selectionBox.end.y - editor.selectionBox.start.y,
+                )}
+                className={
+                  editor.selectionBox.end.x < editor.selectionBox.start.x
+                    ? "selection-box crossing"
+                    : "selection-box"
+                }
+                pointerEvents="none"
+              />
+            )}
             {hover.current && (
               <circle
                 cx={pinPosition(preview, hover.current.id).x}
@@ -624,7 +693,7 @@ export function App() {
         {editor.draft
           ? "초안 미확정 · Ctrl+Z는 초안만 취소"
           : "Ctrl+Z Undo · Ctrl+Shift+Z Redo"}{" "}
-        · Space+drag 화면 이동
+        · 빈 공간 좌드래그 선택박스 · 우드래그 화면 이동
       </footer>
       {search !== null && (
         <div className="overlay">

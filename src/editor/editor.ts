@@ -10,6 +10,7 @@ import {
 } from "../model/circuit";
 import {
   clean,
+  boxComponents,
   endpointPosition,
   route,
   transform,
@@ -31,13 +32,19 @@ export class Editor {
   selection: string[] = [];
   tool: "SELECT" | "WIRE" = "SELECT";
   draft: Draft | null = null;
+  selectionBox: {
+    start: Point;
+    end: Point;
+    base: string[];
+    additive: boolean;
+  } | null = null;
   transient: "NONE" | "PAN" = "NONE";
   focus: "CANVAS" | "TEXT_EDITOR" | "MODAL" | "IME_COMPOSING" = "CANVAS";
   viewport = { x: 0, y: 0, zoom: 1 };
   history: Command[] = [];
   future: Command[] = [];
   get operation() {
-    return this.draft?.type ?? "NONE";
+    return this.selectionBox ? "BOX_SELECT" : (this.draft?.type ?? "NONE");
   }
   commit(label: string, after: Circuit) {
     if (JSON.stringify(after) === JSON.stringify(this.circuit)) return;
@@ -52,9 +59,33 @@ export class Editor {
   }
   cancel() {
     this.draft = null;
+    this.selectionBox = null;
+  }
+  beginBox(start: Point, additive = false) {
+    if (this.draft || this.selectionBox) return;
+    this.selectionBox = {
+      start,
+      end: start,
+      base: [...this.selection],
+      additive,
+    };
+  }
+  updateBox(end: Point) {
+    if (this.selectionBox) this.selectionBox.end = end;
+  }
+  finishBox(dragged: boolean) {
+    const box = this.selectionBox;
+    if (!box) return;
+    const found = dragged
+      ? boxComponents(this.circuit, box.start, box.end)
+      : [];
+    this.selection = box.additive
+      ? [...new Set([...box.base, ...found])]
+      : found;
+    this.selectionBox = null;
   }
   undo() {
-    if (this.draft) {
+    if (this.draft || this.selectionBox) {
       this.cancel();
       return;
     }
@@ -66,7 +97,7 @@ export class Editor {
     }
   }
   redo() {
-    if (this.draft) return;
+    if (this.draft || this.selectionBox) return;
     const cmd = this.future.pop();
     if (cmd) {
       this.history.push(cmd);
@@ -83,7 +114,7 @@ export class Editor {
     this.draft = { type: "PLACE", kind, position, rotation: 0 };
   }
   move(origin: Point) {
-    if (this.selection.length && !this.draft)
+    if (this.selection.length && !this.draft && !this.selectionBox)
       this.draft = {
         type: "MOVE",
         origin,
@@ -107,14 +138,14 @@ export class Editor {
     const rotation = clockwise ? 90 : -90;
     if (this.draft?.type === "PLACE")
       this.draft.rotation = (this.draft.rotation + rotation + 360) % 360;
-    else if (!this.draft)
+    else if (!this.draft && !this.selectionBox)
       this.commit(
         "Rotate",
         transform(this.circuit, this.selection, { x: 0, y: 0 }, rotation),
       );
   }
   startWire(from: Endpoint) {
-    if (this.draft) return;
+    if (this.draft || this.selectionBox) return;
     const position = endpointPosition(this.circuit, from);
     this.tool = "WIRE";
     this.draft = {
@@ -179,7 +210,7 @@ export class Editor {
     }
   }
   escape() {
-    if (this.draft) this.cancel();
+    if (this.draft || this.selectionBox) this.cancel();
     else if (this.tool === "WIRE") this.tool = "SELECT";
     else this.selection = [];
   }

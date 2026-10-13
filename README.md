@@ -10,6 +10,8 @@ Node.js 22.23.3 이상에서 `npm ci` 후 `npm run dev`로 실행합니다. `npm
 
 공개 프로토타입: [GitHub Pages](https://caffentrager.github.io/Circlith/). `main` 또는 `feat/editor-prototype`에 push하면 단위·브라우저 테스트와 빌드 성공 후 GitHub Actions로 배포합니다. 로컬 개발은 `/`, Pages 빌드는 `/Circlith/` 경로를 사용합니다.
 
+빈 공간에서 좌클릭 드래그는 부품 선택박스, 우클릭 드래그는 화면 이동입니다. 선택박스는 좌→우 전체 포함, 우→좌 교차 선택이며 Shift로 기존 선택에 추가합니다. 객체 위 우클릭 메뉴와 Space/가운데 버튼 화면 이동도 유지합니다.
+
 ## 문서
 
 - [Master Spec](docs/CIRCLITH_MASTER_SPEC.md): 제품 정의, 결정 레지스트리, 조작·입력·배선·시뮬레이션·저장·검증 기준.

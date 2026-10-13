@@ -175,7 +175,7 @@ Circlith에 가져올 핵심은 다음이다.
 | DEC-005 | 상태 모델 | `PROVISIONAL` | Tool / Operation / Transient / Focus를 분리한 직교 상태 모델 |
 | DEC-006 | Preview 중 Undo | `PROVISIONAL` | 안전 우선안: 첫 `Ctrl+Z`는 활성 초안만 취소, 다음 `Ctrl+Z`가 history Undo. Codex 단일입력안은 부록에 보존 |
 | DEC-007 | Safe Move geometry | `PROVISIONAL` | 전체 autoroute 금지. 선택 내부는 강체 이동, 외부 연결만 최소 orthogonal stretch |
-| DEC-008 | 우클릭 | `CURRENT` | 기본 = Context menu. Pan은 Space+drag / middle drag. 우클릭 drag pan은 옵션 후보 |
+| DEC-008 | 우클릭 | `CURRENT` | 사용자 요청(2026-10-13): 빈 공간 우클릭 drag = Pan. 객체 위 우클릭 = Context menu. Space+drag / middle drag도 유지 |
 | DEC-009 | 다중 Properties | `PROVISIONAL` | 의미적으로 호환되는 공통 속성만 일괄 편집. 혼합값 표시, 원자적 변경, 1 Undo |
 | DEC-010 | 0/1/X/Z resolution | `PROVISIONAL` | 4상태 논리와 진단을 분리. Simulator 단계 전 확정 |
 | DEC-011 | 미연결 배선 종료 | `PROVISIONAL` | v1에서 빈 공간 더블클릭 종료 제외. 필요 시 명시적 Finish Unconnected 명령 |
@@ -274,7 +274,7 @@ PAN 종료 시 원래 Tool과 Operation을 그대로 복원한다.
 - `Shift+영역 선택`: 현재 선택에 추가.
 - `Ctrl+A`: 도면 전체 편집 대상 선택. 입력 필드에서는 텍스트 전체 선택.
 - 빈 공간 drag: box select.
-- pan은 Space/middle drag로 분리.
+- pan은 빈 공간 우클릭 drag / Space / middle drag로 분리(2026-10-13 사용자 요청 반영).
 
 ### 8.2 대상 우선순위
 
@@ -661,7 +661,7 @@ Codex는 “preview는 history가 아니므로 한 번의 Ctrl+Z에서 preview�
 | Delete | CANVAS + 명시적 selection + 안전 상태 | selection 삭제 | text UI 문자 삭제. 위험 preview 중에는 삭제 금지/안내 |
 | Ctrl+Z | CANVAS history 처리 가능 | §16 정책 | text UI에서는 text undo |
 | Ctrl+S/O/F | app-owned focus에서 수신 가능 | 앱 명령 + 필요 시 default 억제 | 이벤트 수신 불가 환경은 버튼 fallback |
-| Right-click/contextmenu | canvas | 앱 context menu | canvas 밖 browser menu |
+| Right-click/contextmenu | canvas | 빈 공간 drag는 Pan, 객체 위는 앱 context menu | canvas 밖 browser menu |
 | Alt hold | canvas + snap 후보 기능 | grid snap 임시 해제 | Windows browser menu focus 실측 필요 |
 
 실제 구현 문서에는 `handled`, `preventDefault`, `stopPropagation`, `user feedback`, `browser support`를 별도 열로 기록한다.
@@ -695,13 +695,13 @@ keyup / focus loss에서 이동 transaction을 마감한다.
 
 ## 21. 우클릭
 
-기본값은 **Context menu**.
+빈 공간 우클릭 drag는 **Pan**, 객체 위 우클릭은 **Context menu**다(2026-10-13 사용자 요청 반영).
 
 - 선택 대상 위: 기존 selection group용 메뉴.
 - 비선택 대상 위: 그 대상을 선택한 뒤 object menu를 여는 안을 현재 권장.
 - 빈 공간: canvas menu. 기존 selection 유지 가능.
 - active preview 중: preview용 context menu. 기존 회로 selection을 자동 변경하지 않음.
-- right-drag pan: 기본 비활성. 고급 설정 후보.
+- 사용자 요청 반영(2026-10-13): 빈 공간 우클릭 드래그는 화면 이동(PAN). 객체 위 우클릭 메뉴는 유지한다. 빈 공간 우클릭에는 메뉴를 열지 않는다.
 
 ## 22. 다중 선택 Properties
 
@@ -1088,9 +1088,9 @@ Enter는 confirm 의미로 유지. Repeat는 별도 palette/shortcut 후보.
 
 필요 시 명시적 Finish Unconnected로 재검토.
 
-### 40.9 right-drag pan — `REJECTED` as default
+### 40.9 right-drag pan — 과거 `REJECTED` 기본안
 
-Context menu를 우선. advanced option 후보.
+과거에는 Context menu 우선, advanced option 후보였다. 2026-10-13 사용자 요청으로 DEC-008을 변경하여 빈 공간 우클릭 drag Pan을 기본 지원한다. 객체 위 우클릭은 메뉴를 유지한다.
 
 ---
 
