@@ -1,0 +1,63 @@
+{
+  "schemaVersion": "1.0",
+  "id": "shapr3d-navigation",
+  "name": "Shapr3D Navigation",
+  "kind": "navigation-reference",
+  "description": "Shapr3D Default의 현대적인 3-button mouse navigation 철학을 2D Circlith에 적용.",
+  "basePreset": "circlith-modern",
+  "compatibility": {
+    "target": "Shapr3D Default",
+    "level": "navigation-only",
+    "notes": [
+      "MMB drag = Pan, wheel = Zoom.",
+      "RMB drag Orbit은 2D Circlith에 대응 명령이 없어 제외한다.",
+      "Modifier key 사용을 줄이는 modern 3-button mouse 접근을 참고한다."
+    ]
+  },
+  "behavior": {
+    "zoomFocus": "cursor"
+  },
+  "sources": [
+    {
+      "title": "Shapr3D Navigation Presets",
+      "url": "https://support.shapr3d.com/hc/en-us/articles/7873881091356-Navigation-Presets",
+      "checkedAt": "2026-10-13",
+      "scope": "Navigation preset philosophy"
+    },
+    {
+      "title": "Shapr3D keyboard shortcuts, gestures, and hotkeys",
+      "url": "https://support.shapr3d.com/hc/en-us/articles/7873906073884-Keyboard-shortcuts-gestures-and-hotkeys",
+      "checkedAt": "2026-10-13",
+      "scope": "Pan and zoom mappings"
+    }
+  ],
+  "bindings": [
+    {
+      "command": "view.pan",
+      "input": {
+        "type": "mouseDrag",
+        "button": "middle"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.zoom",
+      "input": {
+        "type": "wheel"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    }
+  ],
+  "unmappedTargetActions": [
+    {
+      "action": "RMB drag — Orbit",
+      "reason": "Circlith is a 2D schematic canvas."
+    },
+    {
+      "action": "Space — Zoom to face",
+      "reason": "No face/orbit concept in a 2D schematic canvas."
+    }
+  ]
+}

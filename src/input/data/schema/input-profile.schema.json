@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://circlith.local/schema/input-profile.schema.json",
+  "title": "Circlith Input Profile",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "id",
+    "name",
+    "kind",
+    "compatibility",
+    "bindings"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9._-]*$"
+    },
+    "name": {
+      "type": "string"
+    },
+    "kind": {
+      "enum": [
+        "native",
+        "cad-compatibility",
+        "navigation-reference",
+        "canvas-reference"
+      ]
+    },
+    "description": {
+      "type": "string"
+    },
+    "basePreset": {
+      "type": ["string", "null"]
+    },
+    "compatibility": {
+      "type": "object",
+      "required": ["target", "level"],
+      "properties": {
+        "target": {
+          "type": "string"
+        },
+        "level": {
+          "enum": [
+            "native",
+            "high",
+            "partial",
+            "navigation-only",
+            "reference-only"
+          ]
+        },
+        "notes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "behavior": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title", "url", "checkedAt"],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "checkedAt": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "bindings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["command", "input"],
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "context": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "input": {
+            "type": "object",
+            "required": ["type"],
+            "properties": {
+              "type": {
+                "enum": [
+                  "key",
+                  "keyChord",
+                  "keySequence",
+                  "mouseClick",
+                  "mouseDoubleClick",
+                  "mouseDrag",
+                  "wheel",
+                  "wheelChord"
+                ]
+              },
+              "key": {
+                "type": "string"
+              },
+              "keys": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "sequence": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "button": {
+                "type": "string"
+              },
+              "modifiers": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "direction": {
+                "type": "string"
+              },
+              "thresholdPx": {
+                "type": "number"
+              }
+            },
+            "additionalProperties": false
+          },
+          "provenance": {
+            "enum": [
+              "circlith-master",
+              "target-native",
+              "adapted",
+              "recommended"
+            ]
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "unmappedTargetActions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["action", "reason"],
+        "properties": {
+          "action": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

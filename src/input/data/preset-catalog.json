@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0",
+  "defaultPreset": "circlith-modern",
+  "presets": [
+    {
+      "id": "circlith-modern",
+      "name": "Circlith Modern",
+      "kind": "native",
+      "compatibility": "native"
+    },
+    {
+      "id": "kicad-9",
+      "name": "KiCad 9",
+      "kind": "cad-compatibility",
+      "compatibility": "high"
+    },
+    {
+      "id": "altium-designer-2026",
+      "name": "Altium Designer 2026",
+      "kind": "cad-compatibility",
+      "compatibility": "high"
+    },
+    {
+      "id": "easyeda-pro",
+      "name": "EasyEDA Pro",
+      "kind": "cad-compatibility",
+      "compatibility": "high"
+    },
+    {
+      "id": "fusion-electronics-2026",
+      "name": "Autodesk Fusion Electronics 2026",
+      "kind": "cad-compatibility",
+      "compatibility": "partial"
+    },
+    {
+      "id": "fusion-navigation",
+      "name": "Fusion Navigation",
+      "kind": "navigation-reference",
+      "compatibility": "navigation-only"
+    },
+    {
+      "id": "shapr3d-navigation",
+      "name": "Shapr3D Navigation",
+      "kind": "navigation-reference",
+      "compatibility": "navigation-only"
+    },
+    {
+      "id": "figma-modern-canvas",
+      "name": "Figma / Modern Canvas",
+      "kind": "canvas-reference",
+      "compatibility": "reference-only"
+    }
+  ]
+}

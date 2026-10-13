@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.0",
+  "bindings": [
+    {
+      "command": "component.rotateCW90",
+      "context": ["canvas"],
+      "input": { "type": "keyChord", "keys": ["Shift", "R"] }
+    },
+    {
+      "command": "history.redo",
+      "context": ["canvas"],
+      "input": { "type": "keyChord", "keys": ["Ctrl", "Shift", "Z"] }
+    },
+    {
+      "command": "wire.toggleBend",
+      "context": ["wire-draft"],
+      "input": { "type": "keyChord", "keys": ["Shift", "Space"] }
+    },
+    {
+      "command": "selection.all",
+      "context": ["canvas"],
+      "input": { "type": "keyChord", "keys": ["Ctrl", "A"] }
+    },
+    {
+      "command": "view.zoomIn",
+      "context": ["canvas"],
+      "input": { "type": "key", "key": "+" }
+    },
+    {
+      "command": "view.zoomOut",
+      "context": ["canvas"],
+      "input": { "type": "key", "key": "-" }
+    },
+    {
+      "command": "selection.replaceItem",
+      "context": ["canvas"],
+      "input": { "type": "mouseClick", "button": "left" }
+    }
+  ]
+}

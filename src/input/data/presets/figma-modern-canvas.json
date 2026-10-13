@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "1.0",
+  "id": "figma-modern-canvas",
+  "name": "Figma / Modern Canvas",
+  "kind": "canvas-reference",
+  "description": "CAD가 아닌 무한 캔버스 사용자용 보조 프리셋. Space+drag와 키보드 중심 canvas navigation을 참고한다.",
+  "basePreset": "circlith-modern",
+  "compatibility": {
+    "target": "Figma",
+    "level": "reference-only",
+    "notes": [
+      "CAD compatibility가 아니라 현대적인 infinite-canvas 조작 참고용이다."
+    ]
+  },
+  "behavior": {},
+  "sources": [
+    {
+      "title": "Figma keyboard navigation",
+      "url": "https://help.figma.com/hc/en-us/articles/360040328653-Use-Figma-products-with-a-keyboard",
+      "checkedAt": "2026-10-13",
+      "scope": "Keyboard canvas navigation"
+    }
+  ],
+  "bindings": [
+    {
+      "command": "view.pan",
+      "input": {
+        "type": "mouseDrag",
+        "button": "left",
+        "modifiers": ["Space"]
+      },
+      "provenance": "recommended",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.zoomIn",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "+"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.zoomOut",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "-"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    }
+  ]
+}

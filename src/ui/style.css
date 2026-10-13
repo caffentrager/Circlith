@@ -190,6 +190,56 @@ footer {
   min-width: 350px;
   box-shadow: 0 15px 70px #20324744;
 }
+.settings-overlay .input-settings {
+  width: min(1100px, 95vw);
+  max-height: 90vh;
+  overflow: auto;
+}
+.input-settings .settings-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.input-settings button {
+  display: inline-block;
+  width: auto;
+  margin: 4px;
+}
+.input-settings input,
+.input-settings select {
+  width: auto;
+  margin: 8px;
+}
+.input-settings label {
+  display: block;
+}
+.input-settings table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.input-settings td,
+.input-settings th {
+  border-bottom: 1px solid #c5cfdb;
+  text-align: left;
+  padding: 7px;
+}
+.input-settings pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 11px;
+  max-height: 200px;
+  overflow: auto;
+  background: #eef2f7;
+  padding: 10px;
+}
+.input-settings textarea {
+  width: 100%;
+  min-height: 180px;
+}
+.input-settings [role="alert"] {
+  color: #b91c1c;
+}
 .overlay input,
 .overlay button {
   display: block;
@@ -212,4 +262,29 @@ footer {
   aside {
     padding: 12px;
   }
+}
+.overlay .input-settings button {
+  display: inline-block;
+  width: auto;
+  margin: 4px;
+}
+.overlay .input-settings input {
+  display: inline-block;
+  width: auto;
+  margin: 8px;
+}
+.overlay .input-settings input[type="checkbox"] {
+  vertical-align: middle;
+}
+.overlay .input-settings input[type="number"] {
+  width: 110px;
+}
+.input-settings .settings-heading {
+  gap: 20px;
+}
+.input-settings .settings-heading h2 {
+  margin: 0;
+}
+.input-settings .settings-heading button {
+  flex-shrink: 0;
 }

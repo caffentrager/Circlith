@@ -22,7 +22,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto("/");
 });
 
-test("right drag on empty canvas pans without changing selection, components or history; draft survives", async ({
+test("Space left drag pans without changing selection, components or history; draft survives", async ({
   page,
 }) => {
   await place(page, "AND", 200, 200);
@@ -32,8 +32,9 @@ test("right drag on empty canvas pans without changing selection, components or 
     .locator(".library")
     .getByRole("button", { name: "Input", exact: true })
     .click();
-  await drag(page, { x: 500, y: 400 }, { x: 580, y: 450 }, "right");
-  await page.mouse.up({ button: "right" });
+  await page.keyboard.down('Space');
+  await drag(page, { x: 500, y: 400 }, { x: 580, y: 450 });
+  await page.mouse.up(); await page.keyboard.up('Space');
   await expect(page.locator("main svg > g").first()).toHaveAttribute(
     "transform",
     "translate(80 50) scale(1)",

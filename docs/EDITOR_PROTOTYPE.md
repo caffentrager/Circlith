@@ -14,7 +14,7 @@
 - DEC-005: Tool / Operation / Transient / Focus 분리. 검증용 구현이며 결정 상태는 PROVISIONAL 유지.
 - DEC-006: 첨부 개발 지시에서 명시한 2단계 Undo 적용. 첫 Ctrl+Z는 Draft만 취소. Draft 중 Redo 차단.
 - DEC-007: 연결 그래프를 유지하는 최소 orthogonal stretch. 경로 정책은 PROVISIONAL 유지.
-- DEC-008: 사용자 요청으로 빈 공간 우클릭 drag Pan, 객체 위 우클릭 메뉴, Space/middle drag Pan.
+- DEC-008: 입력 지침을 반영해 Master Spec 기본값(짧은 RMB 메뉴, MMB/Space+LMB Pan)으로 정정했다. RMB drag Pan은 호환 프리셋/사용자 바인딩이다.
 - DEC-011: 빈 공간 더블클릭 배선 확정 제외.
 - DEC-015: 도면이 포커스를 소유할 때만 도면 키 처리. 아래 표와 브라우저 테스트로 현재 범위를 기록.
 
@@ -41,7 +41,7 @@
 - grid=10, pin hit=9 screen px, drag threshold=4 screen px는 검증 전 가설이다. zoom 범위는 프로토타입에서 50–200%로 제한했다.
 - 검색 라이브러리는 세 부품만 포함한다. exact/prefix/부분 문자열 및 in/out 별칭을 제공한다. 결과가 하나면 Enter, 여러 결과는 명시적 버튼 선택. Favorites/recent/fuzzy 확장은 후속이다.
 - 저장·자동 복구·시뮬레이션·분기 UI·삭제·clipboard·Properties·hover 부품 명령·키 재배정·Alt snap은 미구현이다. 새로고침 후 회로는 유지되지 않는다.
-- 빈 공간 좌클릭 drag는 BOX_SELECT다. 좌→우는 핀을 포함한 부품 bounds 전체 포함, 우→좌는 교차 부품을 선택한다. 회전과 zoom을 반영하고 Shift는 기존 선택에 추가한다. 현재 box select 대상은 부품이며 wire 선택은 후속이다. 선택은 release에서만 변경하며 취소는 기존 선택을 보존한다. 빈 공간 우클릭 drag는 PAN으로, 안정된 Draft와 selection/history를 유지한다. 단순 빈 공간 좌클릭은 선택 해제다.
+- 빈 공간 좌클릭 drag는 BOX_SELECT다. 좌→우는 핀을 포함한 부품 bounds 전체 포함, 우→좌는 교차 부품을 선택한다. 회전과 zoom을 반영하고 Shift는 기존 선택에 추가한다. 현재 box select 대상은 부품이며 wire 선택은 후속이다. 선택은 release에서만 변경하며 취소는 기존 선택을 보존한다. PAN은 안정된 Draft와 selection/history를 유지하며 바인딩은 [입력 프리셋 기록](INPUT_CONTROLS.md)을 따른다. 단순 빈 공간 좌클릭은 선택 해제다.
 - 4상태 truth/resolution과 feedback stabilization은 DEC-010 확정 전 구현하지 않는다. 시간·계층·Bus·Q Quick Place 등도 활성화하지 않는다.
 
 ## 입력 억제 범위
@@ -73,7 +73,7 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-2026-10-13 검증: build 성공, 단위 테스트 10개, 브라우저 시나리오 14개 통과. dependency audit에서 보고된 Vitest 취약점은 패키지 업데이트 후 해소했다. 사용성·성능 검증 완료를 뜻하지 않는다.
+초기 선택박스 단계 검증: 단위 테스트 10개, 브라우저 시나리오 14개 통과. 입력 프리셋 이후 전체 검증 결과는 [INPUT_CONTROLS.md](INPUT_CONTROLS.md)에 기록한다. 사용성·성능 검증 완료를 뜻하지 않는다.
 
 브라우저 시나리오: 연결된 부품의 pointer 이동·회전 및 정확한 wire Undo, 배치/선택/이동/회전/정확한 Undo·Redo, wire bend/Backspace/commit/복원, text/IME/Tab/autorepeat 보호, Pan 중 Draft 유지 및 pointercancel rollback.
 
@@ -85,4 +85,4 @@ npm run test:browser
 알려진 문제: 범위 밖 명령·플랫폼은 검증하지 않았으며 새 pin 법선 routing은 후속이다.
 설계 판단: snapshot history와 endpoint 기반 연결 분리. PROVISIONAL 결정은 확정 상태로 변경하지 않았다.
 
-Claude 독립 리뷰를 로컬 `review/`에서 확인했다. 오래된 hover의 canvas 이탈 재현은 ACCEPT하여 이번 입력 변경에서 수정했다. Pan 시작점에 핀이 있는 재현은 Pan 후 핀이 포인터 아래에 그대로 있으므로 실패 결과만으로 잘못된 접속을 입증하지 못한다. 메뉴 Esc와 연결 검증 보강 등 나머지 항목은 후속 작업이며 이번 드래그 입력 변경에서 완료했다고 주장하지 않는다. 독립 리뷰 원본은 이번 변경에 포함하지 않았다.
+Claude 독립 리뷰를 `review/`에서 확인했다. 오래된 hover의 canvas 이탈은 드래그 입력 변경에서, 메뉴 Esc는 입력 프리셋 변경에서 수정했다. 당시 리뷰와 후속 disposition은 [REVIEW_RESPONSE.md](../review/REVIEW_RESPONSE.md)에 보존한다. 다중 회전·routing·graph validator 문제를 이번 입력 변경에서 해결했다고 주장하지 않는다.

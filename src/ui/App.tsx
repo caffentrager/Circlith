@@ -9,6 +9,24 @@ import {
 } from "../model/circuit";
 import { pinPosition, snap } from "../geometry/geometry";
 import { Symbols, path } from "../renderer/CircuitSvg";
+import { CommandDispatcher } from "../editor/dispatcher";
+import {
+  effective,
+  freshUser,
+  validateUser,
+  storageKey,
+} from "../input/profiles";
+import {
+  InputResolver,
+  activeContexts,
+  keyToken,
+  mouseButton,
+  mouseModifiers,
+} from "../input/resolver";
+import { signature, type UserProfile } from "../input/types";
+import { keyboardAdapter } from "./keyboardAdapter";
+import { InputSettings } from "./InputSettings";
+import { fitView } from "../geometry/view";
 import "./style.css";
 const kinds: Kind[] = ["AND", "Input", "Output"];
 export function App() {
@@ -28,12 +46,14 @@ export function App() {
     inside: boolean;
   } | null>(null);
   const suppressPaletteClick = useRef(false);
-  const suppressRightMenu = useRef(false);
   const gesture = useRef<{
-    type: "pan" | "move" | "wire" | "box";
+    type: "pan" | "move" | "wire" | "box" | "panPending" | "click";
     start: Point;
     view: { x: number; y: number };
     moved: boolean;
+    threshold?: number;
+    clickCommand?: string;
+    objectKey?: string;
   } | null>(null);
   const [search, setSearch] = useState<string | null>(null);
   const [menu, setMenu] = useState(false);
@@ -42,6 +62,52 @@ export function App() {
     "왼쪽 부품을 도면으로 드래그하세요. 접점을 클릭하거나 드래그하면 배선이 시작됩니다.",
   );
   const [singleKeys, setSingleKeys] = useState(true);
+  const [initial] = useState(() => {
+    try {
+      const data = localStorage.getItem(storageKey);
+      return {
+        user: data ? validateUser(JSON.parse(data)) : freshUser(),
+        error: "",
+      };
+    } catch (e) {
+      return { user: freshUser(), error: `프로필 복구 실패: ${String(e)}` };
+    }
+  });
+  const [user, setUser] = useState<UserProfile>(initial.user);
+  const [settings, setSettings] = useState(false);
+  const dispatchRef = useRef<(command: string) => void>(() => {});
+  const wheelHandlerRef = useRef<(event: WheelEvent) => void>(() => {});
+  const [resolver] = useState(
+    () =>
+      new InputResolver(effective(initial.user), refresh, (command) =>
+        dispatchRef.current(command),
+      ),
+  );
+  const contexts = () =>
+    activeContexts(
+      settings || menu
+        ? "MODAL"
+        : search !== null
+          ? "TEXT_EDITOR"
+          : editor.focus,
+      editor.operation,
+    );
+  const hint = (command: string) =>
+    resolver.profile.bindings
+      .filter((b) => b.command === command && b.input.type.startsWith("key"))
+      .map((b) => signature(b.input))
+      .join(" / ");
+  const applyProfile = (next: UserProfile) => {
+    const validated = validateUser(next);
+    resolver.setProfile(effective(validated));
+    setUser(validated);
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(validated));
+      setMessage("입력 프로필을 저장했습니다.");
+    } catch (e) {
+      setMessage(`프로필 저장 실패: ${String(e)}. JSON 내보내기로 보관하세요.`);
+    }
+  };
   const screen = (e: { clientX: number; clientY: number }) => {
     const r = svg.current!.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -96,6 +162,7 @@ export function App() {
       editor.viewport.y = gesture.current.view.y;
     }
     gesture.current = null;
+    resolver.cancel();
     paletteDrag.current = null;
     hover.current = undefined;
     pointer.current = null;
@@ -108,8 +175,18 @@ export function App() {
     window.addEventListener("blur", blur);
     return () => window.removeEventListener("blur", blur);
   }, [editor]);
+  useEffect(() => {
+    const el = svg.current!;
+    const wheel = (event: WheelEvent) => wheelHandlerRef.current(event);
+    el.addEventListener("wheel", wheel, { passive: false });
+    return () => el.removeEventListener("wheel", wheel);
+  }, []);
+  useEffect(() => {
+    if (initial.error) setMessage(initial.error);
+    return () => resolver.cancel();
+  }, []);
   const place = (kind: Kind) => {
-    editor.place(kind, cursor.current);
+    dispatcher.dispatch("component.place", { kind, position: cursor.current });
     setSearch(null);
     setMenu(false);
     svg.current?.focus();
@@ -134,6 +211,168 @@ export function App() {
     svg.current?.focus();
     refresh();
   };
+  const zoomAt = (direction: number, point?: Point) => {
+    const v = editor.viewport,
+      p = point ?? {
+        x: svg.current!.clientWidth / 2,
+        y: svg.current!.clientHeight / 2,
+      };
+    const z = Math.max(
+      0.5,
+      Math.min(2, v.zoom * (direction < 0 ? 1.1 : 1 / 1.1)),
+    );
+    v.x = p.x - ((p.x - v.x) * z) / v.zoom;
+    v.y = p.y - ((p.y - v.y) * z) / v.zoom;
+    v.zoom = z;
+    hover.current = hitPin(pointer.current);
+  };
+  const dispatcher = new CommandDispatcher(
+    {
+      "app.cancel": (p) => {
+        resolver.cancel();
+        if (p?.operation) editor.escape();
+        if (settings) {
+          setSettings(false);
+          svg.current?.focus();
+        } else if (menu) {
+          setMenu(false);
+          svg.current?.focus();
+        } else if (search !== null) {
+          setSearch(null);
+          svg.current?.focus();
+        } else if (gesture.current || paletteDrag.current) rollback();
+        else editor.escape();
+      },
+      "app.confirm": (p) =>
+        editor.confirm(
+          p?.endpoint ?? hitPin(pointer.current),
+          p?.repeat ?? false,
+        ),
+      "history.undo": undo,
+      "history.redo": redo,
+      "component.place": (p) => editor.place(p.kind, p.position),
+      "tool.select": () => editor.setTool("SELECT"),
+      "component.addSearch": () => {
+        editor.cancel();
+        resolver.cancel();
+        setSearch("");
+        editor.focus = "TEXT_EDITOR";
+      },
+      "component.moveSafe": move,
+      "component.rotateCCW90": rotate,
+      "component.rotateCW90": () => editor.rotate(true),
+      "wire.start": (p) => {
+        if (p?.endpoint) editor.startWire(p.endpoint);
+        else if (editor.draft?.type !== "WIRE_DRAFT") {
+          editor.setTool("WIRE");
+          const endpoint = hitPin(pointer.current);
+          if (endpoint) editor.startWire(endpoint);
+        }
+      },
+      "wire.removeLastPoint": () => editor.backspace(),
+      "wire.toggleBend": () => {
+        if (editor.draft?.type === "WIRE_DRAFT")
+          editor.draft.horizontal = !editor.draft.horizontal;
+      },
+      "grid.toggleVisible": () => setGrid((v) => !v),
+      "selection.all": () => {
+        if (!editor.draft)
+          editor.selection = Object.keys(editor.circuit.components);
+      },
+      "selection.replaceItem": (p) => {
+        if (p?.key) editor.selection = [p.key];
+      },
+      "selection.toggleItem": (p) => {
+        if (p?.key)
+          editor.selection = editor.selection.includes(p.key)
+            ? editor.selection.filter((k) => k !== p.key)
+            : [...editor.selection, p.key];
+      },
+      "selection.addItem": (p) => {
+        if (p?.key && !editor.selection.includes(p.key))
+          editor.selection = [...editor.selection, p.key];
+      },
+      "selection.box": (p) => editor.beginBox(p.start, p.additive),
+      "view.pan": (p) => {
+        if (p?.start) {
+          gesture.current = {
+            type: "pan",
+            start: p.start,
+            view: { x: editor.viewport.x, y: editor.viewport.y },
+            moved: false,
+          };
+          editor.transient = "PAN";
+        }
+      },
+      "view.zoom": (p) =>
+        zoomAt(
+          p.delta * (resolver.profile.behavior?.reverseWheel ? -1 : 1),
+          p.point,
+        ),
+      "view.zoomIn": () => zoomAt(-1),
+      "view.zoomOut": () => zoomAt(1),
+      "view.fitAll": () => {
+        const v = fitView(
+          editor.circuit,
+          svg.current!.clientWidth,
+          svg.current!.clientHeight,
+        );
+        if (v) editor.viewport = v;
+      },
+      "view.fitSelection": () => {
+        const v = fitView(
+          editor.circuit,
+          svg.current!.clientWidth,
+          svg.current!.clientHeight,
+          editor.selection,
+        );
+        if (v) editor.viewport = v;
+      },
+      "view.contextMenu": (p) => {
+        if (!editor.draft && p?.key && !editor.selection.includes(p.key))
+          editor.selection = [p.key];
+        resolver.cancel();
+        editor.focus = "MODAL";
+        setMenu(true);
+      },
+    },
+    setMessage,
+  );
+  const dispatch = (command: string, payload?: any) => {
+    dispatcher.dispatch(command, payload);
+    refresh();
+  };
+  dispatchRef.current = dispatch;
+  wheelHandlerRef.current = (e) => {
+    const modifiers = mouseModifiers(e),
+      type = modifiers.length ? "wheelChord" : "wheel";
+    const binding = resolver.mouse(
+      type,
+      undefined,
+      modifiers,
+      contexts(),
+      e.deltaY < 0 ? "up" : "down",
+    );
+    if (!binding) return;
+    e.preventDefault();
+    dispatch(binding.command, { delta: e.deltaY, point: screen(e) });
+    pointer.current = { clientX: e.clientX, clientY: e.clientY };
+    hover.current = hitPin(e);
+    refresh();
+  };
+  const keyboard = keyboardAdapter({
+    resolver,
+    contexts,
+    composing: () => composing.current,
+    singleKeys: () => singleKeys,
+    gestureActive: () => !!gesture.current,
+    blocked: () => editor.transient === "PAN" || !!editor.selectionBox,
+    rollback,
+    space: (value) => {
+      space.current = value;
+    },
+    dispatch,
+  });
   const preview = editor.preview();
   const draft = editor.draft;
   const ghost = emptyCircuit();
@@ -157,6 +396,7 @@ export function App() {
     <div
       className="app"
       onFocusCapture={(e) => {
+        resolver.cancel();
         const el = e.target as Element;
         editor.focus = el.closest("svg")
           ? "CANVAS"
@@ -172,34 +412,41 @@ export function App() {
         <input aria-label="프로젝트 이름" defaultValue="Untitled circuit" />
         <button
           onClick={() => {
-            editor.setTool("SELECT");
-            refresh();
+            dispatch("tool.select");
           }}
         >
-          선택 V
+          선택 {hint("tool.select")}
         </button>
         <button
           onClick={() => {
-            editor.setTool("WIRE");
+            dispatch("wire.start");
             svg.current?.focus();
             refresh();
           }}
         >
-          배선 W
+          배선 {hint("wire.start")}
         </button>
-        <button onClick={undo}>Undo</button>
-        <button onClick={redo}>Redo</button>
+        <button onClick={() => dispatch("history.undo")}>Undo</button>
+        <button onClick={() => dispatch("history.redo")}>Redo</button>
+        <button
+          onClick={() => {
+            rollback();
+            resolver.cancel();
+            setSettings(true);
+          }}
+        >
+          입력 설정
+        </button>
         <span>{editor.history.length} committed edits</span>
       </header>
       <aside className="library">
         <h2>부품</h2>
         <button
           onClick={() => {
-            editor.cancel();
-            setSearch("");
+            dispatch("component.addSearch");
           }}
         >
-          검색 A
+          검색 {hint("component.addSearch")}
         </button>
         {kinds.map((k) => (
           <button
@@ -227,7 +474,10 @@ export function App() {
                 ) >= 4
               ) {
                 drag.active = true;
-                editor.place(drag.kind, world(e));
+                dispatch("component.place", {
+                  kind: drag.kind,
+                  position: world(e),
+                });
               }
               if (drag.active) {
                 drag.inside = insideCanvas(e);
@@ -243,7 +493,7 @@ export function App() {
                 suppressPaletteClick.current = true;
                 if (insideCanvas(e)) {
                   editor.update(world(e));
-                  editor.confirm();
+                  dispatch("app.confirm");
                   svg.current?.focus();
                 } else editor.cancel();
                 refresh();
@@ -259,7 +509,11 @@ export function App() {
               if (paletteDrag.current) rollback();
             }}
             onKeyDown={(e) => {
-              if (e.code === "Escape" && paletteDrag.current) {
+              if (
+                resolver.key(keyToken(e), ["canvas"], e.repeat).command ===
+                  "app.cancel" &&
+                paletteDrag.current
+              ) {
                 e.preventDefault();
                 suppressPaletteClick.current = true;
                 rollback();
@@ -284,7 +538,8 @@ export function App() {
           접점 드래그 → 접점에서 놓기
           <br />
           빈 공간 좌드래그: 선택박스
-          <br />빈 공간 우드래그: 화면 이동
+          <br />
+          우클릭: 메뉴 · Pan: 프리셋 참조
         </p>
         <label>
           <input
@@ -312,6 +567,7 @@ export function App() {
           }}
           onBlur={rollback}
           onCompositionStart={() => {
+            resolver.cancel();
             composing.current = true;
             editor.focus = "IME_COMPOSING";
           }}
@@ -321,62 +577,74 @@ export function App() {
           }}
           onContextMenu={(e) => {
             e.preventDefault();
-            const object = (e.target as Element).closest(
-              '[data-component],[data-pin],[data-wire],[data-layer="junctions"]',
+          }}
+          onDoubleClick={(e) => {
+            const b = resolver.mouse(
+              "mouseDoubleClick",
+              mouseButton(e.button),
+              mouseModifiers(e),
+              contexts(),
             );
-            if (suppressRightMenu.current || !object) return;
-            if (!editor.draft) {
-              const key = (e.target as Element)
-                .closest("[data-component]")
-                ?.getAttribute("data-component");
-              if (key && !editor.selection.includes(key))
-                editor.selection = [key];
+            if (b) {
+              e.preventDefault();
+              dispatch(b.command);
             }
-            editor.focus = "MODAL";
-            setMenu(true);
-            refresh();
           }}
           onPointerDown={(e) => {
             const object = (e.target as Element).closest(
               '[data-component],[data-pin],[data-wire],[data-layer="junctions"]',
             );
-            const rightPan = e.button === 2 && !object && !hitPin(e);
-            if (e.button === 2) {
-              suppressRightMenu.current = rightPan;
-              if (!rightPan) return;
-            }
             svg.current?.focus();
             pointer.current = { clientX: e.clientX, clientY: e.clientY };
             cursor.current = world(e);
+            const button = mouseButton(e.button),
+              modifiers = mouseModifiers(e, space.current);
+            const dragBinding = resolver.mouse(
+              "mouseDrag",
+              button,
+              modifiers,
+              contexts(),
+            );
+            const clickBinding = resolver.mouse(
+              "mouseClick",
+              button,
+              modifiers,
+              contexts(),
+            );
+            const objectKey =
+              object?.getAttribute("data-component") ?? undefined;
             if (
-              e.button === 1 ||
-              (e.button === 0 && space.current) ||
-              rightPan
+              dragBinding?.command === "view.pan" ||
+              (button === "right" && clickBinding)
             ) {
               e.preventDefault();
               gesture.current = {
-                type: "pan",
+                type:
+                  dragBinding?.command === "view.pan" ? "panPending" : "click",
                 start: screen(e),
                 view: { x: editor.viewport.x, y: editor.viewport.y },
                 moved: false,
+                threshold: dragBinding?.input.thresholdPx ?? 4,
+                clickCommand: clickBinding?.command,
+                objectKey,
               };
-              editor.transient = "PAN";
               e.currentTarget.setPointerCapture(e.pointerId);
               refresh();
               return;
             }
-            if (e.button !== 0) return;
+            if (button !== "left") return;
             const pin = target(e.target) ?? hitPin(e);
             hover.current = pin;
             if (editor.draft) {
               editor.update(cursor.current);
               if (editor.draft.type === "WIRE_DRAFT" && !pin) editor.waypoint();
-              else editor.confirm(pin, e.shiftKey);
+              else
+                dispatch("app.confirm", { endpoint: pin, repeat: e.shiftKey });
               refresh();
               return;
             }
             if (pin) {
-              editor.startWire(pin);
+              dispatch("wire.start", { endpoint: pin });
               gesture.current = {
                 type: "wire",
                 start: screen(e),
@@ -392,13 +660,15 @@ export function App() {
               .closest("[data-component]")
               ?.getAttribute("data-component");
             if (key) {
-              if (e.shiftKey) {
-                editor.selection = editor.selection.includes(key)
-                  ? editor.selection.filter((k) => k !== key)
-                  : [...editor.selection, key];
+              if (
+                clickBinding?.command === "selection.toggleItem" ||
+                clickBinding?.command === "selection.addItem"
+              ) {
+                dispatch(clickBinding.command, { key });
               } else {
-                if (!editor.selection.includes(key)) editor.selection = [key];
-                editor.move(cursor.current);
+                if (!editor.selection.includes(key))
+                  dispatch("selection.replaceItem", { key });
+                dispatch("component.moveSafe");
                 gesture.current = {
                   type: "move",
                   start: screen(e),
@@ -407,8 +677,17 @@ export function App() {
                 };
                 e.currentTarget.setPointerCapture(e.pointerId);
               }
-            } else if (!object) {
-              editor.beginBox(drawingPoint(e), e.shiftKey);
+            } else if (
+              !object &&
+              (dragBinding?.command === "selection.box" ||
+                (e.shiftKey &&
+                  resolver.mouse("mouseDrag", button, [], contexts())
+                    ?.command === "selection.box"))
+            ) {
+              dispatch("selection.box", {
+                start: drawingPoint(e),
+                additive: e.shiftKey,
+              });
               gesture.current = {
                 type: "box",
                 start: screen(e),
@@ -422,7 +701,21 @@ export function App() {
           onPointerMove={(e) => {
             pointer.current = { clientX: e.clientX, clientY: e.clientY };
             const g = gesture.current;
-            if (g?.type === "pan") {
+            if (g?.type === "panPending") {
+              const p = screen(e);
+              if (
+                Math.hypot(p.x - g.start.x, p.y - g.start.y) >=
+                (g.threshold ?? 4)
+              ) {
+                dispatch("view.pan", { start: g.start });
+                gesture.current!.view = g.view;
+                editor.viewport.x = g.view.x + p.x - g.start.x;
+                editor.viewport.y = g.view.y + p.y - g.start.y;
+              }
+            } else if (g?.type === "click") {
+              const p = screen(e);
+              g.moved ||= Math.hypot(p.x - g.start.x, p.y - g.start.y) >= 4;
+            } else if (g?.type === "pan") {
               const p = screen(e);
               editor.viewport.x = g.view.x + p.x - g.start.x;
               editor.viewport.y = g.view.y + p.y - g.start.y;
@@ -449,12 +742,18 @@ export function App() {
           onPointerUp={(e) => {
             const g = gesture.current;
             gesture.current = null;
+            if (
+              (g?.type === "panPending" || g?.type === "click") &&
+              !g.moved &&
+              g.clickCommand
+            )
+              dispatch(g.clickCommand, { key: g.objectKey });
             if (g?.type === "box") {
               editor.updateBox(drawingPoint(e));
               editor.finishBox(g.moved);
             }
             if (g?.type === "move") {
-              if (g.moved) editor.confirm();
+              if (g.moved) dispatch("app.confirm");
               else editor.cancel();
             }
             if (
@@ -465,7 +764,8 @@ export function App() {
               if (!insideCanvas(e)) editor.cancel();
               else {
                 editor.update(world(e));
-                editor.confirm(hitPin(e));
+                pointer.current = { clientX: e.clientX, clientY: e.clientY };
+                dispatch("app.confirm");
               }
             }
             hover.current = hitPin(e);
@@ -483,94 +783,8 @@ export function App() {
           onLostPointerCapture={() => {
             if (gesture.current) rollback();
           }}
-          onWheel={(e) => {
-            const p = screen(e),
-              v = editor.viewport;
-            const z = Math.max(
-              0.5,
-              Math.min(2, v.zoom * (e.deltaY < 0 ? 1.1 : 1 / 1.1)),
-            );
-            v.x = p.x - ((p.x - v.x) * z) / v.zoom;
-            v.y = p.y - ((p.y - v.y) * z) / v.zoom;
-            v.zoom = z;
-            pointer.current = { clientX: e.clientX, clientY: e.clientY };
-            hover.current = hitPin(e);
-            refresh();
-          }}
-          onKeyUp={(e) => {
-            if (e.code === "Space") space.current = false;
-          }}
-          onKeyDown={(e) => {
-            if (
-              e.isDefaultPrevented() ||
-              e.nativeEvent.isComposing ||
-              composing.current ||
-              editor.focus !== "CANVAS"
-            )
-              return;
-            if (e.code === "Tab") {
-              if (gesture.current) rollback();
-              return;
-            }
-            if (
-              (editor.transient === "PAN" || editor.selectionBox) &&
-              e.code !== "Escape"
-            )
-              return;
-            if (e.altKey || e.metaKey) return;
-            let handled = true;
-            if (e.ctrlKey) {
-              if (e.code === "KeyZ") {
-                if (!e.repeat) e.shiftKey ? redo() : undo();
-              } else if (e.code === "KeyY" && !e.shiftKey) {
-                if (!e.repeat) redo();
-              } else if (e.code === "KeyA" && !e.shiftKey && !editor.draft)
-                editor.selection = Object.keys(editor.circuit.components);
-              else handled = false;
-            } else if (e.code === "Escape") {
-              if (gesture.current) rollback();
-              else editor.escape();
-            } else if (
-              e.code === "Space" &&
-              e.shiftKey &&
-              editor.draft?.type === "WIRE_DRAFT"
-            ) {
-              if (!e.repeat) editor.draft.horizontal = !editor.draft.horizontal;
-            } else if (e.code === "Space" && !e.shiftKey) space.current = true;
-            else if (
-              e.code === "Backspace" &&
-              editor.draft?.type === "WIRE_DRAFT"
-            ) {
-              if (!e.repeat) editor.backspace();
-            } else if (e.code === "Enter" && editor.draft) {
-              if (!e.repeat) editor.confirm(hitPin(pointer.current));
-            } else if (
-              singleKeys &&
-              !e.repeat &&
-              (!e.shiftKey || e.code === "KeyR")
-            ) {
-              if (e.code === "KeyA") {
-                editor.cancel();
-                editor.focus = "TEXT_EDITOR";
-                setSearch("");
-              } else if (e.code === "KeyW") {
-                if (editor.draft?.type !== "WIRE_DRAFT") {
-                  editor.setTool("WIRE");
-                  const pin = hitPin(pointer.current);
-                  if (pin) editor.startWire(pin);
-                }
-              } else if (e.code === "KeyV") editor.setTool("SELECT");
-              else if (e.code === "KeyM") editor.move(cursor.current);
-              else if (e.code === "KeyR") editor.rotate(e.shiftKey);
-              else if (e.code === "KeyG") setGrid((v) => !v);
-              else handled = false;
-            } else handled = false;
-            if (handled) {
-              e.preventDefault();
-              e.stopPropagation();
-              refresh();
-            }
-          }}
+          onKeyUp={keyboard.keyUp}
+          onKeyDown={keyboard.keyDown}
         >
           <defs>
             <pattern
@@ -647,40 +861,39 @@ export function App() {
       <aside className="properties">
         <h2>선택</h2>
         <p>{editor.selection.length}개 부품</p>
-        <button onClick={move}>연결 유지 이동 M</button>
-        <button onClick={rotate}>반시계 회전 R</button>
-        <button
-          onClick={() => {
-            editor.rotate(true);
-            refresh();
-          }}
-        >
-          시계 회전 Shift+R
+        <button onClick={() => dispatch("component.moveSafe")}>
+          연결 유지 이동
+        </button>
+        <button onClick={() => dispatch("component.rotateCCW90")}>
+          반시계 회전
         </button>
         <button
           onClick={() => {
-            editor.escape();
-            refresh();
+            dispatch("component.rotateCW90");
           }}
         >
-          취소 Esc
+          시계 회전 {hint("component.rotateCW90")}
         </button>
         <button
           onClick={() => {
-            if (editor.draft?.type === "WIRE_DRAFT")
-              editor.draft.horizontal = !editor.draft.horizontal;
-            refresh();
+            dispatch("app.cancel");
           }}
         >
-          꺾임 전환 Shift+Space
+          취소 {hint("app.cancel")}
         </button>
         <button
           onClick={() => {
-            editor.backspace();
-            refresh();
+            dispatch("wire.toggleBend");
           }}
         >
-          경유점 제거 Backspace
+          꺾임 전환 {hint("wire.toggleBend")}
+        </button>
+        <button
+          onClick={() => {
+            dispatch("wire.removeLastPoint");
+          }}
+        >
+          경유점 제거 {hint("wire.removeLastPoint")}
         </button>
         <p>
           초안: {editor.operation}
@@ -693,7 +906,10 @@ export function App() {
         {editor.draft
           ? "초안 미확정 · Ctrl+Z는 초안만 취소"
           : "Ctrl+Z Undo · Ctrl+Shift+Z Redo"}{" "}
-        · 빈 공간 좌드래그 선택박스 · 우드래그 화면 이동
+        · {resolver.profile.name} ·{" "}
+        {resolver.pending.length
+          ? `순차 키 대기: ${resolver.pending.join(" → ")}`
+          : "입력 대기"}
       </footer>
       {search !== null && (
         <div className="overlay">
@@ -732,11 +948,22 @@ export function App() {
         </div>
       )}
       {menu && (
-        <div className="overlay">
+        <div
+          className="overlay"
+          onKeyDown={(e) => {
+            if (e.nativeEvent.isComposing) return;
+            if (e.code === "Escape") {
+              e.preventDefault();
+              e.stopPropagation();
+              dispatch("app.cancel");
+            }
+          }}
+        >
           <section role="dialog" aria-label="도면 메뉴">
             <button
+              autoFocus
               onClick={() => {
-                editor.escape();
+                dispatch("app.cancel", { operation: true });
                 setMenu(false);
                 svg.current?.focus();
                 refresh();
@@ -746,7 +973,7 @@ export function App() {
             </button>
             <button
               onClick={() => {
-                undo();
+                dispatch("history.undo");
                 setMenu(false);
                 svg.current?.focus();
               }}
@@ -763,6 +990,17 @@ export function App() {
             </button>
           </section>
         </div>
+      )}
+      {settings && (
+        <InputSettings
+          user={user}
+          onChange={applyProfile}
+          onClose={() => {
+            setSettings(false);
+            resolver.cancel();
+            svg.current?.focus();
+          }}
+        />
       )}
     </div>
   );

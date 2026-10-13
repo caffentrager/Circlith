@@ -175,7 +175,7 @@ Circlith에 가져올 핵심은 다음이다.
 | DEC-005 | 상태 모델 | `PROVISIONAL` | Tool / Operation / Transient / Focus를 분리한 직교 상태 모델 |
 | DEC-006 | Preview 중 Undo | `PROVISIONAL` | 안전 우선안: 첫 `Ctrl+Z`는 활성 초안만 취소, 다음 `Ctrl+Z`가 history Undo. Codex 단일입력안은 부록에 보존 |
 | DEC-007 | Safe Move geometry | `PROVISIONAL` | 전체 autoroute 금지. 선택 내부는 강체 이동, 외부 연결만 최소 orthogonal stretch |
-| DEC-008 | 우클릭 | `CURRENT` | 사용자 요청(2026-10-13): 빈 공간 우클릭 drag = Pan. 객체 위 우클릭 = Context menu. Space+drag / middle drag도 유지 |
+| DEC-008 | 우클릭 | `CURRENT` | Master Spec 기본 구현 정정: Modern은 짧은 RMB 메뉴, MMB/Space+LMB Pan. RMB drag Pan은 호환 프리셋 또는 사용자 바인딩 |
 | DEC-009 | 다중 Properties | `PROVISIONAL` | 의미적으로 호환되는 공통 속성만 일괄 편집. 혼합값 표시, 원자적 변경, 1 Undo |
 | DEC-010 | 0/1/X/Z resolution | `PROVISIONAL` | 4상태 논리와 진단을 분리. Simulator 단계 전 확정 |
 | DEC-011 | 미연결 배선 종료 | `PROVISIONAL` | v1에서 빈 공간 더블클릭 종료 제외. 필요 시 명시적 Finish Unconnected 명령 |
@@ -183,6 +183,11 @@ Circlith에 가져올 핵심은 다음이다.
 | DEC-013 | 시간 Step | `DEFERRED` | 이벤트 Step과 clock edge/period를 분리. 동시 이벤트 semantics 이후 키 확정 |
 | DEC-014 | 성능 기준 | `PROVISIONAL` | 수치보다 측정 지표를 먼저 정의. 60Hz 16.7ms는 목표 후보, 기존 33ms는 과거 잠정안으로 보존 |
 | DEC-015 | 브라우저 억제 | `PROVISIONAL` | key/pointer × state/focus 매트릭스로 `preventDefault`/전파 종료를 관리 |
+| DEC-016 | 입력 프로필 | `CURRENT` | Command Registry → Binding → Preset 분리. Modern 기본, 버전 있는 외부 JSON, built-in + 사용자 override. 입력 재배정은 연결 유지 등 명령 불변식을 바꾸지 않음. 미지원 명령은 표시하며 실행하지 않음 |
+
+### 6.1 입력 프리셋 구현 결정
+
+2026-10-13 후속 사용자 지시로 `IMPLEMENTATION_PROMPT.md`를 우선 반영한다. 기본 우클릭은 메뉴이며 Altium/EasyEDA 등의 RMB click/drag는 threshold로 구분한다. 좌클릭 box와 부품 패널/접점 직접 조작은 유지한다. 순차 accelerator는 설정 가능한 timeout과 대기 표시를 제공하며 Esc/focus/modal/IME에서 취소한다(Quick Place Q의 timeout과는 별도 기능). Settings → Input & Controls에서 선택·혼합·바인딩 수정·개별/전체 reset·충돌 검사·JSON import/export를 지원한다. 프로필만 독립 localStorage 버전 1.0으로 저장하며 회로 저장과 혼동하지 않는다. 형식/명령 오류는 현재 프로필을 유지하며 안내한다. compatibility/source metadata는 seed 자료의 정보이며 1:1 호환 검증 완료를 뜻하지 않는다.
 
 ---
 
@@ -274,7 +279,7 @@ PAN 종료 시 원래 Tool과 Operation을 그대로 복원한다.
 - `Shift+영역 선택`: 현재 선택에 추가.
 - `Ctrl+A`: 도면 전체 편집 대상 선택. 입력 필드에서는 텍스트 전체 선택.
 - 빈 공간 drag: box select.
-- pan은 빈 공간 우클릭 drag / Space / middle drag로 분리(2026-10-13 사용자 요청 반영).
+- 기본 pan은 Space+LMB / MMB drag다. RMB drag Pan은 호환 프리셋/사용자 바인딩에서 선택한다.
 
 ### 8.2 대상 우선순위
 
@@ -661,7 +666,7 @@ Codex는 “preview는 history가 아니므로 한 번의 Ctrl+Z에서 preview�
 | Delete | CANVAS + 명시적 selection + 안전 상태 | selection 삭제 | text UI 문자 삭제. 위험 preview 중에는 삭제 금지/안내 |
 | Ctrl+Z | CANVAS history 처리 가능 | §16 정책 | text UI에서는 text undo |
 | Ctrl+S/O/F | app-owned focus에서 수신 가능 | 앱 명령 + 필요 시 default 억제 | 이벤트 수신 불가 환경은 버튼 fallback |
-| Right-click/contextmenu | canvas | 빈 공간 drag는 Pan, 객체 위는 앱 context menu | canvas 밖 browser menu |
+| Right-click/contextmenu | canvas | 기본은 짧은 RMB 메뉴. 호환 프리셋의 click/drag는 threshold로 구분 | canvas 밖 browser menu |
 | Alt hold | canvas + snap 후보 기능 | grid snap 임시 해제 | Windows browser menu focus 실측 필요 |
 
 실제 구현 문서에는 `handled`, `preventDefault`, `stopPropagation`, `user feedback`, `browser support`를 별도 열로 기록한다.
@@ -695,13 +700,13 @@ keyup / focus loss에서 이동 transaction을 마감한다.
 
 ## 21. 우클릭
 
-빈 공간 우클릭 drag는 **Pan**, 객체 위 우클릭은 **Context menu**다(2026-10-13 사용자 요청 반영).
+기본은 **짧은 우클릭 Context menu**다. Pan은 MMB/Space+LMB drag이며 호환 프로필에서는 RMB drag에도 배정할 수 있다. 기존 코드가 다른 경우 Master Spec 기본값에 맞게 정정한다.
 
 - 선택 대상 위: 기존 selection group용 메뉴.
 - 비선택 대상 위: 그 대상을 선택한 뒤 object menu를 여는 안을 현재 권장.
 - 빈 공간: canvas menu. 기존 selection 유지 가능.
 - active preview 중: preview용 context menu. 기존 회로 selection을 자동 변경하지 않음.
-- 사용자 요청 반영(2026-10-13): 빈 공간 우클릭 드래그는 화면 이동(PAN). 객체 위 우클릭 메뉴는 유지한다. 빈 공간 우클릭에는 메뉴를 열지 않는다.
+- click/drag가 공유된 버튼은 pointer-down에 메뉴를 열지 않는다. threshold 미만 release는 click, 이상 움직이면 drag를 실행한다. 실제 drag 후 메뉴를 추가로 열지 않는다.
 
 ## 22. 다중 선택 Properties
 
@@ -903,7 +908,7 @@ keyup / focus loss에서 이동 transaction을 마감한다.
 ## 31. 단축키·검색 비교
 
 - gate 20개 이상 과제: A 검색 / alias 보강 / 필요 시 Q Quick Place 비교.
-- 필수 sequence timeout 없음.
+- Quick Place 후보에는 필수 sequence timeout 없음. 호환 accelerator timeout은 DEC-016의 설정을 따른다.
 - 완료 시간, 오입력, 학습 시간 기록.
 - KiCad 경험자의 M/G 이해도 기록.
 - `Shift+Space`가 WIRE_DRAFT에서 page scroll/pan을 일으키지 않는지.
@@ -990,7 +995,7 @@ pointermove마다 전체 circuit을 재계산하지 않고, 필요하면 최신 
 | Input/Output 빠른 키 | A 검색/명시 메뉴 우선 |
 | `/` palette | 긴 꼬리 command discoverability 필요성 |
 | repeat duplicate | 변위 재사용 UX/Undo 검사 |
-| right-drag pan | advanced option only |
+| right-drag pan | 호환 프리셋/사용자 바인딩 |
 
 ## 37. 해당 기능 착수 전에 결정할 항목
 
@@ -1090,7 +1095,7 @@ Enter는 confirm 의미로 유지. Repeat는 별도 palette/shortcut 후보.
 
 ### 40.9 right-drag pan — 과거 `REJECTED` 기본안
 
-과거에는 Context menu 우선, advanced option 후보였다. 2026-10-13 사용자 요청으로 DEC-008을 변경하여 빈 공간 우클릭 drag Pan을 기본 지원한다. 객체 위 우클릭은 메뉴를 유지한다.
+기본은 Context menu 우선이다. 중간 프로토타입에서는 사용자 요청으로 빈 공간 RMB drag Pan을 지원했으며, 후속 입력 지침에서 Master Spec 기본값으로 정정했다. 현재 RMB drag Pan은 호환 프리셋/사용자 바인딩에만 적용한다.
 
 ---
 
