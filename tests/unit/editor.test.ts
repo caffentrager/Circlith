@@ -106,7 +106,7 @@ describe("draft / command / history", () => {
   });
 });
 describe("safe geometry", () => {
-  it("preserves graph, fixed external span, deterministic geometry, and exact move undo", () => {
+  it("preserves graph and fixed endpoint, removes retraced spur, and restores exact move undo", () => {
     const { c, a } = fixture();
     const before = clone(c);
     const e = new Editor();
@@ -119,9 +119,9 @@ describe("safe geometry", () => {
     expect(electricalGraph(result)).toBe(electricalGraph(before));
     expect(result).toEqual(transform(c, [a], { x: 50, y: 60 }));
     orthogonal(result);
-    expect(Object.values(result.geometry.wires)[0].points.slice(-2)).toEqual(
-      Object.values(before.geometry.wires)[0].points.slice(-2),
-    );
+    expect(Object.values(result.geometry.wires)[0].points).toEqual([
+      { x: 190, y: 160 }, { x: 260, y: 160 }, { x: 260, y: 190 },
+    ]);
     e.confirm();
     expect(e.history).toHaveLength(1);
     e.undo();

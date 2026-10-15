@@ -1,22 +1,11 @@
 import { clone, type Circuit, type Point } from "../model/circuit";
-import { clean, endpointPosition, route, same } from "./geometry";
+import { endpointPosition, route, same } from "./geometry";
+import { simplifyPath } from "./path";
+export { simplifyPath } from "./path";
 
 export type WireEditKind = "segment" | "corner" | "jog";
 
 // Pure geometry: electrical endpoints and nets are never changed here.
-export function simplifyPath(points: Point[]): Point[] {
-  const result: Point[] = [];
-  for (const point of clean(points)) {
-    while (result.length >= 2) {
-      const a = result[result.length - 2], b = result[result.length - 1];
-      if (!((a.x === b.x && b.x === point.x) || (a.y === b.y && b.y === point.y))) break;
-      result.pop();
-    }
-    if (!result.length || !same(result[result.length - 1], point)) result.push({ ...point });
-  }
-  return result;
-}
-
 export function nearestSegment(points: Point[], p: Point): number {
   let best = 0, distance = Infinity;
   for (let i = 0; i < points.length - 1; i++) {
@@ -71,7 +60,7 @@ export function replaceWirePath(c: Circuit, key: string, points: Point[]): Circu
   const wire = c.geometry.wires[key];
   if (!wire) throw new Error("배선이 없습니다.");
   const normalized = simplifyPath(points);
-  if (normalized.length < 2 || normalized.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y)) ||
+  if (normalized.length < 1 || normalized.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y)) ||
     !same(normalized[0], endpointPosition(c, wire.from)) ||
     !same(normalized[normalized.length - 1], endpointPosition(c, wire.to)) ||
     normalized.some((p, i) => i > 0 && p.x !== normalized[i - 1].x && p.y !== normalized[i - 1].y))

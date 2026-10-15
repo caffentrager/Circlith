@@ -5,9 +5,11 @@ export const path = (points: Point[]) =>
 export function Symbols({
   circuit,
   selection,
+  zoom = 1,
 }: {
   circuit: Circuit;
   selection: string[];
+  zoom?: number;
 }) {
   return (
     <>
@@ -30,7 +32,7 @@ export function Symbols({
       </g>
       <g data-layer="junctions">
         {Object.entries(circuit.geometry.junctions).map(([id, p]) => (
-          <circle key={id} cx={p.x} cy={p.y} r="4" />
+          <circle key={id} data-junction={id} cx={p.x} cy={p.y} r={4 / zoom} className="junction"><title>접속점 · 클릭하여 분기</title></circle>
         ))}
       </g>
       <g data-layer="symbols">
@@ -72,7 +74,7 @@ export function Symbols({
               cx={p.x}
               cy={p.y}
               r="5"
-              className="pin"
+              className={Object.values(circuit.nets).some((n) => n.pins.includes(pin.id)) ? "pin connected" : "pin"}
             >
               <title>
                 {pin.direction} {pin.index + 1}

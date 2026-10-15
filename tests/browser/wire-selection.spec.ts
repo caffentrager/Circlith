@@ -14,13 +14,14 @@ async function connectedCircuit(page: Page) {
   const pins = page.locator('main [data-layer="pins"] [data-pin]');
   await pins.nth(0).click();
   await pins.nth(1).click();
+  await page.keyboard.press("Escape");
 }
 
 test("wire click, Shift selection, Escape and Undo preserve circuit and history", async ({ page }) => {
   await connectedCircuit(page);
   const wire = page.locator("main [data-wire]");
   const points = await wire.getAttribute("points");
-  // Wiring leaves WIRE active; clicking a finished wire still selects it.
+  // SELECT clicks select; WIRE clicks now explicitly start a branch.
   await clickCanvas(page, 240, 104);
   await expect(wire).toHaveClass(/selected/);
   await expect(page.locator(".properties")).toContainText("1개 배선");

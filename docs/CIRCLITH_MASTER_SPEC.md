@@ -395,7 +395,7 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 4. 경로는 orthogonal segment만 사용.
 5. 기존 첫 출발 방향과 waypoint를 가능한 한 보존.
 6. 후보가 동점이면 결정적(deterministic) 순서를 사용.
-7. 길이 0 segment와 중복 waypoint 제거.
+7. 길이 0 segment, 중복 waypoint와 공선 되접힘을 공통 정규화 함수로 제거. 실제 junction은 분할된 wire의 endpoint로 보존하고 논리 연결은 변경하지 않는다.
 8. 전체 net autorouting, obstacle avoidance, shortest-path reroute는 v1에서 하지 않는다.
 9. 겹침은 경고하되 자동 접속·삭제하지 않는다.
 
@@ -422,7 +422,7 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 - 경로 다시 그리기는 기존 두 endpoint를 고정한다. 빈 공간 클릭으로 경유점, Backspace로 마지막 경유점 취소, Shift+Space로 꺾임 방향, Enter/완료 버튼으로 경로 전체를 한 번 확정한다. 다른 핀과 교차해도 새 접속을 만들지 않는다.
 - 가로/세로 우선 정리는 선택 배선의 경유점을 의도적으로 제거하고 두 endpoint 사이의 최소 직각 경로로 대체한다. 여러 배선도 한 Undo다.
 - 모든 경로 수정은 wire ID, from/to, net, 부품·핀·junction을 보존한다. 중복점과 불필요 공선점을 정리하며 결과는 유한 좌표·직각·고정 endpoint 검증 후 commit한다.
-- 분기 생성·endpoint 재연결·전기적 삭제는 이 경로 편집과 구분하며 후속 기능이다.
+- 분기 생성은 §13.5의 명시적 접속 transaction으로 분리한다. endpoint 재연결·전기적 삭제는 후속 기능이다.
 
 ---
 
@@ -469,6 +469,17 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 `pin/junction snap > wire snap > grid`
 
 `Alt`는 grid snap만 잠시 해제하는 후보. 좌표가 우연히 겹쳤다고 전기적 연결을 새로 만들지 않는다.
+
+### 13.5 분기·배선 합치기와 피드백 — 2026-10-15
+
+- WIRE 대기에서 핀·기존 junction·선분을 클릭하거나, SELECT에서 선분 위 W / 선택 배선의 분기 버튼으로 시작한다. SELECT의 단순 선 클릭·드래그는 선택·경로 편집을 유지한다.
+- 초안 시작·종료 대상은 pin/junction 또는 명시적으로 선택한 wire 위의 투영 좌표다. 선분 내부는 10 단위 grid에 투영하되 가까운 endpoint를 재사용한다. pin/junction 9 screen px → wire 6 screen px 우선이며 최근접 후보를 강조한다.
+- 시작선 분할·끝선 분할·junction 생성·net 병합·새 경로는 전체 검증 후 하나의 Command로 commit한다. 취소·실패 중에는 기존 회로와 Redo를 보존한다. 같은 선의 서로 다른 두 지점 연결과 기존 junction 재사용을 지원한다.
+- 분기점에 wire를 분할하며 기존 wire ID는 첫 구간에 유지한다. 공유 junction은 이동·회전·경로 정리로 삭제하거나 옮기지 않는다.
+- 단순 교차는 미접속이다. 동거리 대상이 여러 개면 후보 선택 창으로 구분한다. 정확히 같은 내부 교차점의 후보에는 별도 접속 버튼을 제공하며, 명시적으로 누른 경우에만 한 junction으로 합친다.
+- 유효 접속 후보·분기 예정점·연결된 pin·실제 junction·현재 배선 모드를 색과 형태/문자로 함께 구분한다. 선에서 시작한 초안의 junction은 commit 전에 미리보기만 표시한다.
+- 연결망 선택은 동일 net의 wire를 모두 선택한다. 부품 이동과 경로 편집은 연결망을 자동 병합하지 않는다.
+- wire/net/endpoint 참조·net 구성원·실제 연결성·유한 좌표·직각·endpoint 일치를 검증한다. overlap/obstacle 회피와 파일 저장·시뮬레이션은 별도 범위다.
 
 ---
 

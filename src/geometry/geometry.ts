@@ -4,7 +4,8 @@ import {
   type Endpoint,
   type Point,
 } from "../model/circuit";
-export const same = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
+import { clean, simplifyPath } from "./path";
+export { clean, same } from "./path";
 export const snap = (p: Point): Point => ({
   x: Math.round(p.x / 10) * 10,
   y: Math.round(p.y / 10) * 10,
@@ -34,13 +35,6 @@ export function pinPosition(c: Circuit, key: string): Point {
 }
 export const endpointPosition = (c: Circuit, e: Endpoint) =>
   e.type === "pin" ? pinPosition(c, e.id) : c.geometry.junctions[e.id];
-export function clean(points: Point[]): Point[] {
-  const result: Point[] = [];
-  for (const p of points)
-    if (!result.length || !same(result[result.length - 1], p))
-      result.push({ ...p });
-  return result;
-}
 export function route(a: Point, b: Point, horizontal = true): Point[] {
   return clean([a, horizontal ? { x: b.x, y: a.y } : { x: a.x, y: b.y }, b]);
 }
@@ -134,20 +128,20 @@ export function transform(
     const a = moving(w.from),
       b = moving(w.to);
     if (a && b) {
-      w.points = clean(w.points.map(map));
+      w.points = simplifyPath(w.points.map(map));
       continue;
     }
     const stretch = (points: Point[], e: Endpoint) => {
       const start = endpointPosition(next, e),
-        fixed = points[1];
+        fixed = points[1] ?? points[0];
       const horizontal = points[0].y === fixed.y;
-      return clean([
+      return simplifyPath([
         ...route(start, fixed, rotation ? !horizontal : horizontal),
         ...points.slice(2),
       ]);
     };
-    if (a) w.points = stretch(w.points, w.from);
-    if (b) w.points = stretch([...w.points].reverse(), w.to).reverse();
+    if (a) w.points = stretch(simplifyPath(w.points), w.from);
+    if (b) w.points = stretch(simplifyPath(w.points).reverse(), w.to).reverse();
   }
   return next;
 }

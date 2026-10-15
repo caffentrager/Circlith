@@ -12,6 +12,7 @@ async function setup(page: Page) {
   }
   const pins = page.locator('main [data-layer="pins"] [data-pin]');
   await pins.nth(0).click(); await pins.nth(1).click();
+  await page.keyboard.press("Escape");
   const p = await canvasPoint(page, 200, 100); await page.mouse.click(p.x, p.y);
   return page.locator("main [data-wire]");
 }

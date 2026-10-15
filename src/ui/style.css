@@ -145,6 +145,18 @@ svg:focus {
 .wire-tools h2 { margin-bottom: 8px; }
 .properties { overflow-y: auto; }
 button:disabled { opacity: .45; cursor: default; }
+button[aria-pressed="true"] { background: #dff5f5; border-color: #008cab; box-shadow: inset 0 -2px #008cab; }
+.junction { fill: #167887; stroke: white; stroke-width: 1; vector-effect: non-scaling-stroke; cursor: crosshair; }
+.pin.connected { fill: #147e94; }
+.snap-marker { fill: #00a08022; stroke: #008b72; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.snap-marker.ambiguous { fill: #e8a00022; stroke: #b57500; stroke-dasharray: 3 2; }
+.snap-label { paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; fill: #086352; }
+.pending-junction { fill: white; stroke: #008b72; stroke-width: 1.5; stroke-dasharray: 3 2; vector-effect: non-scaling-stroke; }
+.net-summary { color: #586f80; font-size: 12px; }
+.connection-chooser button { display: block; width: 100%; margin-top: 8px; text-align: left; }
+.wiring-help { font-size: 12px; line-height: 1.7; margin: 10px 0 16px; padding: 10px; border: 1px solid #c5cfdb; border-radius: 6px; }
+.wiring-help summary { cursor: pointer; font-weight: 600; }
+svg[data-tool="WIRE"] { cursor: crosshair; }
 .symbol {
   fill: #f8fcff;
   stroke: #516d82;

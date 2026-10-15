@@ -3,11 +3,14 @@ import { Editor } from "../editor/editor";
 import {
   emptyCircuit,
   addComponent,
-  type Endpoint,
+  type ConnectionTarget,
   type Kind,
   type Point,
 } from "../model/circuit";
-import { pinPosition, snap } from "../geometry/geometry";
+import { snap } from "../geometry/geometry";
+import { connectionHits } from "../geometry/connection-hit";
+import { projectSegment, same } from "../geometry/path";
+import { targetPosition } from "../model/connections";
 import { Symbols, path } from "../renderer/CircuitSvg";
 import { WireHandles } from "../renderer/WireHandles";
 import { nearestSegment, simplifyPath, type WireEditKind } from "../geometry/wire-edit";
@@ -39,7 +42,7 @@ export function App() {
   const cursor = useRef<Point>({ x: 200, y: 200 });
   const space = useRef(false);
   const composing = useRef(false);
-  const hover = useRef<Endpoint | undefined>(undefined);
+  const hover = useRef<ConnectionTarget | undefined>(undefined);
   const pointer = useRef<{ clientX: number; clientY: number } | null>(null);
   const paletteDrag = useRef<{
     kind: Kind;
@@ -60,6 +63,7 @@ export function App() {
   } | null>(null);
   const [search, setSearch] = useState<string | null>(null);
   const [menu, setMenu] = useState(false);
+  const [connectionChoice, setConnectionChoice] = useState<{ targets: ConnectionTarget[]; action: "start" | "finish" } | null>(null);
   const [grid, setGrid] = useState(true);
   const [message, setMessage] = useState(
     "왼쪽 부품을 도면으로 드래그하세요. 접점을 클릭하거나 드래그하면 배선이 시작됩니다.",
@@ -88,7 +92,7 @@ export function App() {
   );
   const contexts = () =>
     activeContexts(
-      settings || menu
+      settings || menu || connectionChoice
         ? "MODAL"
         : search !== null
           ? "TEXT_EDITOR"
@@ -122,9 +126,10 @@ export function App() {
   };
   const world = (e: { clientX: number; clientY: number }) =>
     snap(drawingPoint(e));
-  const target = (e: EventTarget | null): Endpoint | undefined => {
+  const target = (e: EventTarget | null): ConnectionTarget | undefined => {
     const pin = (e as Element)?.closest("[data-pin]")?.getAttribute("data-pin");
-    return pin ? { type: "pin", id: pin } : undefined;
+    const junction = (e as Element)?.closest("[data-junction]")?.getAttribute("data-junction");
+    return pin ? { type: "pin", id: pin } : junction ? { type: "junction", id: junction } : undefined;
   };
   const insideCanvas = (e: { clientX: number; clientY: number }) => {
     const r = svg.current!.getBoundingClientRect();
@@ -135,22 +140,21 @@ export function App() {
       e.clientY <= r.bottom
     );
   };
-  const hitPin = (
-    e: { clientX: number; clientY: number } | null,
-  ): Endpoint | undefined => {
-    if (!e || !insideCanvas(e)) return undefined;
-    const p = screen(e),
-      v = editor.viewport,
-      circuit = editor.preview();
-    const candidates = Object.keys(circuit.pins).filter((k) => {
-      const pos = pinPosition(circuit, k);
-      return (
-        Math.hypot(pos.x * v.zoom + v.x - p.x, pos.y * v.zoom + v.y - p.y) <= 9
-      );
-    });
-    return candidates.length === 1
-      ? { type: "pin", id: candidates[0] }
-      : undefined;
+  const hitsAt = (e: { clientX: number; clientY: number } | null) =>
+    !e || !insideCanvas(e) ? [] : connectionHits(editor.preview(), drawingPoint(e), editor.viewport.zoom);
+  const hitConnection = (e: { clientX: number; clientY: number } | null): ConnectionTarget | undefined => {
+    const hits = hitsAt(e);
+    return hits.length === 1 ? hits[0].target : undefined;
+  };
+  const requestConnection = (action: "start" | "finish", explicit?: ConnectionTarget) => {
+    const targets = explicit ? [explicit] : hitsAt(pointer.current).map((hit) => hit.target);
+    if (targets.length > 1) { resolver.cancel(); setConnectionChoice({ targets, action }); return; }
+    if (!targets.length) {
+      if (action === "finish") setMessage("강조된 핀·접속점·선분에서 연결을 완료하세요. 빈 공간 클릭은 경유점입니다.");
+      return;
+    }
+    if (action === "start") editor.startWire(targets[0]);
+    else editor.confirm(targets[0]);
   };
   const rollback = () => {
     if (
@@ -232,14 +236,17 @@ export function App() {
     v.x = p.x - ((p.x - v.x) * z) / v.zoom;
     v.y = p.y - ((p.y - v.y) * z) / v.zoom;
     v.zoom = z;
-    hover.current = hitPin(pointer.current);
+    hover.current = hitConnection(pointer.current);
   };
   const dispatcher = new CommandDispatcher(
     {
       "app.cancel": (p) => {
         resolver.cancel();
         if (p?.operation) editor.escape();
-        if (settings) {
+        if (connectionChoice) {
+          setConnectionChoice(null);
+          svg.current?.focus();
+        } else if (settings) {
           setSettings(false);
           svg.current?.focus();
         } else if (menu) {
@@ -251,11 +258,13 @@ export function App() {
         } else if (gesture.current || paletteDrag.current) rollback();
         else editor.escape();
       },
-      "app.confirm": (p) =>
-        editor.confirm(
-          p?.endpoint ?? hitPin(pointer.current),
-          p?.repeat ?? false,
-        ),
+      "app.confirm": (p) => {
+        if (editor.draft?.type === "WIRE_DRAFT") {
+          requestConnection("finish", p?.endpoint);
+          if (!editor.draft) setMessage("연결했습니다. 점은 접속점이며, 점 없이 지나가는 교차는 미접속입니다. WIRE 도구에서는 클릭으로 계속 분기할 수 있습니다.");
+        }
+        else editor.confirm(undefined, p?.repeat ?? false);
+      },
       "history.undo": undo,
       "history.redo": redo,
       "component.place": (p) => editor.place(p.kind, p.position),
@@ -270,12 +279,26 @@ export function App() {
       "component.rotateCCW90": rotate,
       "component.rotateCW90": () => editor.rotate(true),
       "wire.start": (p) => {
-        if (p?.endpoint) editor.startWire(p.endpoint);
+        if (p?.endpoint) requestConnection("start", p.endpoint);
         else if (editor.draft?.type !== "WIRE_DRAFT") {
           editor.setTool("WIRE");
-          const endpoint = hitPin(pointer.current);
-          if (endpoint) editor.startWire(endpoint);
+          requestConnection("start");
         }
+      },
+      "wire.branch": () => {
+        if (editor.draft) return;
+        const key = editor.selection.find((id) => editor.circuit.geometry.wires[id]);
+        if (!key) { setMessage("분기할 배선을 선택하세요."); return; }
+        const points = editor.circuit.geometry.wires[key].points;
+        const i = nearestSegment(points, cursor.current);
+        const position = projectSegment(points[i], points[i + 1], snap(cursor.current));
+        editor.startWire({ type: "wire", id: key, position });
+        svg.current?.focus();
+      },
+      "wire.selectNet": () => { editor.selectNet(); svg.current?.focus(); },
+      "wire.joinCrossing": (p) => {
+        editor.joinWires(p?.targets ?? hitsAt(pointer.current).map((hit) => hit.target));
+        setMessage("교차점을 접속했습니다. 점이 있는 교차만 전기적으로 연결됩니다.");
       },
       "wire.removeLastPoint": () => editor.backspace(),
       "wire.toggleBend": () => {
@@ -296,8 +319,8 @@ export function App() {
         svg.current?.focus();
         setMessage("경유점 클릭 · Shift+Space 꺾임 전환 · Backspace 되돌리기 · Enter 완료 · Esc 취소. 양 끝 연결은 유지됩니다.");
       },
-      "wire.tidyHorizontal": () => editor.tidyWires(true),
-      "wire.tidyVertical": () => editor.tidyWires(false),
+      "wire.tidyHorizontal": () => { editor.tidyWires(true); svg.current?.focus(); },
+      "wire.tidyVertical": () => { editor.tidyWires(false); svg.current?.focus(); },
       "grid.toggleVisible": () => setGrid((v) => !v),
       "selection.all": () => {
         if (!editor.draft)
@@ -366,7 +389,8 @@ export function App() {
     setMessage,
   );
   const dispatch = (command: string, payload?: any) => {
-    dispatcher.dispatch(command, payload);
+    try { dispatcher.dispatch(command, payload); }
+    catch (error) { setMessage(`실행하지 못했습니다: ${error instanceof Error ? error.message : String(error)}`); }
     refresh();
   };
   dispatchRef.current = dispatch;
@@ -384,7 +408,7 @@ export function App() {
     e.preventDefault();
     dispatch(binding.command, { delta: e.deltaY, point: screen(e) });
     pointer.current = { clientX: e.clientX, clientY: e.clientY };
-    hover.current = hitPin(e);
+    hover.current = hitConnection(e);
     refresh();
   };
   const keyboard = keyboardAdapter({
@@ -404,6 +428,23 @@ export function App() {
   const draft = editor.draft;
   const selectedComponents = editor.selection.filter((key) => editor.circuit.components[key]).length;
   const selectedWires = editor.selection.filter((key) => editor.circuit.geometry.wires[key]).length;
+  const snapHits = hitsAt(pointer.current);
+  const snapPoint = hover.current ? targetPosition(preview, hover.current) : snapHits[0]?.position;
+  const wiring = editor.tool === "WIRE" || draft?.type === "WIRE_DRAFT";
+  const snapLabel = snapHits.length > 1 ? "대상이 겹칩니다 · 클릭하여 선택" : hover.current?.type === "wire"
+    ? draft?.type === "WIRE_DRAFT" ? "클릭하여 선에 접속" : wiring ? "클릭하여 분기 시작" : "W로 분기 · 드래그로 편집"
+    : hover.current?.type === "junction" ? "접속점" : hover.current ? "핀 연결" : "";
+  const targetLabel = (candidate: ConnectionTarget) => {
+    const pinName = (id: string) => {
+      const p = editor.circuit.pins[id];
+      return `${editor.circuit.components[p.component].name} ${p.index + 1}`;
+    };
+    if (candidate.type === "pin") return `핀 · ${pinName(candidate.id)}`;
+    if (candidate.type === "junction") return "기존 접속점";
+    const w = editor.circuit.geometry.wires[candidate.id];
+    const name = (e: typeof w.from) => e.type === "pin" ? pinName(e.id) : "접속점";
+    return `${name(w.from)} → ${name(w.to)} · 연결망 ${Object.keys(editor.circuit.nets).indexOf(w.net) + 1}`;
+  };
   const ghost = emptyCircuit();
   if (draft?.type === "PLACE")
     addComponent(ghost, draft.kind, draft.position, draft.rotation);
@@ -440,6 +481,7 @@ export function App() {
         </strong>
         <input aria-label="프로젝트 이름" defaultValue="Untitled circuit" />
         <button
+          aria-pressed={editor.tool === "SELECT"}
           onClick={() => {
             dispatch("tool.select");
           }}
@@ -447,6 +489,7 @@ export function App() {
           선택 {hint("tool.select")}
         </button>
         <button
+          aria-pressed={editor.tool === "WIRE"}
           onClick={() => {
             dispatch("wire.start");
             svg.current?.focus();
@@ -579,7 +622,7 @@ export function App() {
           문자 단축키 사용
         </label>
         <p className="note">
-          Safe Move 경로는 잠정 규칙입니다. 분기·삭제·저장·시뮬레이션은 후속
+          Safe Move 경로는 잠정 규칙입니다. 삭제·저장·시뮬레이션은 후속
           단계입니다.
         </p>
       </aside>
@@ -591,6 +634,9 @@ export function App() {
           data-operation={editor.operation}
           data-tool={editor.tool}
           data-transient={editor.transient}
+          data-net-count={Object.keys(editor.circuit.nets).length}
+          data-junction-count={Object.keys(editor.circuit.junctions).length}
+          data-snap-kind={snapHits.length > 1 ? "ambiguous" : hover.current?.type ?? "none"}
           onFocus={() => {
             editor.focus = "CANVAS";
           }}
@@ -665,7 +711,7 @@ export function App() {
               return;
             }
             if (button !== "left") return;
-            const pin = target(e.target) ?? hitPin(e);
+            const pin = target(e.target) ?? hitConnection(e);
             hover.current = pin;
             if (editor.draft) {
               editor.update(cursor.current);
@@ -673,13 +719,13 @@ export function App() {
                 const end = editor.circuit.geometry.wires[editor.draft.wire].to;
                 if (pin?.type === end.type && pin.id === end.id) dispatch("app.confirm");
                 else editor.waypoint();
-              } else if (editor.draft.type === "WIRE_DRAFT" && !pin) editor.waypoint();
+              } else if (editor.draft.type === "WIRE_DRAFT" && !pin && hitsAt(e).length <= 1) editor.waypoint();
               else
                 dispatch("app.confirm", { endpoint: pin, repeat: e.shiftKey });
               refresh();
               return;
             }
-            if (pin) {
+            if (pin && (pin.type !== "wire" || editor.tool === "WIRE")) {
               dispatch("wire.start", { endpoint: pin });
               gesture.current = {
                 type: "wire",
@@ -693,8 +739,8 @@ export function App() {
             }
             const wire = objectKey && editor.circuit.geometry.wires[objectKey];
             if (editor.tool === "WIRE") {
-              if (!wire) return;
-              dispatch("tool.select");
+              if (hitsAt(e).length > 1) dispatch("wire.start");
+              return;
             }
             const key = objectKey;
             if (key) {
@@ -777,7 +823,7 @@ export function App() {
               const p = screen(e);
               editor.viewport.x = g.view.x + p.x - g.start.x;
               editor.viewport.y = g.view.y + p.y - g.start.y;
-              hover.current = hitPin(e);
+              hover.current = hitConnection(e);
             } else if (g?.type === "box") {
               editor.updateBox(drawingPoint(e));
               const p = screen(e);
@@ -786,10 +832,10 @@ export function App() {
               cursor.current = world(e);
               const p = screen(e),
                 v = editor.viewport;
-              hover.current = hitPin(e);
+              hover.current = hitConnection(e);
               editor.update(
                 editor.draft?.type === "WIRE_DRAFT" && hover.current
-                  ? pinPosition(editor.circuit, hover.current.id)
+                  ? targetPosition(editor.circuit, hover.current)
                   : cursor.current,
               );
               if (g)
@@ -833,7 +879,7 @@ export function App() {
                 dispatch("app.confirm");
               }
             }
-            hover.current = hitPin(e);
+            hover.current = hitConnection(e);
             editor.transient = "NONE";
             if (e.currentTarget.hasPointerCapture(e.pointerId))
               e.currentTarget.releasePointerCapture(e.pointerId);
@@ -874,7 +920,7 @@ export function App() {
                 fill="url(#grid)"
               />
             )}
-            <Symbols circuit={preview} selection={editor.selection} />
+            <Symbols circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom} />
             {(!draft || draft.type === "SEGMENT_MOVE") &&
               <WireHandles circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom} />}
             {editor.selectionBox && (
@@ -902,16 +948,22 @@ export function App() {
                 pointerEvents="none"
               />
             )}
-            {hover.current && (
+            {snapPoint && (
+              <g data-layer="connection-hint" pointerEvents="none">
               <circle
-                cx={pinPosition(preview, hover.current.id).x}
-                cy={pinPosition(preview, hover.current.id).y}
+                cx={snapPoint.x}
+                cy={snapPoint.y}
                 r={9 / editor.viewport.zoom}
-                fill="none"
-                stroke="#008cab"
-                pointerEvents="none"
+                className={snapHits.length > 1 ? "snap-marker ambiguous" : "snap-marker"}
               />
+              {(wiring || hover.current?.type !== "pin") && <text className="snap-label"
+                x={snapPoint.x + 14 / editor.viewport.zoom} y={snapPoint.y - 14 / editor.viewport.zoom}
+                style={{ fontSize: 12 / editor.viewport.zoom }}>{snapLabel}</text>}
+              </g>
             )}
+            {draft?.type === "WIRE_DRAFT" && draft.from.type === "wire" &&
+              <circle data-layer="pending-junction" cx={draft.from.position.x} cy={draft.from.position.y}
+                r={5 / editor.viewport.zoom} className="pending-junction" pointerEvents="none" />}
             <g data-layer="preview" className="preview">
               {draft?.type === "PLACE" &&
                 (!paletteDrag.current?.active ||
@@ -928,8 +980,16 @@ export function App() {
       <aside className="properties">
         <h2>선택</h2>
         <p>{selectedComponents}개 부품 · {selectedWires}개 배선</p>
+        <p className="net-summary">연결망 {Object.keys(editor.circuit.nets).length}개 · 접속점 {Object.keys(editor.circuit.junctions).length}개</p>
+        <details className="wiring-help">
+          <summary>배선 조작법</summary>
+          <p>핀 클릭: 시작/연결<br />선 위 W: 중간에서 분기<br />배선 도구에서 선 클릭: 시작<br />다른 선 클릭: 합치기<br />빈 곳 클릭: 경유점<br />Shift+Space: 꺾임 전환<br />Backspace: 경유점 취소<br />Esc: 초안 취소</p>
+          <p>● 점이 있으면 접속<br />점 없는 교차는 미접속<br />채운 핀은 연결된 핀</p>
+        </details>
         {selectedWires > 0 && <section className="wire-tools" aria-label="배선 경로 편집">
           <h2>배선 경로 편집</h2>
+          <button disabled={!!draft || selectedWires !== 1} onClick={() => dispatch("wire.branch")}>이 선에서 분기</button>
+          <button disabled={!!draft} onClick={() => dispatch("wire.selectNet")}>연결망 전체 선택</button>
           <p>원 ○ 선분 이동<br />사각 □ 모서리 이동<br />마름모 ◇ 우회 구간 추가</p>
           <button disabled={!!draft || selectedWires !== 1 || !!selectedComponents} onClick={() => dispatch("wire.reroute")}>경로 다시 그리기</button>
           <button disabled={!!draft} onClick={() => dispatch("wire.tidyHorizontal")}>가로 우선 정리</button>
@@ -988,6 +1048,24 @@ export function App() {
           ? `순차 키 대기: ${resolver.pending.join(" → ")}`
           : "입력 대기"}
       </footer>
+      {connectionChoice && <div className="overlay" onKeyDown={(e) => {
+        if (e.nativeEvent.isComposing) return;
+        if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); dispatch("app.cancel"); }
+      }}>
+        <section role="dialog" aria-label="접속 대상 선택" className="connection-chooser">
+          <h2>접속할 대상을 선택하세요</h2>
+          <p>겹쳐 보이는 선은 선택하기 전까지 서로 연결되지 않습니다.</p>
+          {connectionChoice.targets.map((candidate, index) => <button key={`${candidate.type}:${candidate.id}`} autoFocus={index === 0}
+            onClick={() => {
+              setConnectionChoice(null);
+              dispatch(connectionChoice.action === "start" ? "wire.start" : "app.confirm", { endpoint: candidate });
+              svg.current?.focus();
+            }}>{index + 1}. {targetLabel(candidate)}</button>)}
+          {!draft && connectionChoice.targets.every((t) => t.type === "wire" && same(targetPosition(editor.circuit, t), targetPosition(editor.circuit, connectionChoice.targets[0]))) &&
+            <button onClick={() => { dispatch("wire.joinCrossing", { targets: connectionChoice.targets }); setConnectionChoice(null); svg.current?.focus(); }}>이 교차점을 접속</button>}
+          <button onClick={() => { setConnectionChoice(null); svg.current?.focus(); }}>취소</button>
+        </section>
+      </div>}
       {search !== null && (
         <div className="overlay">
           <section role="dialog" aria-label="부품 검색">

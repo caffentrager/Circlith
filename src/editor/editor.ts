@@ -1,10 +1,9 @@
 import {
   addComponent,
   clone,
-  connect,
   emptyCircuit,
   type Circuit,
-  type Endpoint,
+  type ConnectionTarget,
   type Kind,
   type Point,
 } from "../model/circuit";
@@ -17,6 +16,8 @@ import {
   transform,
 } from "../geometry/geometry";
 import { editWirePath, replaceWirePath, simpleWirePath, simplifyPath, type WireEditKind } from "../geometry/wire-edit";
+import { connectTargets, joinCrossing, targetPosition } from "../model/connections";
+import { pointOnSegment } from "../geometry/path";
 export type Draft =
   | { type: "PLACE"; kind: Kind; position: Point; rotation: number }
   | { type: "MOVE"; origin: Point; position: Point; selection: string[] }
@@ -24,7 +25,7 @@ export type Draft =
   | { type: "WIRE_ROUTE"; wire: string; waypoints: Point[]; checkpoints: Point[][]; position: Point; horizontal: boolean }
   | {
       type: "WIRE_DRAFT";
-      from: Endpoint;
+      from: ConnectionTarget;
       waypoints: Point[];
       checkpoints: Point[][];
       position: Point;
@@ -190,9 +191,11 @@ export class Editor {
         transform(this.circuit, this.selection, { x: 0, y: 0 }, rotation),
       );
   }
-  startWire(from: Endpoint) {
+  startWire(from: ConnectionTarget) {
     if (this.draft || this.selectionBox) return;
-    const position = endpointPosition(this.circuit, from);
+    const position = targetPosition(this.circuit, from);
+    const sourceSegment = from.type === "wire" ? this.circuit.geometry.wires[from.id].points : [];
+    const index = sourceSegment.findIndex((p, i) => i < sourceSegment.length - 1 && pointOnSegment(p, sourceSegment[i + 1], position));
     this.tool = "WIRE";
     this.draft = {
       type: "WIRE_DRAFT",
@@ -200,13 +203,13 @@ export class Editor {
       waypoints: [position],
       checkpoints: [],
       position,
-      horizontal: true,
+      horizontal: index < 0 || sourceSegment[index].x === sourceSegment[index + 1].x,
     };
   }
   wirePoints() {
     const d = this.draft;
     return d?.type === "WIRE_DRAFT"
-      ? clean([
+      ? simplifyPath([
           ...d.waypoints.slice(0, -1),
           ...route(
             d.waypoints[d.waypoints.length - 1],
@@ -216,17 +219,17 @@ export class Editor {
         ])
       : [];
   }
-  confirm(target?: Endpoint, repeat = false) {
+  confirm(target?: ConnectionTarget, repeat = false) {
     const d = this.draft;
     if (!d) return;
     if (d.type === "WIRE_DRAFT") {
-      if (!target || (target.type === d.from.type && target.id === d.from.id))
+      if (!target || (target.type !== "wire" && target.type === d.from.type && target.id === d.from.id))
         return;
-      d.position = endpointPosition(this.circuit, target);
-      const points = this.wirePoints();
+      d.position = targetPosition(this.circuit, target);
+      const points = simplifyPath(this.wirePoints());
       if (points.length < 2) return;
-      const after = clone(this.circuit);
-      connect(after, d.from, target, points);
+      const after = connectTargets(this.circuit, d.from, target, points);
+      if (!after) return;
       this.commit("Wire", after);
     } else if (d.type === "PLACE") {
       const after = clone(this.circuit);
@@ -236,6 +239,15 @@ export class Editor {
     } else this.commit(d.type === "MOVE" ? "Move" : "Edit wire path", this.preview());
     this.cancel();
     if (repeat && d.type === "PLACE") this.draft = d;
+  }
+  joinWires(targets: ConnectionTarget[]) {
+    if (this.draft || this.selectionBox) return;
+    this.commit("Join crossing", joinCrossing(this.circuit, targets));
+  }
+  selectNet() {
+    if (this.draft || this.selectionBox) return;
+    const nets = new Set(this.selection.flatMap((key) => this.circuit.geometry.wires[key] ? [this.circuit.geometry.wires[key].net] : []));
+    this.selection = Object.values(this.circuit.geometry.wires).filter((w) => nets.has(w.net)).map((w) => w.id);
   }
   waypoint() {
     const d = this.draft;

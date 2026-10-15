@@ -33,14 +33,14 @@
 
 ## 잠정 설계 판단과 한계
 
-- 부품 핀과 공유 junction은 별도 endpoint이다. 현재 UI는 pin-to-pin 배선만 제공한다. junction 분기는 모델·geometry에서만 지원하며 분기 UI는 후속 작업이다.
+- 부품 핀과 공유 junction은 별도 endpoint이다. 핀·접속점·선분 사이 배선과 명시적 교차점 접속을 제공한다. 선분은 commit 시 junction을 기준으로 분할한다.
 - 양쪽 endpoint의 부품이 선택되면 내부 배선 전체를 강체 변환한다. 한쪽만 선택되면 그 endpoint와 인접한 첫 waypoint 사이만 직각으로 늘린다. 외부 공유 junction은 고정한다.
 - 다중 회전 중심은 현재 동일한 부품 bounds(가로 80, 세로 40)의 합집합 중심이다. 새 pin 법선 방향 강제는 미구현이며 Master Spec의 잠정 회전 규칙에 대한 후속 검증 대상이다.
 - Waypoint는 사용자 클릭 단위 checkpoint로 관리한다. Backspace는 자동 bend 하나가 아니라 마지막 클릭 전체를 제거한다.
 - History snapshot 방식은 정확한 복원을 우선한 초기 선택이다. 큰 회로 메모리 사용과 응답성은 측정하지 않았다.
 - grid=10, pin hit=9 screen px, drag threshold=4 screen px는 검증 전 가설이다. zoom 범위는 프로토타입에서 50–200%로 제한했다.
 - 검색 라이브러리는 세 부품만 포함한다. exact/prefix/부분 문자열 및 in/out 별칭을 제공한다. 결과가 하나면 Enter, 여러 결과는 명시적 버튼 선택. Favorites/recent/fuzzy 확장은 후속이다.
-- 저장·자동 복구·시뮬레이션·분기 UI·삭제·clipboard·Properties·hover 부품 명령·키 재배정·Alt snap은 미구현이다. 새로고침 후 회로는 유지되지 않는다.
+- 저장·자동 복구·시뮬레이션·삭제·clipboard·Properties·hover 부품 명령·Alt snap은 미구현이다. 입력 재배정은 입력 프리셋 기록을 따른다. 새로고침 후 회로는 유지되지 않는다.
 - 빈 공간 좌클릭 drag는 BOX_SELECT다. 좌→우는 핀을 포함한 부품 bounds와 배선 경로 전체가 포함된 대상을, 우→좌는 실제로 교차하는 부품·배선 선분을 선택한다. 회전과 zoom을 반영하고 Shift는 기존 선택에 추가한다. 선택은 release에서만 변경하며 취소는 기존 선택을 보존한다. PAN은 안정된 Draft와 selection/history를 유지하며 바인딩은 [입력 프리셋 기록](INPUT_CONTROLS.md)을 따른다. 단순 빈 공간 좌클릭은 선택 해제다.
 - 4상태 truth/resolution과 feedback stabilization은 DEC-010 확정 전 구현하지 않는다. 시간·계층·Bus·Q Quick Place 등도 활성화하지 않는다.
 
@@ -59,6 +59,8 @@ Master Spec §12.5에 따라 선분·모서리 드래그, 국소 우회 구간 �
 조사 출처·조작법·기능 한계는 [WIRE_EDITING.md](WIRE_EDITING.md)를 따른다. Node.js 24.19.0 / Windows / Playwright Chromium 156에서 빌드, 단위 테스트 32개와 브라우저 테스트 29개 통과. geometry 조합 275개에서 고정 endpoint·직각·결정성·연결 보존을 확인하며, 브라우저에서는 직접 드래그·핸들·초안 취소·Undo/Redo·경로 다시 그리기와 50/200% zoom을 포함한다.
 
 ## 입력 억제 범위
+
+2026-10-15 후속 배선 검토: `path.ts` 공통 정규화로 부품 Move/Rotate의 공선 되접힘을 수정하고, `model/connections.ts`의 분할·병합 transaction과 회로 검증기를 추가했다. 접속 후보는 `connection-hit.ts`에서 화면 거리·최근접·우선순위로 계산한다. 후보 선택 창은 MODAL 입력을 소유하고 Esc는 창만 닫아 안정된 배선 초안을 보존한다. WIRE 모드의 선 클릭은 분기이며 SELECT 모드의 선 클릭은 선택이다. 상세 조작과 검토 범위는 [배선 기능 재검토](WIRE_EDITING.md#배선-기능-재검토--분기와-연결망)를 따른다.
 
 | 입력/조건 | handled | preventDefault | stopPropagation | 안내/브라우저 검증 |
 |---|---|---|---|---|
