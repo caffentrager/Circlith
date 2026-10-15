@@ -58,6 +58,8 @@ Node.js 24.19.0 / Windows / Playwright Chromium 156에서 빌드, 단위 테스�
 
 Master Spec §12.5에 따라 선분·모서리 드래그, 국소 우회 구간 추가, 경로 다시 그리기와 일괄 가로/세로 우선 정리를 추가했다. `geometry/wire-edit.ts`가 geometry와 경로 검증을, `WireHandles.tsx`가 편집 핸들을 담당한다. Editor의 `SEGMENT_MOVE`/`WIRE_ROUTE` 초안은 확정 전 committed circuit을 바꾸지 않는다. `electricalGraph()`에 wire endpoint와 net을 포함해 기존 불변식 검사가 endpoint 변경도 검출한다.
 
+2026-10-15 중복 우회 사례: §13.7에 따라 `model/wire-cleanup.ts`가 같은 net·동일 endpoint 쌍의 병렬 wire만 찾는다. `WIRE_CLEANUP`은 제거/유지 대상을 먼저 강조하고 확정 시 중복 wire만 한 Undo로 제거한다. pin/net/junction 구성과 남는 geometry는 보존하며 전체 연결성을 검증한다. 이 명시적 정리에서는 제거 wire ID 목록이 바뀌므로 기존 geometry-only 명령의 `electricalGraph()` 동일성 대신 삭제 대상 외의 circuit 전체 동일성과 연결성·Undo를 검사한다. 일반 Delete나 임의 cycle 삭제는 구현하지 않는다.
+
 조사 출처·조작법·기능 한계는 [WIRE_EDITING.md](WIRE_EDITING.md)를 따른다. Node.js 24.19.0 / Windows / Playwright Chromium 156에서 빌드, 단위 테스트 32개와 브라우저 테스트 29개 통과. geometry 조합 275개에서 고정 endpoint·직각·결정성·연결 보존을 확인하며, 브라우저에서는 직접 드래그·핸들·초안 취소·Undo/Redo·경로 다시 그리기와 50/200% zoom을 포함한다.
 
 ## 입력 억제 범위

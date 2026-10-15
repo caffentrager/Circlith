@@ -17,11 +17,13 @@ import { editWirePath, replaceWirePath, simplifyPath, type WireEditKind } from "
 import { assertCircuit, connectTargets, joinCrossing, targetPosition } from "../model/connections";
 import { anchorOffsets, pointOnSegment, same } from "../geometry/path";
 import { collidingSegments, defaultRouting, planRoute, type RoutingSettings } from "../geometry/routing";
+import { applyWireCleanup, planWireCleanup, type WireCleanupPlan } from "../model/wire-cleanup";
 export type Draft =
   | { type: "PLACE"; kind: Kind; position: Point; rotation: number }
   | { type: "MOVE"; origin: Point; position: Point; selection: string[]; rotation: number }
   | { type: "SEGMENT_MOVE"; wire: string; index: number; kind: WireEditKind; origin: Point; position: Point; points: Point[] }
   | { type: "WIRE_ROUTE"; wire: string; waypoints: Point[]; checkpoints: Point[][]; position: Point; horizontal: boolean; bendOverride?: boolean }
+  | { type: "WIRE_CLEANUP"; position: Point; plan: WireCleanupPlan }
   | {
       type: "WIRE_DRAFT";
       from: ConnectionTarget;
@@ -190,6 +192,15 @@ export class Editor {
     }
     this.commit("Tidy wires", after);
   }
+  beginWireCleanup() {
+    if (this.draft || this.selectionBox) return 0;
+    const plan = planWireCleanup(this.circuit, this.selection);
+    if (plan.remove.length) {
+      this.tool = "SELECT";
+      this.draft = { type: "WIRE_CLEANUP", position: { ...this.circuit.geometry.wires[plan.remove[0]].points[0] }, plan };
+    }
+    return plan.remove.length;
+  }
   previewResult(): { circuit: Circuit; blocked: boolean } {
     const d = this.draft;
     if (d?.type === "SEGMENT_MOVE") {
@@ -275,6 +286,9 @@ export class Editor {
       const after = connectTargets(this.circuit, d.from, target, points, d.waypoints.slice(1));
       if (!after) return;
       this.commit("Wire", after);
+    } else if (d.type === "WIRE_CLEANUP") {
+      this.commit("Clean up duplicate wire routes", applyWireCleanup(this.circuit, d.plan));
+      this.selection = [...new Set([...this.selection, ...d.plan.keep])];
     } else if (d.type === "PLACE") {
       const after = clone(this.circuit);
       const key = addComponent(after, d.kind, d.position, d.rotation);

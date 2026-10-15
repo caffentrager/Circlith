@@ -40,6 +40,7 @@ export const commands = [
     { id: "wire.tidyHorizontal", label: "Route horizontal first", category: "schematic" },
     { id: "wire.tidyVertical", label: "Route vertical first", category: "schematic" },
     { id: "wire.tidyConfigured", label: "Route using settings", category: "schematic" },
+    { id: "wire.cleanupDuplicates", label: "Preview duplicate routes in selected nets", category: "schematic" },
     { id: "selection.all", label: "Select all", category: "selection" },
     {
       id: "selection.replaceItem",

@@ -11,6 +11,7 @@ import { snap } from "../geometry/geometry";
 import { connectionHits } from "../geometry/connection-hit";
 import { projectSegment, same } from "../geometry/path";
 import { targetPosition } from "../model/connections";
+import { planWireCleanup } from "../model/wire-cleanup";
 import { Symbols, path } from "../renderer/CircuitSvg";
 import { WireHandles } from "../renderer/WireHandles";
 import { nearestSegment, simplifyPath, type WireEditKind } from "../geometry/wire-edit";
@@ -46,6 +47,7 @@ export function App() {
   const [, render] = useState(0);
   const refresh = () => render((v) => v + 1);
   const svg = useRef<SVGSVGElement>(null);
+  const properties = useRef<HTMLElement>(null);
   const cursor = useRef<Point>({ x: 200, y: 200 });
   const space = useRef(false);
   const composing = useRef(false);
@@ -279,7 +281,11 @@ export function App() {
           requestConnection("finish", p?.endpoint);
           if (!editor.draft) setMessage("연결했습니다. 점은 접속점이며, 점 없이 지나가는 교차는 미접속입니다. WIRE 도구에서는 클릭으로 계속 분기할 수 있습니다.");
         }
-        else editor.confirm(undefined, p?.repeat ?? false);
+        else {
+          const cleaning = editor.draft?.type === "WIRE_CLEANUP";
+          editor.confirm(undefined, p?.repeat ?? false);
+          if (cleaning && !editor.draft) setMessage("중복 우회를 정리했습니다. 접속점과 연결은 유지됩니다. Ctrl+Z로 전체 복구할 수 있습니다.");
+        }
       },
       "history.undo": undo,
       "history.redo": redo,
@@ -346,6 +352,12 @@ export function App() {
       "wire.tidyHorizontal": () => { editor.tidyWires(true); svg.current?.focus(); },
       "wire.tidyVertical": () => { editor.tidyWires(false); svg.current?.focus(); },
       "wire.tidyConfigured": () => { editor.tidyWires(); svg.current?.focus(); },
+      "wire.cleanupDuplicates": () => {
+        const count = editor.beginWireCleanup();
+        setMessage(count ? `중복 배선 ${count}개를 빨간 점선으로 표시했습니다. 초록색 경로는 남습니다. Enter: 정리 · Esc: 취소`
+          : "같은 두 접속점을 직접 연결한 중복 배선이 없습니다. 중간 분기가 있는 경로는 보존합니다.");
+        svg.current?.focus();
+      },
       "grid.toggleVisible": () => setGrid((v) => !v),
       "selection.all": () => {
         if (!editor.draft)
@@ -451,11 +463,17 @@ export function App() {
   });
   const previewResult = editor.previewResult(), preview = previewResult.circuit;
   const draft = editor.draft;
+  useEffect(() => {
+    if (draft?.type === "WIRE_CLEANUP") properties.current?.scrollTo({ top: 0 });
+  }, [draft?.type]);
   const wirePlan = draft?.type === "WIRE_DRAFT" ? editor.wirePlan() : null;
   const blocked = previewResult.blocked || !!wirePlan?.blocked;
   const collisions = [...Object.values(preview.geometry.wires).flatMap((w) => collidingSegments(preview, w.points)), ...(wirePlan?.collisions ?? [])];
   const selectedComponents = editor.selection.filter((key) => editor.circuit.components[key]).length;
   const selectedWires = editor.selection.filter((key) => editor.circuit.geometry.wires[key]).length;
+  const cleanup = draft?.type === "WIRE_CLEANUP" ? draft.plan : null;
+  const cleanupAvailable = !draft && selectedWires > 0 ? planWireCleanup(editor.circuit, editor.selection).remove.length : 0;
+  const cleanupAnchored = cleanup?.remove.filter((key) => editor.circuit.geometry.wires[key].anchors?.length).length ?? 0;
   const snapHits = hitsAt(pointer.current);
   const snapPoint = hover.current ? targetPosition(preview, hover.current) : snapHits[0]?.position;
   const wiring = editor.tool === "WIRE" || draft?.type === "WIRE_DRAFT";
@@ -963,6 +981,10 @@ export function App() {
               />
             )}
             <Symbols circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom} />
+            {cleanup && <g data-layer="wire-cleanup-preview" pointerEvents="none">
+              {cleanup.keep.map((key) => <polyline key={key} data-cleanup-keep={key} points={path(preview.geometry.wires[key].points)} className="wire-cleanup-keep" />)}
+              {cleanup.remove.map((key) => <polyline key={key} data-cleanup-remove={key} points={path(preview.geometry.wires[key].points)} className="wire-cleanup-remove" />)}
+            </g>}
             <g data-layer="wire-collisions" pointerEvents="none">
               {collisions.map(([a, b], i) => <polyline key={i} points={path([a, b])} className="wire-collision" />)}
             </g>
@@ -1022,7 +1044,19 @@ export function App() {
           </g>
         </svg>
       </main>
-      <aside className="properties">
+      <aside className="properties" ref={properties}>
+        {cleanup && <section className="cleanup-panel" aria-label="중복 우회 정리 미리보기" onKeyDown={(e) => {
+          if (e.nativeEvent.isComposing) return;
+          if (e.code === "Escape") { e.preventDefault(); e.stopPropagation(); dispatch("app.cancel"); svg.current?.focus(); }
+        }}>
+          <h2>중복 우회 정리</h2>
+          <p>선택 배선의 연결망에서<br />빨간 점선 {cleanup.remove.length}개: 제거<br />초록 경로 {cleanup.keep.length}개: 유지</p>
+          <p>접속점과 다른 분기는 유지됩니다.</p>
+          {cleanupAnchored > 0 && <p>제거할 배선 {cleanupAnchored}개의 수동 경유점도 함께 정리합니다.</p>}
+          <button onClick={() => { dispatch("app.confirm"); svg.current?.focus(); }}>정리 적용</button>
+          <button onClick={() => { dispatch("app.cancel"); svg.current?.focus(); }}>정리 취소</button>
+          <p>Enter: 정리 · Esc: 취소<br />확정 후 Ctrl+Z: 전체 복구</p>
+        </section>}
         <section className="routing-status" aria-label="현재 배선 설정">
           <strong>{routingLabel(editor.routing)}</strong>
           <p>설정에서 변경 · Shift+Space: 꺾임 전환</p>
@@ -1042,6 +1076,7 @@ export function App() {
           <h2>배선 경로 편집</h2>
           <button disabled={!!draft || selectedWires !== 1} onClick={() => dispatch("wire.branch")}>이 선에서 분기</button>
           <button disabled={!!draft} onClick={() => dispatch("wire.selectNet")}>연결망 전체 선택</button>
+          <button disabled={!!draft} title="선택 배선이 속한 연결망의 같은 두 끝점 사이 중복 경로만 정리합니다" onClick={() => dispatch("wire.cleanupDuplicates")}>연결망 중복 정리{cleanupAvailable > 0 ? ` (${cleanupAvailable})` : ""}</button>
           <p>원 ○ 선분 이동<br />사각 □ 모서리 이동<br />마름모 ◇ 우회 구간 추가</p>
           <button disabled={!!draft || selectedWires !== 1 || !!selectedComponents} onClick={() => dispatch("wire.reroute")}>경로 다시 그리기</button>
           <button disabled={!!draft} onClick={() => dispatch("wire.tidyHorizontal")}>가로 우선 정리</button>

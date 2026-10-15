@@ -336,3 +336,9 @@ footer {
 .wire-collision { fill: none; stroke: #dc5309; stroke-width: 4; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
 .wire.route-blocked { stroke: #c63816; }
 select:focus-visible { outline: 3px solid #0792b3; }
+.wire-cleanup-keep, .wire-cleanup-remove { fill: none; stroke-width: 4; vector-effect: non-scaling-stroke; }
+.wire-cleanup-keep { stroke: #13815d; }
+.wire-cleanup-remove { stroke: #c53030; stroke-dasharray: 6 4; }
+.cleanup-panel { padding: 12px; margin-bottom: 16px; border: 1px solid #b9cbd6; border-radius: 6px; background: #f6fbf9; }
+.cleanup-panel h2 { margin-bottom: 8px; }
+.cleanup-panel p { margin: 10px 0; font-size: 12px; line-height: 1.65; }
