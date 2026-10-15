@@ -32,10 +32,17 @@ import { signature, type UserProfile } from "../input/types";
 import { keyboardAdapter } from "./keyboardAdapter";
 import { InputSettings } from "./InputSettings";
 import { fitView } from "../geometry/view";
+import { collidingSegments, defaultRouting, routingLabel, routingStorageKey, validateRouting, type RoutingSettings } from "../geometry/routing";
 import "./style.css";
 const kinds: Kind[] = ["AND", "Input", "Output"];
 export function App() {
-  const [editor] = useState(() => new Editor());
+  const [initialRouting] = useState(() => {
+    try {
+      const data = localStorage.getItem(routingStorageKey);
+      return { value: data ? validateRouting(JSON.parse(data)) : { ...defaultRouting }, error: "" };
+    } catch { return { value: { ...defaultRouting }, error: "배선 설정을 복구하지 못해 기본값을 사용합니다." }; }
+  });
+  const [editor] = useState(() => { const e = new Editor(); e.routing = initialRouting.value; return e; });
   const [, render] = useState(0);
   const refresh = () => render((v) => v + 1);
   const svg = useRef<SVGSVGElement>(null);
@@ -115,6 +122,14 @@ export function App() {
       setMessage(`프로필 저장 실패: ${String(e)}. JSON 내보내기로 보관하세요.`);
     }
   };
+  const applyRouting = (next: RoutingSettings) => {
+    editor.routing = validateRouting(next);
+    try {
+      localStorage.setItem(routingStorageKey, JSON.stringify(editor.routing));
+      setMessage(`배선 설정 저장: ${routingLabel(next)}`);
+    } catch { setMessage("배선 설정은 이번 세션에 적용되었습니다. 브라우저 저장에 실패했습니다."); }
+    refresh();
+  };
   const screen = (e: { clientX: number; clientY: number }) => {
     const r = svg.current!.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -190,7 +205,7 @@ export function App() {
     return () => el.removeEventListener("wheel", wheel);
   }, []);
   useEffect(() => {
-    if (initial.error) setMessage(initial.error);
+    if (initial.error || initialRouting.error) setMessage([initial.error, initialRouting.error].filter(Boolean).join(" · "));
     return () => resolver.cancel();
   }, []);
   const place = (kind: Kind) => {
@@ -210,8 +225,9 @@ export function App() {
     editor.redo();
     refresh();
   };
-  const rotate = () => {
-    editor.rotate();
+  const rotate = (clockwise = false) => {
+    editor.rotate(clockwise);
+    if (gesture.current?.type === "move" && editor.draft?.type === "MOVE") gesture.current.moved = true;
     refresh();
   };
   const move = () => {
@@ -276,8 +292,8 @@ export function App() {
         editor.focus = "TEXT_EDITOR";
       },
       "component.moveSafe": move,
-      "component.rotateCCW90": rotate,
-      "component.rotateCW90": () => editor.rotate(true),
+      "component.rotateCCW90": () => rotate(),
+      "component.rotateCW90": () => rotate(true),
       "wire.start": (p) => {
         if (p?.endpoint) requestConnection("start", p.endpoint);
         else if (editor.draft?.type !== "WIRE_DRAFT") {
@@ -303,7 +319,15 @@ export function App() {
       "wire.removeLastPoint": () => editor.backspace(),
       "wire.toggleBend": () => {
         if (editor.draft?.type === "WIRE_DRAFT" || editor.draft?.type === "WIRE_ROUTE")
-          editor.draft.horizontal = !editor.draft.horizontal;
+          {
+            const d = editor.draft;
+            if (!d.bendOverride) {
+              const start = d.waypoints[d.waypoints.length - 1];
+              d.horizontal = editor.routing.pathMode === "smart" ? Math.abs(d.position.x - start.x) >= Math.abs(d.position.y - start.y) : editor.routing.pathMode === "horizontal";
+            }
+            d.horizontal = !d.horizontal;
+            d.bendOverride = true;
+          }
       },
       "wire.editPath": (p) => {
         if (p?.wire) editor.beginWireEdit(p.wire, p.index, p.kind, p.origin);
@@ -321,6 +345,7 @@ export function App() {
       },
       "wire.tidyHorizontal": () => { editor.tidyWires(true); svg.current?.focus(); },
       "wire.tidyVertical": () => { editor.tidyWires(false); svg.current?.focus(); },
+      "wire.tidyConfigured": () => { editor.tidyWires(); svg.current?.focus(); },
       "grid.toggleVisible": () => setGrid((v) => !v),
       "selection.all": () => {
         if (!editor.draft)
@@ -424,8 +449,11 @@ export function App() {
     },
     dispatch,
   });
-  const preview = editor.preview();
+  const previewResult = editor.previewResult(), preview = previewResult.circuit;
   const draft = editor.draft;
+  const wirePlan = draft?.type === "WIRE_DRAFT" ? editor.wirePlan() : null;
+  const blocked = previewResult.blocked || !!wirePlan?.blocked;
+  const collisions = [...Object.values(preview.geometry.wires).flatMap((w) => collidingSegments(preview, w.points)), ...(wirePlan?.collisions ?? [])];
   const selectedComponents = editor.selection.filter((key) => editor.circuit.components[key]).length;
   const selectedWires = editor.selection.filter((key) => editor.circuit.geometry.wires[key]).length;
   const snapHits = hitsAt(pointer.current);
@@ -507,7 +535,7 @@ export function App() {
             setSettings(true);
           }}
         >
-          입력 설정
+          설정
         </button>
         <span>{editor.history.length} committed edits</span>
       </header>
@@ -637,6 +665,8 @@ export function App() {
           data-net-count={Object.keys(editor.circuit.nets).length}
           data-junction-count={Object.keys(editor.circuit.junctions).length}
           data-snap-kind={snapHits.length > 1 ? "ambiguous" : hover.current?.type ?? "none"}
+          data-routing-mode={editor.routing.pathMode}
+          data-routing-blocked={blocked}
           onFocus={() => {
             editor.focus = "CANVAS";
           }}
@@ -837,6 +867,7 @@ export function App() {
                 editor.draft?.type === "WIRE_DRAFT" && hover.current
                   ? targetPosition(editor.circuit, hover.current)
                   : cursor.current,
+                hover.current,
               );
               if (g)
                 g.moved ||= Math.hypot(p.x - g.start.x, p.y - g.start.y) >= 4;
@@ -857,14 +888,14 @@ export function App() {
               editor.finishBox(g.moved);
             }
             if (g?.type === "move") {
-              if (g.moved) dispatch("app.confirm");
+              if (g.moved && insideCanvas(e)) dispatch("app.confirm");
               else editor.cancel();
             }
             if (g?.type === "wireEdit") {
               if (insideCanvas(e)) {
                 editor.update(world(e));
                 dispatch("app.confirm");
-                setMessage("배선 경로를 수정했습니다. Ctrl+Z로 되돌릴 수 있습니다.");
+                if (!editor.draft) setMessage("배선 경로를 수정했습니다. Ctrl+Z로 되돌릴 수 있습니다.");
               } else editor.cancel();
             }
             if (
@@ -921,6 +952,9 @@ export function App() {
               />
             )}
             <Symbols circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom} />
+            <g data-layer="wire-collisions" pointerEvents="none">
+              {collisions.map(([a, b], i) => <polyline key={i} points={path([a, b])} className="wire-collision" />)}
+            </g>
             {(!draft || draft.type === "SEGMENT_MOVE") &&
               <WireHandles circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom} />}
             {editor.selectionBox && (
@@ -971,13 +1005,20 @@ export function App() {
                   <Symbols circuit={ghost} selection={[]} />
                 )}
               {draft?.type === "WIRE_DRAFT" && (
-                <polyline points={path(editor.wirePoints())} className="wire" />
+                <polyline points={path(wirePlan!.points)} className={blocked ? "wire route-blocked" : "wire"} />
               )}
             </g>
           </g>
         </svg>
       </main>
       <aside className="properties">
+        <section className="routing-status" aria-label="현재 배선 설정">
+          <strong>{routingLabel(editor.routing)}</strong>
+          <p>설정에서 변경 · Shift+Space: 꺾임 전환</p>
+          {(draft?.type === "MOVE" || selectedComponents > 0) && <p>드래그 중 R: ↶ 90°<br />Shift+R: ↷ 90°</p>}
+          {blocked ? <p role="alert" className="routing-warning">우회할 수 없습니다. 고정 경유점이나 부품 위치를 조정하세요. Esc: 취소</p>
+            : collisions.length > 0 && <p className="routing-warning">부품과 겹치는 배선이 있습니다. 점선으로 표시했습니다.</p>}
+        </section>
         <h2>선택</h2>
         <p>{selectedComponents}개 부품 · {selectedWires}개 배선</p>
         <p className="net-summary">연결망 {Object.keys(editor.circuit.nets).length}개 · 접속점 {Object.keys(editor.circuit.junctions).length}개</p>
@@ -994,6 +1035,7 @@ export function App() {
           <button disabled={!!draft || selectedWires !== 1 || !!selectedComponents} onClick={() => dispatch("wire.reroute")}>경로 다시 그리기</button>
           <button disabled={!!draft} onClick={() => dispatch("wire.tidyHorizontal")}>가로 우선 정리</button>
           <button disabled={!!draft} onClick={() => dispatch("wire.tidyVertical")}>세로 우선 정리</button>
+          <button disabled={!!draft} title="기존 경유점을 재설정하고 현재 배선 설정으로 정리합니다" onClick={() => dispatch("wire.tidyConfigured")}>설정대로 정리</button>
           {draft?.type === "WIRE_ROUTE" && <button onClick={() => { dispatch("app.confirm"); svg.current?.focus(); }}>경로 수정 완료</button>}
           <p className="note">양 끝 연결은 고정됩니다.<br />드래그 후 놓기: 확정<br />Esc: 취소 · Ctrl+Z: 복구</p>
         </section>}
@@ -1149,6 +1191,8 @@ export function App() {
       {settings && (
         <InputSettings
           user={user}
+          routing={editor.routing}
+          onRoutingChange={applyRouting}
           onChange={applyProfile}
           onClose={() => {
             setSettings(false);

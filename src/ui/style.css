@@ -327,3 +327,12 @@ footer {
 .input-settings .settings-heading button {
   flex-shrink: 0;
 }
+.routing-settings { margin: 20px 0; padding: 16px; border: 1px solid #b9cbd6; border-radius: 8px; background: #f3f9fb; }
+.routing-settings p { font-size: 13px; line-height: 1.6; }
+.routing-settings select { font: inherit; min-width: 170px; padding: 7px 10px; border: 1px solid #b9cbd6; border-radius: 5px; background: white; color: inherit; }
+.routing-status { padding: 10px; border: 1px solid #b9cbd6; border-radius: 6px; background: #f3f9fb; font-size: 12px; line-height: 1.5; }
+.routing-status p { margin: 6px 0 0; }
+.routing-warning { color: #9a3412; }
+.wire-collision { fill: none; stroke: #dc5309; stroke-width: 4; stroke-dasharray: 4 3; vector-effect: non-scaling-stroke; }
+.wire.route-blocked { stroke: #c63816; }
+select:focus-visible { outline: 3px solid #0792b3; }

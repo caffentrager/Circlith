@@ -35,7 +35,7 @@
 
 - 부품 핀과 공유 junction은 별도 endpoint이다. 핀·접속점·선분 사이 배선과 명시적 교차점 접속을 제공한다. 선분은 commit 시 junction을 기준으로 분할한다.
 - 양쪽 endpoint의 부품이 선택되면 내부 배선 전체를 강체 변환한다. 한쪽만 선택되면 그 endpoint와 인접한 첫 waypoint 사이만 직각으로 늘린다. 외부 공유 junction은 고정한다.
-- 다중 회전 중심은 현재 동일한 부품 bounds(가로 80, 세로 40)의 합집합 중심이다. 새 pin 법선 방향 강제는 미구현이며 Master Spec의 잠정 회전 규칙에 대한 후속 검증 대상이다.
+- 다중 회전 중심은 현재 동일한 부품 bounds(가로 80, 세로 40)의 합집합 중심을 그리드에 맞춘다. 스마트 배선은 회전된 pin 출입 방향을 반영한다. 드래그/M 이동 중 R·Shift+R은 누적 미리보기 후 이동과 한 번에 확정·Undo한다. [배선 설정 기록](WIRE_EDITING.md)을 따른다.
 - Waypoint는 사용자 클릭 단위 checkpoint로 관리한다. Backspace는 자동 bend 하나가 아니라 마지막 클릭 전체를 제거한다.
 - History snapshot 방식은 정확한 복원을 우선한 초기 선택이다. 큰 회로 메모리 사용과 응답성은 측정하지 않았다.
 - grid=10, pin hit=9 screen px, drag threshold=4 screen px는 검증 전 가설이다. zoom 범위는 프로토타입에서 50–200%로 제한했다.
@@ -98,7 +98,7 @@ npm run test:browser
 목적: 안전한 첫 편집 흐름과 책임 경계 검증.
 변경 범위: TypeScript/React/Vite 앱, 모델·geometry·editor·SVG·테스트 및 실행 문서.
 구현하지 않은 범위: 위 한계 목록과 첫 사용 가능 버전의 저장·시뮬레이션.
-알려진 문제: 범위 밖 명령·플랫폼은 검증하지 않았으며 새 pin 법선 routing은 후속이다.
+알려진 문제: 범위 밖 명령·플랫폼과 대규모 routing 성능은 검증하지 않았다. 스마트 배선·몸체 우회·겹침 경고·드래그 회전의 구현/검증 범위는 [배선 설정 기록](WIRE_EDITING.md)을 따른다.
 설계 판단: snapshot history와 endpoint 기반 연결 분리. PROVISIONAL 결정은 확정 상태로 변경하지 않았다.
 
 Claude 독립 리뷰를 `review/`에서 확인했다. 오래된 hover의 canvas 이탈은 드래그 입력 변경에서, 메뉴 Esc는 입력 프리셋 변경에서 수정했다. 당시 리뷰와 후속 disposition은 [REVIEW_RESPONSE.md](../review/REVIEW_RESPONSE.md)에 보존한다. 다중 회전·routing·graph validator 문제를 이번 입력 변경에서 해결했다고 주장하지 않는다.

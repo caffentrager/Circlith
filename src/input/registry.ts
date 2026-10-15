@@ -39,6 +39,7 @@ export const commands = [
     { id: "wire.joinCrossing", label: "Connect wire crossing", category: "schematic" },
     { id: "wire.tidyHorizontal", label: "Route horizontal first", category: "schematic" },
     { id: "wire.tidyVertical", label: "Route vertical first", category: "schematic" },
+    { id: "wire.tidyConfigured", label: "Route using settings", category: "schematic" },
     { id: "selection.all", label: "Select all", category: "selection" },
     {
       id: "selection.replaceItem",

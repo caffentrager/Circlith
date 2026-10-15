@@ -15,15 +15,20 @@ import {
   type UserProfile,
 } from "../input/types";
 import { commands } from "../input/registry";
+import { defaultRouting, type RoutingSettings } from "../geometry/routing";
 
 export function InputSettings({
   user,
   onChange,
   onClose,
+  routing,
+  onRoutingChange,
 }: {
   user: UserProfile;
   onChange: (u: UserProfile) => void;
   onClose: () => void;
+  routing: RoutingSettings;
+  onRoutingChange: (settings: RoutingSettings) => void;
 }) {
   const [error, setError] = useState(""),
     [editing, setEditing] = useState<{ key: string; json: string } | null>(
@@ -112,11 +117,28 @@ export function InputSettings({
         className="input-settings"
       >
         <div className="settings-heading">
-          <h2>Settings → Input & Controls</h2>
+          <h2>설정 · 배선 및 입력</h2>
           <button autoFocus onClick={onClose}>
             닫기
           </button>
         </div>
+        <fieldset className="routing-settings">
+          <legend>배선 설정</legend>
+          <label>경로 생성 방식
+            <select aria-label="경로 생성 방식" value={routing.pathMode} onChange={(e) => onRoutingChange({ ...routing, pathMode: e.target.value as RoutingSettings["pathMode"] })}>
+              <option value="smart">스마트 자동</option><option value="horizontal">가로 우선</option><option value="vertical">세로 우선</option>
+            </select>
+          </label>
+          <label>부품과 겹칠 때
+            <select aria-label="부품과 겹칠 때" value={routing.overlapMode} onChange={(e) => onRoutingChange({ ...routing, overlapMode: e.target.value as RoutingSettings["overlapMode"] })}>
+              <option value="avoid">자동 우회</option><option value="warn">경고하며 허용</option>
+            </select>
+          </label>
+          <p>스마트 자동은 핀 방향과 꺾임을 고려합니다. 자동 우회는 부품 몸체에서 여유를 두며, 가로·세로 우선도 장애물을 피합니다.</p>
+          <p>설정은 바로 저장되며 새 배선·경로 정리·이동에 적용됩니다. 기존 회로는 유지됩니다. 고정 경유점이 우회를 막으면 확정 전에 표시합니다.</p>
+          <p>배선 중 Shift+Space: 이번 구간 꺾임 전환 · 부품 드래그 중 R / Shift+R: 반시계 / 시계 회전</p>
+          <button onClick={() => onRoutingChange({ ...defaultRouting })}>배선 설정 초기화</button>
+        </fieldset>
         <label>
           Control Preset{" "}
           <select

@@ -116,7 +116,7 @@ test("editing follows drawing coordinates at 50% and 200% zoom", async ({ page }
     await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2); await page.mouse.down();
     await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2 + 40 * zoom, { steps: 5 });
     await page.mouse.up();
-    await expect(wire).toHaveAttribute("points", "140,100 140,140 360,140 360,300");
+    await expect(wire).toHaveAttribute("points", "140,100 140,140 350,140 350,300 360,300");
     await page.keyboard.press("Control+z"); await expect(wire).toHaveAttribute("points", original!);
   }
 });

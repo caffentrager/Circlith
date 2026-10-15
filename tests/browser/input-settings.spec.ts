@@ -1,7 +1,7 @@
 import { test, expect, type Page } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 async function settings(page: Page) {
-  await page.getByRole("button", { name: "입력 설정", exact: true }).click();
+  await page.getByRole("button", { name: "설정", exact: true }).click();
   return page.getByRole("dialog", { name: "Input & Controls" });
 }
 async function choose(page: Page, id: string) {

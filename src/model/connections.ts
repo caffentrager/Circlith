@@ -1,6 +1,6 @@
 import { clone, connect, id, mergeNets, type Circuit, type ConnectionTarget, type Endpoint, type Point } from "./circuit";
 import { endpointPosition } from "../geometry/geometry";
-import { pointOnSegment, same, simplifyPath } from "../geometry/path";
+import { anchorOffsets, clean, pointOnSegment, same, simplifyPath } from "../geometry/path";
 
 export const targetPosition = (c: Circuit, target: ConnectionTarget): Point =>
   target.type === "wire" ? target.position : endpointPosition(c, target);
@@ -9,7 +9,8 @@ export const targetPosition = (c: Circuit, target: ConnectionTarget): Point =>
 function splitWire(c: Circuit, wireId: string, point: Point, shared?: string): { endpoint: Endpoint; tail?: string } {
   const wire = c.geometry.wires[wireId];
   if (!wire) throw new Error("선택한 배선이 없습니다.");
-  const points = simplifyPath(wire.points);
+  const normalize = wire.anchors?.length ? clean : simplifyPath;
+  const points = normalize(wire.points);
   if (same(point, points[0])) return { endpoint: wire.from };
   if (same(point, points[points.length - 1])) return { endpoint: wire.to };
   const index = points.findIndex((p, i) => i < points.length - 1 && pointOnSegment(p, points[i + 1], point));
@@ -19,10 +20,17 @@ function splitWire(c: Circuit, wireId: string, point: Point, shared?: string): {
   c.geometry.junctions[junction] = { ...point };
   if (!c.nets[wire.net].junctions.includes(junction)) c.nets[wire.net].junctions.push(junction);
   const tail = id();
+  const anchors = wire.anchors, offsets = anchorOffsets(points, anchors ?? []);
+  const cut = points.slice(1, index + 1).reduce((length, p, i) => length + Math.abs(p.x - points[i].x) + Math.abs(p.y - points[i].y), 0)
+    + Math.abs(point.x - points[index].x) + Math.abs(point.y - points[index].y);
   c.geometry.wires[tail] = { ...wire, id: tail, from: endpoint,
-    points: simplifyPath([point, ...points.slice(index + 1)]) };
+    points: normalize([point, ...points.slice(index + 1)]) };
   wire.to = endpoint;
-  wire.points = simplifyPath([...points.slice(0, index + 1), point]);
+  wire.points = normalize([...points.slice(0, index + 1), point]);
+  if (anchors && offsets) {
+    wire.anchors = anchors.filter((_, i) => offsets[i] < cut);
+    c.geometry.wires[tail].anchors = anchors.filter((_, i) => offsets[i] > cut);
+  }
   return { endpoint, tail };
 }
 
@@ -38,12 +46,12 @@ function materialize(c: Circuit, target: ConnectionTarget, lineage: Map<string, 
   return result.endpoint;
 }
 
-export function connectTargets(c: Circuit, from: ConnectionTarget, to: ConnectionTarget, points: Point[]): Circuit | null {
+export function connectTargets(c: Circuit, from: ConnectionTarget, to: ConnectionTarget, points: Point[], anchors?: Point[]): Circuit | null {
   if (same(targetPosition(c, from), targetPosition(c, to))) return null;
   const next = clone(c), lineage = new Map<string, string[]>();
   const a = materialize(next, from, lineage), b = materialize(next, to, lineage);
   if (a.type === b.type && a.id === b.id) return null;
-  connect(next, a, b, simplifyPath(points));
+  connect(next, a, b, points, anchors);
   assertCircuit(next);
   return next;
 }
@@ -101,6 +109,7 @@ export function validateCircuit(c: Circuit): string[] {
     adjacency.set(a, new Set([...(adjacency.get(a) ?? []), b]));
     adjacency.set(b, new Set([...(adjacency.get(b) ?? []), a]));
     const pts = w.points;
+    if (w.anchors && (w.anchors.some((a) => !Number.isFinite(a.x) || !Number.isFinite(a.y)) || anchorOffsets(pts, w.anchors) === null)) errors.push("배선 경유점 오류");
     if (pts.length < 1 || pts.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y)) ||
       !same(pts[0], endpointPosition(c, w.from)) || !same(pts[pts.length - 1], endpointPosition(c, w.to)) ||
       pts.some((p, i) => i > 0 && (same(p, pts[i - 1]) || (p.x !== pts[i - 1].x && p.y !== pts[i - 1].y)))) errors.push("배선 경로 오류");

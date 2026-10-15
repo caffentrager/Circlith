@@ -26,7 +26,7 @@ export type Circuit = {
     junctions: Record<string, Point>;
     wires: Record<
       string,
-      { id: string; net: string; from: Endpoint; to: Endpoint; points: Point[] }
+      { id: string; net: string; from: Endpoint; to: Endpoint; points: Point[]; anchors?: Point[] }
     >;
   };
 };
@@ -67,6 +67,7 @@ export function connect(
   from: Endpoint,
   to: Endpoint,
   points: Point[],
+  anchors?: Point[],
 ) {
   const owners = Object.values(c.nets).filter((n) =>
     [from, to].some((e) =>
@@ -79,7 +80,7 @@ export function connect(
     if (!list.includes(e.id)) list.push(e.id);
   }
   const key = id();
-  c.geometry.wires[key] = { id: key, net, from, to, points };
+  c.geometry.wires[key] = { id: key, net, from, to, points, ...(anchors?.length ? { anchors: clone(anchors) } : {}) };
 }
 export function mergeNets(c: Circuit, ids: string[]): string {
   const net = ids[0] ?? id();

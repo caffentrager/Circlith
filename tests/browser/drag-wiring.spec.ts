@@ -46,7 +46,7 @@ test("palette drop and pin dragging use drawing coordinates at 50% zoom", async 
   await page.mouse.up();
   await expect(page.locator("main [data-wire]")).toHaveAttribute(
     "points",
-    "240,200 560,200 560,400",
+    "240,200 550,200 550,400 560,400",
   );
 });
 
@@ -144,7 +144,7 @@ test("pin drag snaps at release, preserves orthogonal wire, and cancelled wire d
   await expect(page.locator("main [data-wire]")).toHaveCount(1);
   await expect(page.locator("main [data-wire]")).toHaveAttribute(
     "points",
-    "140,100 360,100 360,300",
+    "140,100 350,100 350,300 360,300",
   );
   await page.keyboard.press("Escape");
   await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);

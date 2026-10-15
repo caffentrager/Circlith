@@ -1,6 +1,6 @@
 import { clone, type Circuit, type Point } from "../model/circuit";
 import { endpointPosition, route, same } from "./geometry";
-import { simplifyPath } from "./path";
+import { clean, simplifyPath } from "./path";
 export { simplifyPath } from "./path";
 
 export type WireEditKind = "segment" | "corner" | "jog";
@@ -56,10 +56,10 @@ export function editWirePath(points: Point[], index: number, kind: WireEditKind,
   return simplifyPath(next);
 }
 
-export function replaceWirePath(c: Circuit, key: string, points: Point[]): Circuit {
+export function replaceWirePath(c: Circuit, key: string, points: Point[], anchors?: Point[]): Circuit {
   const wire = c.geometry.wires[key];
   if (!wire) throw new Error("배선이 없습니다.");
-  const normalized = simplifyPath(points);
+  const normalized = anchors?.length ? clean(points) : simplifyPath(points);
   if (normalized.length < 1 || normalized.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y)) ||
     !same(normalized[0], endpointPosition(c, wire.from)) ||
     !same(normalized[normalized.length - 1], endpointPosition(c, wire.to)) ||
@@ -67,6 +67,7 @@ export function replaceWirePath(c: Circuit, key: string, points: Point[]): Circu
     throw new Error("연결점과 직각 경로를 유지해야 합니다.");
   const next = clone(c);
   next.geometry.wires[key].points = normalized;
+  if (anchors) next.geometry.wires[key].anchors = structuredClone(anchors);
   return next;
 }
 

@@ -103,7 +103,7 @@ export function transform(
   const chosen = new Set(selection.filter((k) => c.components[k]));
   if (!chosen.size) return next;
   const positions = [...chosen].map((k) => c.geometry.components[k].position);
-  const center = {
+  const center = snap({
     x:
       (Math.min(...positions.map((p) => p.x - 40)) +
         Math.max(...positions.map((p) => p.x + 40))) /
@@ -112,7 +112,7 @@ export function transform(
       (Math.min(...positions.map((p) => p.y - 20)) +
         Math.max(...positions.map((p) => p.y + 20))) /
       2,
-  };
+  });
   const map = (p: Point) => {
     const r = rotatePoint({ x: p.x - center.x, y: p.y - center.y }, rotation);
     return { x: center.x + r.x + delta.x, y: center.y + r.y + delta.y };
@@ -129,6 +129,7 @@ export function transform(
       b = moving(w.to);
     if (a && b) {
       w.points = simplifyPath(w.points.map(map));
+      if (w.anchors) w.anchors = w.anchors.map(map);
       continue;
     }
     const stretch = (points: Point[], e: Endpoint) => {

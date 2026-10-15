@@ -33,3 +33,19 @@ export function pointOnSegment(a: Point, b: Point, p: Point): boolean {
   const q = projectSegment(a, b, p);
   return Math.hypot(q.x - p.x, q.y - p.y) < 1e-7;
 }
+
+// Arc-length positions preserve the order of explicit waypoints, including retraces.
+export function anchorOffsets(points: Point[], anchors: Point[]): number[] | null {
+  const offsets: number[] = []; let previous = 0;
+  for (const anchor of anchors) {
+    let length = 0, found = false;
+    if (points.length === 1 && same(points[0], anchor)) { offsets.push(0); continue; }
+    for (let i = 1; i < points.length; i++) {
+      const a = points[i - 1], b = points[i], offset = length + Math.abs(anchor.x - a.x) + Math.abs(anchor.y - a.y);
+      if (offset >= previous && pointOnSegment(a, b, anchor)) { offsets.push(offset); previous = offset; found = true; break; }
+      length += Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
+    }
+    if (!found) return null;
+  }
+  return offsets;
+}
