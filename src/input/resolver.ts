@@ -18,9 +18,9 @@ export const activeContexts = (focus: string, operation: string): Context[] =>
             "canvas",
             ...(operation === "PLACE"
               ? ["placement" as Context]
-              : operation === "MOVE"
+              : operation === "MOVE" || operation === "SEGMENT_MOVE"
                 ? ["move" as Context]
-                : operation === "WIRE_DRAFT"
+                : operation === "WIRE_DRAFT" || operation === "WIRE_ROUTE"
                   ? ["wire-draft" as Context]
                   : []),
           ];

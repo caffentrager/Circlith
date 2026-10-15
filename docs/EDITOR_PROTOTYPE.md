@@ -41,8 +41,22 @@
 - grid=10, pin hit=9 screen px, drag threshold=4 screen px는 검증 전 가설이다. zoom 범위는 프로토타입에서 50–200%로 제한했다.
 - 검색 라이브러리는 세 부품만 포함한다. exact/prefix/부분 문자열 및 in/out 별칭을 제공한다. 결과가 하나면 Enter, 여러 결과는 명시적 버튼 선택. Favorites/recent/fuzzy 확장은 후속이다.
 - 저장·자동 복구·시뮬레이션·분기 UI·삭제·clipboard·Properties·hover 부품 명령·키 재배정·Alt snap은 미구현이다. 새로고침 후 회로는 유지되지 않는다.
-- 빈 공간 좌클릭 drag는 BOX_SELECT다. 좌→우는 핀을 포함한 부품 bounds 전체 포함, 우→좌는 교차 부품을 선택한다. 회전과 zoom을 반영하고 Shift는 기존 선택에 추가한다. 현재 box select 대상은 부품이며 wire 선택은 후속이다. 선택은 release에서만 변경하며 취소는 기존 선택을 보존한다. PAN은 안정된 Draft와 selection/history를 유지하며 바인딩은 [입력 프리셋 기록](INPUT_CONTROLS.md)을 따른다. 단순 빈 공간 좌클릭은 선택 해제다.
+- 빈 공간 좌클릭 drag는 BOX_SELECT다. 좌→우는 핀을 포함한 부품 bounds와 배선 경로 전체가 포함된 대상을, 우→좌는 실제로 교차하는 부품·배선 선분을 선택한다. 회전과 zoom을 반영하고 Shift는 기존 선택에 추가한다. 선택은 release에서만 변경하며 취소는 기존 선택을 보존한다. PAN은 안정된 Draft와 selection/history를 유지하며 바인딩은 [입력 프리셋 기록](INPUT_CONTROLS.md)을 따른다. 단순 빈 공간 좌클릭은 선택 해제다.
 - 4상태 truth/resolution과 feedback stabilization은 DEC-010 확정 전 구현하지 않는다. 시간·계층·Bus·Q Quick Place 등도 활성화하지 않는다.
+
+## 배선 선택 보강 — 2026-10-15
+
+배선도 클릭·Shift+클릭·선택박스·Ctrl+A로 선택하며 점선 강조와 선택 개수를 표시한다. 클릭 판정은 zoom과 무관하게 선 중심에서 6 screen px다. 배선 완료 후 WIRE 대기 상태에서 기존 선을 클릭하면 SELECT로 전환해 선택한다. 활성 배선 초안과 핀 직접 배선은 기존 동작을 유지한다. 후속 경로 편집 구현은 아래 기록을 따른다.
+
+선택은 부품·배선 ID를 함께 보관하며 회로 편집/Undo 이후 실제 존재하는 ID만 유지한다. 배선만 선택한 상태에서는 부품 Move/Rotate 버튼을 비활성화하며, 혼합 선택의 부품 변환은 기존 endpoint 기반 배선 갱신 규칙을 따른다. Shift+Home은 선택 배선도 화면에 맞춘다. 선택으로 회로·history·Redo를 변경하지 않는다.
+
+Node.js 24.19.0 / Windows / Playwright Chromium 156에서 빌드, 단위 테스트 27개, 브라우저 테스트 24개 통과. 기존 21개 브라우저 테스트와 배선 클릭·Shift·전체 선택·취소·Undo/Redo, L자 경로의 실제 교차, 50% zoom·Pan 후 screen px 판정 및 핀 배선 우선순위 회귀 테스트를 포함한다.
+
+## 배선 경로 편집 구현 — 2026-10-15
+
+Master Spec §12.5에 따라 선분·모서리 드래그, 국소 우회 구간 추가, 경로 다시 그리기와 일괄 가로/세로 우선 정리를 추가했다. `geometry/wire-edit.ts`가 geometry와 경로 검증을, `WireHandles.tsx`가 편집 핸들을 담당한다. Editor의 `SEGMENT_MOVE`/`WIRE_ROUTE` 초안은 확정 전 committed circuit을 바꾸지 않는다. `electricalGraph()`에 wire endpoint와 net을 포함해 기존 불변식 검사가 endpoint 변경도 검출한다.
+
+조사 출처·조작법·기능 한계는 [WIRE_EDITING.md](WIRE_EDITING.md)를 따른다. Node.js 24.19.0 / Windows / Playwright Chromium 156에서 빌드, 단위 테스트 32개와 브라우저 테스트 29개 통과. geometry 조합 275개에서 고정 endpoint·직각·결정성·연결 보존을 확인하며, 브라우저에서는 직접 드래그·핸들·초안 취소·Undo/Redo·경로 다시 그리기와 50/200% zoom을 포함한다.
 
 ## 입력 억제 범위
 

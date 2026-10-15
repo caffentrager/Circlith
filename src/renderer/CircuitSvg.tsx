@@ -13,12 +13,19 @@ export function Symbols({
     <>
       <g data-layer="wires">
         {Object.values(circuit.geometry.wires).map((w) => (
-          <polyline
-            key={w.id}
-            data-wire={w.id}
-            points={path(w.points)}
-            className="wire"
-          />
+          <g key={w.id}>
+            <polyline
+              data-wire-hit={w.id}
+              points={path(w.points)}
+              className="wire-hit"
+            />
+            <polyline
+              data-wire={w.id}
+              points={path(w.points)}
+              className={selection.includes(w.id) ? "wire selected" : "wire"}
+              pointerEvents="none"
+            />
+          </g>
         ))}
       </g>
       <g data-layer="junctions">

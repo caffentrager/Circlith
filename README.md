@@ -10,13 +10,16 @@ Node.js 22.23.3 이상에서 `npm ci` 후 `npm run dev`로 실행합니다. `npm
 
 공개 프로토타입: [GitHub Pages](https://caffentrager.github.io/Circlith/). `main` 또는 `feat/editor-prototype`에 push하면 단위·브라우저 테스트와 빌드 성공 후 GitHub Actions로 배포합니다. 로컬 개발은 `/`, Pages 빌드는 `/Circlith/` 경로를 사용합니다.
 
-빈 공간에서 좌클릭 드래그는 부품 선택박스입니다. 기본 Circlith Modern은 짧은 우클릭 메뉴, Space+좌드래그/가운데 버튼 드래그 화면 이동입니다. 선택박스는 좌→우 전체 포함, 우→좌 교차 선택이며 Shift로 기존 선택에 추가합니다. `입력 설정`에서 8개 프리셋 선택·navigation 혼합·바인딩 수정·JSON 가져오기/내보내기가 가능합니다. 설정은 브라우저에 저장하며 회로는 저장하지 않습니다.
+부품과 배선은 클릭으로 선택하고 Shift+클릭으로 추가·해제합니다. 선택 배선은 선분 드래그, 모서리 이동, 우회 구간 추가, 경로 다시 그리기와 가로/세로 우선 정리가 가능합니다. 양 끝 연결은 고정하며 수정 하나마다 Undo로 복구합니다. [배선 편집 사용법과 공식 문서 조사](docs/WIRE_EDITING.md)를 참고하세요.
+
+빈 공간 좌클릭 드래그는 부품·배선 선택박스입니다. 기본 Circlith Modern은 짧은 우클릭 메뉴, Space+좌드래그/가운데 버튼 드래그 화면 이동입니다. 선택박스는 좌→우 전체 포함, 우→좌 교차 선택이며 Shift로 기존 선택에 추가합니다. `입력 설정`에서 8개 프리셋 선택·navigation 혼합·바인딩 수정·JSON 가져오기/내보내기가 가능합니다. 설정은 브라우저에 저장하며 회로는 저장하지 않습니다.
 
 ## 문서
 
 - [Master Spec](docs/CIRCLITH_MASTER_SPEC.md): 제품 정의, 결정 레지스트리, 조작·입력·배선·시뮬레이션·저장·검증 기준.
 - [편집 프로토타입 구현 기록](docs/EDITOR_PROTOTYPE.md): 구조, 범위, 잠정 설계 판단, 입력 매트릭스, 검증과 한계.
 - [입력 프리셋 구현 기록](docs/INPUT_CONTROLS.md): 명령/resolver/dispatcher 경계, 프리셋 의미론, 사용자 설정, 검증과 미지원 명령.
+- [배선 경로 편집](docs/WIRE_EDITING.md): 공식 문서 비교, 핸들·선분 드래그·경로 다시 그리기와 검증 범위.
 - [이전 문서 목록](docs/archive/README.md): 통합 이전 계획, 단축키 제안, 검토 및 회신 이력.
 - [업로드 전 정보 검토 기록](docs/INFORMATION_REVIEW.md): 제거한 정보와 검토 범위.
 

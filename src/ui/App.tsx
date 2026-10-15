@@ -9,6 +9,8 @@ import {
 } from "../model/circuit";
 import { pinPosition, snap } from "../geometry/geometry";
 import { Symbols, path } from "../renderer/CircuitSvg";
+import { WireHandles } from "../renderer/WireHandles";
+import { nearestSegment, simplifyPath, type WireEditKind } from "../geometry/wire-edit";
 import { CommandDispatcher } from "../editor/dispatcher";
 import {
   effective,
@@ -47,13 +49,14 @@ export function App() {
   } | null>(null);
   const suppressPaletteClick = useRef(false);
   const gesture = useRef<{
-    type: "pan" | "move" | "wire" | "box" | "panPending" | "click";
+    type: "pan" | "move" | "wire" | "box" | "panPending" | "click" | "wireEditPending" | "wireEdit";
     start: Point;
     view: { x: number; y: number };
     moved: boolean;
     threshold?: number;
     clickCommand?: string;
     objectKey?: string;
+    wireEdit?: { wire: string; index: number; kind: WireEditKind; origin: Point };
   } | null>(null);
   const [search, setSearch] = useState<string | null>(null);
   const [menu, setMenu] = useState(false);
@@ -154,6 +157,7 @@ export function App() {
       gesture.current?.type === "move" ||
       gesture.current?.type === "wire" ||
       gesture.current?.type === "box" ||
+      gesture.current?.type === "wireEdit" ||
       paletteDrag.current?.active
     )
       editor.cancel();
@@ -207,6 +211,10 @@ export function App() {
     refresh();
   };
   const move = () => {
+    if (editor.selection.length && !editor.selection.some((key) => editor.circuit.components[key])) {
+      setMessage("선분을 드래그하거나 원형 핸들을 끌어 이동하세요. 사각형은 모서리, 마름모는 우회 구간입니다.");
+      return;
+    }
     editor.move(cursor.current);
     svg.current?.focus();
     refresh();
@@ -271,13 +279,32 @@ export function App() {
       },
       "wire.removeLastPoint": () => editor.backspace(),
       "wire.toggleBend": () => {
-        if (editor.draft?.type === "WIRE_DRAFT")
+        if (editor.draft?.type === "WIRE_DRAFT" || editor.draft?.type === "WIRE_ROUTE")
           editor.draft.horizontal = !editor.draft.horizontal;
       },
+      "wire.editPath": (p) => {
+        if (p?.wire) editor.beginWireEdit(p.wire, p.index, p.kind, p.origin);
+        else setMessage("수정할 선분 또는 편집 핸들을 드래그하세요.");
+      },
+      "wire.reroute": () => {
+        const wires = editor.selection.filter((key) => editor.circuit.geometry.wires[key]);
+        if (wires.length !== 1 || editor.selection.length !== 1) {
+          setMessage("다시 그릴 배선 하나만 선택하세요.");
+          return;
+        }
+        editor.rerouteWire(wires[0]);
+        svg.current?.focus();
+        setMessage("경유점 클릭 · Shift+Space 꺾임 전환 · Backspace 되돌리기 · Enter 완료 · Esc 취소. 양 끝 연결은 유지됩니다.");
+      },
+      "wire.tidyHorizontal": () => editor.tidyWires(true),
+      "wire.tidyVertical": () => editor.tidyWires(false),
       "grid.toggleVisible": () => setGrid((v) => !v),
       "selection.all": () => {
         if (!editor.draft)
-          editor.selection = Object.keys(editor.circuit.components);
+          editor.selection = [
+            ...Object.keys(editor.circuit.components),
+            ...Object.keys(editor.circuit.geometry.wires),
+          ];
       },
       "selection.replaceItem": (p) => {
         if (p?.key) editor.selection = [p.key];
@@ -375,6 +402,8 @@ export function App() {
   });
   const preview = editor.preview();
   const draft = editor.draft;
+  const selectedComponents = editor.selection.filter((key) => editor.circuit.components[key]).length;
+  const selectedWires = editor.selection.filter((key) => editor.circuit.geometry.wires[key]).length;
   const ghost = emptyCircuit();
   if (draft?.type === "PLACE")
     addComponent(ghost, draft.kind, draft.position, draft.rotation);
@@ -592,7 +621,7 @@ export function App() {
           }}
           onPointerDown={(e) => {
             const object = (e.target as Element).closest(
-              '[data-component],[data-pin],[data-wire],[data-layer="junctions"]',
+              '[data-component],[data-pin],[data-wire],[data-wire-hit],[data-wire-handle],[data-layer="junctions"]',
             );
             svg.current?.focus();
             pointer.current = { clientX: e.clientX, clientY: e.clientY };
@@ -612,7 +641,10 @@ export function App() {
               contexts(),
             );
             const objectKey =
-              object?.getAttribute("data-component") ?? undefined;
+              object?.getAttribute("data-component") ??
+              object?.getAttribute("data-wire") ??
+              object?.getAttribute("data-wire-hit") ??
+              object?.getAttribute("data-wire-handle") ?? undefined;
             if (
               dragBinding?.command === "view.pan" ||
               (button === "right" && clickBinding)
@@ -637,7 +669,11 @@ export function App() {
             hover.current = pin;
             if (editor.draft) {
               editor.update(cursor.current);
-              if (editor.draft.type === "WIRE_DRAFT" && !pin) editor.waypoint();
+              if (editor.draft.type === "WIRE_ROUTE") {
+                const end = editor.circuit.geometry.wires[editor.draft.wire].to;
+                if (pin?.type === end.type && pin.id === end.id) dispatch("app.confirm");
+                else editor.waypoint();
+              } else if (editor.draft.type === "WIRE_DRAFT" && !pin) editor.waypoint();
               else
                 dispatch("app.confirm", { endpoint: pin, repeat: e.shiftKey });
               refresh();
@@ -655,10 +691,12 @@ export function App() {
               refresh();
               return;
             }
-            if (editor.tool === "WIRE") return;
-            const key = (e.target as Element)
-              .closest("[data-component]")
-              ?.getAttribute("data-component");
+            const wire = objectKey && editor.circuit.geometry.wires[objectKey];
+            if (editor.tool === "WIRE") {
+              if (!wire) return;
+              dispatch("tool.select");
+            }
+            const key = objectKey;
             if (key) {
               if (
                 clickBinding?.command === "selection.toggleItem" ||
@@ -666,16 +704,28 @@ export function App() {
               ) {
                 dispatch(clickBinding.command, { key });
               } else {
-                if (!editor.selection.includes(key))
+                if (wire || !editor.selection.includes(key))
                   dispatch("selection.replaceItem", { key });
-                dispatch("component.moveSafe");
-                gesture.current = {
-                  type: "move",
-                  start: screen(e),
-                  view: { x: 0, y: 0 },
-                  moved: false,
-                };
-                e.currentTarget.setPointerCapture(e.pointerId);
+                if (wire) {
+                  const handle = (e.target as Element).closest("[data-wire-handle]");
+                  gesture.current = {
+                    type: "wireEditPending", start: screen(e), view: { x: 0, y: 0 }, moved: false,
+                    wireEdit: { wire: key, kind: (handle?.getAttribute("data-kind") ?? "segment") as WireEditKind,
+                      index: handle ? Number(handle.getAttribute("data-index")) : nearestSegment(simplifyPath(wire.points), drawingPoint(e)),
+                      origin: cursor.current },
+                  };
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                  setMessage("선분·원형 핸들 드래그: 이동 · 사각형: 모서리 이동 · 마름모: 우회 구간 추가 · Esc: 취소");
+                } else {
+                  dispatch("component.moveSafe");
+                  gesture.current = {
+                    type: "move",
+                    start: screen(e),
+                    view: { x: 0, y: 0 },
+                    moved: false,
+                  };
+                  e.currentTarget.setPointerCapture(e.pointerId);
+                }
               }
             } else if (
               !object &&
@@ -701,7 +751,15 @@ export function App() {
           onPointerMove={(e) => {
             pointer.current = { clientX: e.clientX, clientY: e.clientY };
             const g = gesture.current;
-            if (g?.type === "panPending") {
+            if (g?.type === "wireEditPending" || g?.type === "wireEdit") {
+              const p = screen(e);
+              if (g.type === "wireEditPending" && Math.hypot(p.x - g.start.x, p.y - g.start.y) >= 4) {
+                dispatch("wire.editPath", g.wireEdit);
+                g.type = "wireEdit";
+                g.moved = true;
+              }
+              if (g.type === "wireEdit") editor.update(world(e));
+            } else if (g?.type === "panPending") {
               const p = screen(e);
               if (
                 Math.hypot(p.x - g.start.x, p.y - g.start.y) >=
@@ -755,6 +813,13 @@ export function App() {
             if (g?.type === "move") {
               if (g.moved) dispatch("app.confirm");
               else editor.cancel();
+            }
+            if (g?.type === "wireEdit") {
+              if (insideCanvas(e)) {
+                editor.update(world(e));
+                dispatch("app.confirm");
+                setMessage("배선 경로를 수정했습니다. Ctrl+Z로 되돌릴 수 있습니다.");
+              } else editor.cancel();
             }
             if (
               g?.type === "wire" &&
@@ -810,6 +875,8 @@ export function App() {
               />
             )}
             <Symbols circuit={preview} selection={editor.selection} />
+            {(!draft || draft.type === "SEGMENT_MOVE") &&
+              <WireHandles circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom} />}
             {editor.selectionBox && (
               <rect
                 data-layer="selection-box"
@@ -860,14 +927,24 @@ export function App() {
       </main>
       <aside className="properties">
         <h2>선택</h2>
-        <p>{editor.selection.length}개 부품</p>
-        <button onClick={() => dispatch("component.moveSafe")}>
+        <p>{selectedComponents}개 부품 · {selectedWires}개 배선</p>
+        {selectedWires > 0 && <section className="wire-tools" aria-label="배선 경로 편집">
+          <h2>배선 경로 편집</h2>
+          <p>원 ○ 선분 이동<br />사각 □ 모서리 이동<br />마름모 ◇ 우회 구간 추가</p>
+          <button disabled={!!draft || selectedWires !== 1 || !!selectedComponents} onClick={() => dispatch("wire.reroute")}>경로 다시 그리기</button>
+          <button disabled={!!draft} onClick={() => dispatch("wire.tidyHorizontal")}>가로 우선 정리</button>
+          <button disabled={!!draft} onClick={() => dispatch("wire.tidyVertical")}>세로 우선 정리</button>
+          {draft?.type === "WIRE_ROUTE" && <button onClick={() => { dispatch("app.confirm"); svg.current?.focus(); }}>경로 수정 완료</button>}
+          <p className="note">양 끝 연결은 고정됩니다.<br />드래그 후 놓기: 확정<br />Esc: 취소 · Ctrl+Z: 복구</p>
+        </section>}
+        <button disabled={!selectedComponents} onClick={() => dispatch("component.moveSafe")}>
           연결 유지 이동
         </button>
-        <button onClick={() => dispatch("component.rotateCCW90")}>
+        <button disabled={!selectedComponents} onClick={() => dispatch("component.rotateCCW90")}>
           반시계 회전
         </button>
         <button
+          disabled={!selectedComponents}
           onClick={() => {
             dispatch("component.rotateCW90");
           }}

@@ -118,6 +118,33 @@ svg:focus {
   stroke-width: 2;
   fill: none;
 }
+.wire-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 12;
+  vector-effect: non-scaling-stroke;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+.wire.selected {
+  vector-effect: non-scaling-stroke;
+}
+.wire-handle {
+  fill: #fff;
+  stroke: #008cab;
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+  pointer-events: all;
+}
+.wire-handle.horizontal { cursor: ns-resize; }
+.wire-handle.vertical { cursor: ew-resize; }
+.wire-handle.corner { cursor: move; }
+.wire-handle.jog { fill: #dff8f4; stroke: #087b68; }
+.wire-handle:hover { fill: #74e2df; }
+.wire-tools { border-top: 1px solid #c5cfdb; padding-top: 15px; margin-bottom: 15px; }
+.wire-tools h2 { margin-bottom: 8px; }
+.properties { overflow-y: auto; }
+button:disabled { opacity: .45; cursor: default; }
 .symbol {
   fill: #f8fcff;
   stroke: #516d82;

@@ -32,6 +32,10 @@ export const commands = [
       category: "schematic",
     },
     { id: "wire.toggleBend", label: "Toggle wire bend", category: "schematic" },
+    { id: "wire.editPath", label: "Edit wire path", category: "schematic" },
+    { id: "wire.reroute", label: "Redraw wire path", category: "schematic" },
+    { id: "wire.tidyHorizontal", label: "Route horizontal first", category: "schematic" },
+    { id: "wire.tidyVertical", label: "Route vertical first", category: "schematic" },
     { id: "selection.all", label: "Select all", category: "selection" },
     {
       id: "selection.replaceItem",

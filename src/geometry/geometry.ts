@@ -70,6 +70,34 @@ export function boxComponents(c: Circuit, start: Point, end: Point): string[] {
       : x1 >= left && x2 <= right && y1 >= top && y2 <= bottom;
   });
 }
+export function boxWires(c: Circuit, start: Point, end: Point): string[] {
+  const left = Math.min(start.x, end.x), right = Math.max(start.x, end.x);
+  const top = Math.min(start.y, end.y), bottom = Math.max(start.y, end.y);
+  const inside = (p: Point) =>
+    p.x >= left && p.x <= right && p.y >= top && p.y <= bottom;
+  const intersects = (a: Point, b: Point) => {
+    let enter = 0, exit = 1;
+    for (const [origin, delta, min, max] of [
+      [a.x, b.x - a.x, left, right],
+      [a.y, b.y - a.y, top, bottom],
+    ]) {
+      if (delta === 0) {
+        if (origin < min || origin > max) return false;
+      } else {
+        const t1 = (min - origin) / delta, t2 = (max - origin) / delta;
+        enter = Math.max(enter, Math.min(t1, t2));
+        exit = Math.min(exit, Math.max(t1, t2));
+        if (enter > exit) return false;
+      }
+    }
+    return true;
+  };
+  return Object.values(c.geometry.wires)
+    .filter((wire) => wire.points.length > 1 && (end.x >= start.x
+      ? wire.points.every(inside)
+      : wire.points.some((p, i) => i > 0 && intersects(wire.points[i - 1], p))))
+    .map((wire) => wire.id);
+}
 // Only the span adjacent to a moving endpoint is rebuilt. Shared junctions remain fixed.
 export function transform(
   c: Circuit,

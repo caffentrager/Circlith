@@ -95,5 +95,8 @@ export function electricalGraph(c: Circuit) {
     pins: c.pins,
     nets: c.nets,
     junctions: c.junctions,
+    // Endpoint ownership is electrical even though wire routes live in geometry.
+    wires: Object.values(c.geometry.wires).sort((a, b) => a.id.localeCompare(b.id))
+      .map(({ id, net, from, to }) => ({ id, net, from, to })),
   });
 }

@@ -13,9 +13,10 @@ export function fitView(
         { x: p.position.x - 50, y: p.position.y - 50 },
         { x: p.position.x + 50, y: p.position.y + 50 },
       );
-  if (!chosen) {
-    for (const wire of Object.values(c.geometry.wires))
+  for (const wire of Object.values(c.geometry.wires))
+    if (!chosen || chosen.has(wire.id))
       points.push(...wire.points);
+  if (!chosen) {
     points.push(...Object.values(c.geometry.junctions));
   }
   if (!points.length) return null;
