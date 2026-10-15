@@ -32,7 +32,7 @@ import {
 import { signature, type UserProfile } from "../input/types";
 import { keyboardAdapter } from "./keyboardAdapter";
 import { InputSettings } from "./InputSettings";
-import { fitView } from "../geometry/view";
+import { fitView, wheelZoomFactor, zoomView, ZOOM_STEP } from "../geometry/view";
 import { collidingSegments, defaultRouting, routingLabel, routingStorageKey, validateRouting, type RoutingSettings } from "../geometry/routing";
 import "./style.css";
 const kinds: Kind[] = ["AND", "Input", "Output"];
@@ -241,19 +241,13 @@ export function App() {
     svg.current?.focus();
     refresh();
   };
-  const zoomAt = (direction: number, point?: Point) => {
+  const zoomAt = (factor: number, point?: Point) => {
     const v = editor.viewport,
       p = point ?? {
         x: svg.current!.clientWidth / 2,
         y: svg.current!.clientHeight / 2,
       };
-    const z = Math.max(
-      0.5,
-      Math.min(2, v.zoom * (direction < 0 ? 1.1 : 1 / 1.1)),
-    );
-    v.x = p.x - ((p.x - v.x) * z) / v.zoom;
-    v.y = p.y - ((p.y - v.y) * z) / v.zoom;
-    v.zoom = z;
+    editor.viewport = zoomView(v, factor, p);
     hover.current = hitConnection(pointer.current);
   };
   const dispatcher = new CommandDispatcher(
@@ -277,14 +271,20 @@ export function App() {
         else editor.escape();
       },
       "app.confirm": (p) => {
-        if (editor.draft?.type === "WIRE_DRAFT") {
-          requestConnection("finish", p?.endpoint);
-          if (!editor.draft) setMessage("연결했습니다. 점은 접속점이며, 점 없이 지나가는 교차는 미접속입니다. WIRE 도구에서는 클릭으로 계속 분기할 수 있습니다.");
-        }
-        else {
-          const cleaning = editor.draft?.type === "WIRE_CLEANUP";
-          editor.confirm(undefined, p?.repeat ?? false);
-          if (cleaning && !editor.draft) setMessage("중복 우회를 정리했습니다. 접속점과 연결은 유지됩니다. Ctrl+Z로 전체 복구할 수 있습니다.");
+        const operation = editor.draft?.type;
+        try {
+          if (editor.draft?.type === "WIRE_DRAFT") {
+            requestConnection("finish", p?.endpoint);
+            if (!editor.draft) setMessage("연결했습니다. 점은 접속점이며, 점 없이 지나가는 교차는 미접속입니다. WIRE 도구에서는 클릭으로 계속 분기할 수 있습니다.");
+          } else {
+            const cleaning = editor.draft?.type === "WIRE_CLEANUP";
+            editor.confirm(undefined, p?.repeat ?? false);
+            if (cleaning && !editor.draft) setMessage("중복 우회를 정리했습니다. 접속점과 연결은 유지됩니다. Ctrl+Z로 전체 복구할 수 있습니다.");
+          }
+          if (operation === "SEGMENT_MOVE" && !editor.draft) setMessage("배선 경로를 수정했습니다. Ctrl+Z로 되돌릴 수 있습니다.");
+        } catch (error) {
+          if (p?.pointerDrag && (operation === "MOVE" || operation === "SEGMENT_MOVE")) editor.cancel();
+          throw error;
         }
       },
       "history.undo": undo,
@@ -393,11 +393,11 @@ export function App() {
       },
       "view.zoom": (p) =>
         zoomAt(
-          p.delta * (resolver.profile.behavior?.reverseWheel ? -1 : 1),
+          wheelZoomFactor(p.delta, p.deltaMode ?? 0, svg.current!.clientHeight, !!resolver.profile.behavior?.reverseWheel),
           p.point,
         ),
-      "view.zoomIn": () => zoomAt(-1),
-      "view.zoomOut": () => zoomAt(1),
+      "view.zoomIn": () => zoomAt(ZOOM_STEP),
+      "view.zoomOut": () => zoomAt(1 / ZOOM_STEP),
       "view.fitAll": () => {
         const v = fitView(
           editor.circuit,
@@ -432,6 +432,7 @@ export function App() {
   };
   dispatchRef.current = dispatch;
   wheelHandlerRef.current = (e) => {
+    if (!Number.isFinite(e.deltaY) || e.deltaY === 0) return;
     const modifiers = mouseModifiers(e),
       type = modifiers.length ? "wheelChord" : "wheel";
     const binding = resolver.mouse(
@@ -443,7 +444,7 @@ export function App() {
     );
     if (!binding) return;
     e.preventDefault();
-    dispatch(binding.command, { delta: e.deltaY, point: screen(e) });
+    dispatch(binding.command, { delta: e.deltaY, deltaMode: e.deltaMode, point: screen(e) });
     pointer.current = { clientX: e.clientX, clientY: e.clientY };
     hover.current = hitConnection(e);
     refresh();
@@ -527,12 +528,16 @@ export function App() {
       }}
       onFocusCapture={(e) => {
         resolver.cancel();
-        const el = e.target as Element;
+        const el = e.target as HTMLElement;
         editor.focus = el.closest("svg")
           ? "CANVAS"
-          : el.matches('input,textarea,[contenteditable="true"]')
+          : el.matches('input,textarea') || el.isContentEditable
             ? "TEXT_EDITOR"
-            : "MODAL";
+            : el.closest('.overlay,[role="dialog"]') ? "MODAL" : "CANVAS";
+      }}
+      onClick={(e) => {
+        const button = (e.target as Element).closest("button");
+        if (button && !button.disabled && !button.closest('.overlay,[role="dialog"]')) svg.current?.focus({ preventScroll: true });
       }}
     >
       <header>
@@ -917,14 +922,13 @@ export function App() {
               editor.finishBox(g.moved);
             }
             if (g?.type === "move") {
-              if (g.moved && insideCanvas(e)) dispatch("app.confirm");
+              if (g.moved && insideCanvas(e)) dispatch("app.confirm", { pointerDrag: true });
               else editor.cancel();
             }
             if (g?.type === "wireEdit") {
               if (insideCanvas(e)) {
                 editor.update(world(e));
-                dispatch("app.confirm");
-                if (!editor.draft) setMessage("배선 경로를 수정했습니다. Ctrl+Z로 되돌릴 수 있습니다.");
+                dispatch("app.confirm", { pointerDrag: true });
               } else editor.cancel();
             }
             if (

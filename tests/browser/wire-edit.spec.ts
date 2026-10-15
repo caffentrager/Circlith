@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { wheelToZoom } from "./zoom-helper";
 
 async function canvasPoint(page: Page, x: number, y: number) {
   const box = (await page.locator("main svg").boundingBox())!;
@@ -107,7 +108,7 @@ test("editing follows drawing coordinates at 50% and 200% zoom", async ({ page }
   for (const zoom of [0.5, 2]) {
     const anchor = await canvasPoint(page, 200, 100);
     await page.mouse.move(anchor.x, anchor.y);
-    for (let i = 0; i < 16; i++) await page.mouse.wheel(0, zoom < 1 ? 100 : -100);
+    await wheelToZoom(page, zoom);
     await expect(page.locator("main svg > g").first()).toHaveAttribute("transform", new RegExp(`scale\\(${zoom}\\)`));
     const handle = page.locator('[data-wire-handle][data-kind="segment"]').first();
     const b = (await handle.boundingBox())!;

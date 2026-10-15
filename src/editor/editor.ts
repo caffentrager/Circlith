@@ -244,7 +244,10 @@ export class Editor {
     else if (!this.draft && !this.selectionBox) {
       this.move({ x: 0, y: 0 });
       const moving = this.draft as Draft | null;
-      if (moving?.type === "MOVE") { moving.rotation = (rotation + 360) % 360; this.confirm(); }
+      if (moving?.type === "MOVE") {
+        moving.rotation = (rotation + 360) % 360;
+        try { this.confirm(); } catch (error) { this.cancel(); throw error; }
+      }
     }
   }
   startWire(from: ConnectionTarget) {
@@ -296,7 +299,7 @@ export class Editor {
       this.selection = [key];
     } else {
       const result = this.previewResult();
-      if (result.blocked) throw new Error("우회 경로가 없습니다. 고정 경유점이나 부품 위치를 조정하세요. Esc로 취소할 수 있습니다.");
+      if (result.blocked) throw new Error("우회 경로가 없습니다. 고정 경유점이나 부품 위치를 조정하세요.");
       assertCircuit(result.circuit);
       this.commit(d.type === "MOVE" ? "Move / Rotate" : "Edit wire path", result.circuit);
     }

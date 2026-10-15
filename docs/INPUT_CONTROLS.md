@@ -19,7 +19,7 @@
 | `src/ui/keyboardAdapter.ts` | DOM keyboard normalization/Tab/IME/Space ownership. Editor 의미론 없음 |
 | `src/ui/InputSettings.tsx` | 프로필 선택·navigation 혼합·수정·reset·conflict·import/export |
 | `src/ui/App.tsx` | 기존 Editor를 연결하는 handler와 pointer gesture lifecycle, UI focus/feedback |
-| `src/geometry/view.ts` | Home/Shift+Home fit 계산 |
+| `src/geometry/view.ts` | 공통 줌 범위, 휠 delta 정규화, 확대 중심 보존, Home/Shift+Home fit 계산 |
 | `tests/unit/input.test.ts`, `tests/browser/input-settings.spec.ts` | resolver/프로필/설정/포커스와 실제 pointer 동작 |
 
 ## 프로필 합성과 의미론
@@ -60,6 +60,8 @@ source URL/checkedAt/compatibility 값은 공급 데이터의 provenance를 보�
 2026-10-15 우클릭 보정: pointerup에서 메뉴가 열린 뒤 contextmenu의 target이 overlay로 바뀌는 경우를 재현했다. SVG만의 bubble handler 대신 앱 루트 capture에서 기본 동작과 전파를 차단한다. 도면·메뉴·설정의 비텍스트 영역·툴바에서 앱 메뉴와 브라우저 메뉴가 겹치지 않으며, input/textarea/contenteditable의 편집 메뉴는 유지한다. 모달의 비텍스트 영역 우클릭은 키보드 포커스를 유지해 backdrop 우클릭 후에도 Esc로 닫힌다. 프리셋의 RMB click/cancel/drag Pan 바인딩과 회로·history 의미론은 바꾸지 않는다. 실제 우클릭 이벤트의 defaultPrevented/전파, 반복 우클릭과 Esc, 텍스트 입력 메뉴, RMB Pan, 안정된 배선 초안·history 보존을 브라우저 회귀 테스트로 확인한다.
 
 ## 검증
+
+2026-10-15 감사 대응: 일반 버튼은 `MODAL`로 분류하지 않고 실행 뒤 svg 키보드 포커스를 복구한다. 검색·설정·후보/메뉴는 자체 포커스를 유지하며 text/IME를 canvas 명령으로 처리하지 않는다. 휠은 delta 크기에 비례해 처리하고, line/page 단위 정규화·한 이벤트 최대 240px·수평(deltaY=0) 무시·반전 설정·10–200% 공통 범위를 적용한다. 50% 아래 fit에서 휠/키보드 줌 아웃이 확대되는 회귀를 검사한다. 드래그 release 확정 실패는 feedback을 남기고 원래 geometry로 돌아가며, 다음 hover로 움직이지 않는다.
 
 2026-10-13 Windows / Node.js 22.23.3 / Playwright Chromium 156:
 

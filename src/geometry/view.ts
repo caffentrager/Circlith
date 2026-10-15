@@ -1,4 +1,18 @@
 import { type Circuit, type Point } from "../model/circuit";
+export const MIN_ZOOM = 0.1, MAX_ZOOM = 2, ZOOM_STEP = 1.1;
+const stable = (value: number) => Number(value.toFixed(12));
+const clampZoom = (zoom: number) => stable(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom)));
+export function wheelZoomFactor(delta: number, mode: number, height: number, reverse = false): number {
+  if (!Number.isFinite(delta) || delta === 0) return 1;
+  const pixels = delta * (mode === 1 ? 16 : mode === 2 ? Math.max(1, height) : 1);
+  return Math.exp(-Math.max(-240, Math.min(240, pixels)) * (reverse ? -1 : 1) * Math.log(ZOOM_STEP) / 100);
+}
+export function zoomView(view: { x: number; y: number; zoom: number }, factor: number, anchor: Point) {
+  if (!Number.isFinite(factor) || factor <= 0 || factor === 1) return view;
+  const zoom = clampZoom(view.zoom * factor);
+  return { zoom, x: stable(anchor.x - (anchor.x - view.x) * zoom / view.zoom),
+    y: stable(anchor.y - (anchor.y - view.y) * zoom / view.zoom) };
+}
 export function fitView(
   c: Circuit,
   width: number,
@@ -24,14 +38,10 @@ export function fitView(
     x2 = Math.max(...points.map((p) => p.x)),
     y1 = Math.min(...points.map((p) => p.y)),
     y2 = Math.max(...points.map((p) => p.y));
-  const zoom = Math.max(
-    0.1,
-    Math.min(
-      2,
-      (width - 80) / Math.max(1, x2 - x1),
-      (height - 80) / Math.max(1, y2 - y1),
-    ),
-  );
+  const zoom = clampZoom(Math.min(
+    (width - 80) / Math.max(1, x2 - x1),
+    (height - 80) / Math.max(1, y2 - y1),
+  ));
   return {
     zoom,
     x: width / 2 - ((x1 + x2) * zoom) / 2,

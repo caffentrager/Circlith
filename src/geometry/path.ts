@@ -24,6 +24,8 @@ export function simplifyPath(points: Point[]): Point[] {
 }
 
 export function projectSegment(a: Point, b: Point, p: Point): Point {
+  if (a.y === b.y) return { x: Math.max(Math.min(a.x, b.x), Math.min(Math.max(a.x, b.x), p.x)), y: a.y };
+  if (a.x === b.x) return { x: a.x, y: Math.max(Math.min(a.y, b.y), Math.min(Math.max(a.y, b.y), p.y)) };
   const dx = b.x - a.x, dy = b.y - a.y;
   const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy || 1)));
   return { x: a.x + t * dx, y: a.y + t * dy };

@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { wheelToZoom } from "./zoom-helper";
 
 async function at(page: Page, x: number, y: number) {
   const box = (await page.locator("main svg").boundingBox())!;
@@ -115,7 +116,7 @@ test("branch button, wire tool and snap thresholds work at 50% and 200% zoom", a
   await page.keyboard.press("Escape");
   for (const zoom of [.5, 2]) {
     await move(page, 240, 100);
-    for (let i = 0; i < 16; i++) await page.mouse.wheel(0, zoom < 1 ? 100 : -100);
+    await wheelToZoom(page, zoom);
     await expect(page.locator("main svg > g").first()).toHaveAttribute("transform", new RegExp(`scale\\(${zoom}\\)`));
     await page.keyboard.press("w");
     await expect(svg).toHaveAttribute("data-operation", "WIRE_DRAFT");

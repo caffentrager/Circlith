@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { wheelToZoom } from "./zoom-helper";
 
 async function clickCanvas(page: Page, x: number, y: number) {
   const canvas = (await page.locator("main svg").boundingBox())!;
@@ -81,7 +82,7 @@ test("wire hit tolerance stays in screen pixels after zoom and pan; pins still s
   await connectedCircuit(page);
   const canvas = (await page.locator("main svg").boundingBox())!;
   await page.mouse.move(canvas.x + 640, canvas.y + 400);
-  for (let i = 0; i < 8; i++) await page.mouse.wheel(0, 100);
+  await wheelToZoom(page, 0.5);
   await expect(page.locator("main svg > g").first()).toHaveAttribute("transform", /scale\(0.5\)/);
   await clickCanvas(page, 440, 254);
   await expect(page.locator("main [data-wire]")).toHaveClass(/selected/);

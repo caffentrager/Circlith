@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { wheelToZoom } from "./zoom-helper";
 async function place(page: Page, kind: string, x: number, y: number) {
   await page
     .locator(".library")
@@ -97,7 +98,7 @@ test("selection rollback on Escape and capture loss restores selection and rotat
   await expect(page.locator("main .symbol.selected")).toHaveCount(1);
   const c = (await page.locator("main svg").boundingBox())!;
   await page.mouse.move(c.x + 640, c.y + 400);
-  for (let i = 0; i < 8; i++) await page.mouse.wheel(0, 100);
+  await wheelToZoom(page, 0.5);
   await expect(page.locator("main svg > g").first()).toHaveAttribute(
     "transform",
     /scale\(0.5\)/,
