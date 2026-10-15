@@ -160,6 +160,10 @@ Circlith에 가져올 핵심은 다음이다.
 - AI 회로 생성
 - 원본 MyLogic 전체 라이브러리/파일 호환
 
+### 5.1 `feat/editor-prototype` 브랜치 우선순위 — 2026-10-15 사용자 지시
+
+이 브랜치는 조작과 제어, UI/UX 성숙을 우선한다. 기존 선택·드래그·배선·회전·뷰 조작의 일관성, 입력 소유권, 상태 피드백, 취소·Undo/Redo와 브라우저 충돌을 먼저 다듬는다. Delete·클립보드·저장·추가 부품·시뮬레이션 등 미구현 목록은 즉시 구현할 작업 순서가 아니다. 추가 기능은 조작 흐름이 충분히 성숙한 뒤 진행한다. 위 단계별 표는 장기 제품 범위이며 이 브랜치의 현재 구현 우선순위를 덮어쓰지 않는다.
+
 ---
 
 # Part II. 결정 레지스트리
@@ -184,6 +188,7 @@ Circlith에 가져올 핵심은 다음이다.
 | DEC-014 | 성능 기준 | `PROVISIONAL` | 수치보다 측정 지표를 먼저 정의. 60Hz 16.7ms는 목표 후보, 기존 33ms는 과거 잠정안으로 보존 |
 | DEC-015 | 브라우저 억제 | `PROVISIONAL` | key/pointer × state/focus 매트릭스로 `preventDefault`/전파 종료를 관리 |
 | DEC-016 | 입력 프로필 | `CURRENT` | Command Registry → Binding → Preset 분리. Modern 기본, 버전 있는 외부 JSON, built-in + 사용자 override. 입력 재배정은 연결 유지 등 명령 불변식을 바꾸지 않음. 미지원 명령은 표시하며 실행하지 않음 |
+| DEC-017 | 현재 브랜치 우선순위 | `CURRENT` | `feat/editor-prototype`은 조작·제어·UI/UX 성숙을 우선한다. 미구현 기능 확장은 그 이후다. §5.1 |
 
 ### 6.1 입력 프리셋 구현 결정
 
@@ -697,7 +702,7 @@ Codex는 “preview는 history가 아니므로 한 번의 Ctrl+Z에서 preview�
 | Delete | CANVAS + 명시적 selection + 안전 상태 | selection 삭제 | text UI 문자 삭제. 위험 preview 중에는 삭제 금지/안내 |
 | Ctrl+Z | CANVAS history 처리 가능 | §16 정책 | text UI에서는 text undo |
 | Ctrl+S/O/F | app-owned focus에서 수신 가능 | 앱 명령 + 필요 시 default 억제 | 이벤트 수신 불가 환경은 버튼 fallback |
-| Right-click/contextmenu | canvas | 기본은 짧은 RMB 메뉴. 호환 프리셋의 click/drag는 threshold로 구분 | canvas 밖 browser menu |
+| Right-click/contextmenu | 앱의 비텍스트 UI, 도면·메뉴·오버레이 | 앱 루트 capture에서 default와 전파 억제. 짧은 RMB 메뉴와 호환 프리셋 drag Pan을 유지하며 메뉴가 열린 뒤 도착하는 contextmenu도 차단 | input/textarea/contenteditable의 텍스트 편집 메뉴와 앱 밖 browser menu 유지 |
 | Alt hold | canvas + snap 후보 기능 | grid snap 임시 해제 | Windows browser menu focus 실측 필요 |
 
 실제 구현 문서에는 `handled`, `preventDefault`, `stopPropagation`, `user feedback`, `browser support`를 별도 열로 기록한다.

@@ -6,6 +6,8 @@
 
 첫 개발 목표인 Component 배치 → 선택 → Move → Rotate → Wire → bend 변경 → Esc → Undo를 검증할 실행 가능한 프로토타입을 만든다.
 
+2026-10-15 사용자 지시: 현재 `feat/editor-prototype`은 조작·제어·UI/UX 성숙을 우선한다. 신규 기능 확장은 그 이후다. 미구현 목록을 곧바로 다음 구현 순서로 해석하지 않는다. 기준은 Master Spec §5.1/DEC-017이다.
+
 2026-10-13 사용자 후속 요청으로 부품 패널 드래그 배치와 도구 전환 없이 접점 클릭/드래그 배선을 추가했다. 도면 밖 부품 drop은 취소하며, 핀까지 wire drag 후 release는 하나의 Wire Command다. 빈 공간에서 release는 초안으로 유지한다. 캡처 상실과 pointercancel은 드래그 초안만 폐기한다. 좌표·접점 후보는 현재 포인터와 viewport로 다시 계산하여 canvas 이탈 후 오래된 hover로 Enter 연결되는 문제를 수정했다.
 
 - DEC-001: Master Spec 우선. 기존 archive는 구현 기준으로 사용하지 않는다.
@@ -71,7 +73,7 @@ Master Spec §12.5에 따라 선분·모서리 드래그, 국소 우회 구간 �
 | Tab | no | no | no | 기본 탐색. drag 진행 중 rollback |
 | TEXT / MODAL / IME | no | no | no | canvas handler에서 명령 실행 안 함 |
 | Ctrl+D / Ctrl+S/O/F 등 미구현 키 | no | no | no | browser 기본 동작 유지 |
-| canvas contextmenu | yes | yes | no | prototype 메뉴 |
+| 앱 비텍스트 UI contextmenu | yes | yes | yes | 도면·새로 열린 메뉴/overlay·앱 UI를 루트 capture에서 차단. input/textarea/contenteditable 기본 편집 메뉴는 유지 |
 | Alt/Meta 조합 | no | no | no | 별도 지원 검증 전 미구현 |
 
 문자 단축키는 체크박스로 끌 수 있고, 핵심 명령은 버튼 경로를 제공한다. 회전 등 일회성 명령의 autorepeat는 무시한다. 실제 Windows 한/영 전환 및 IME 조합 세션, Chrome/Edge 전체 UI의 예약키·Alt·autoscroll 실측, 사용자 사용성 검사는 아직 수행하지 않았다. 합성 IME 이벤트 테스트를 실제 IME 검증으로 간주하지 않는다.

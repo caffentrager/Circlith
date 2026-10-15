@@ -493,6 +493,20 @@ export function App() {
   return (
     <div
       className="app"
+      onContextMenuCapture={(e) => {
+        const el = e.target as HTMLElement;
+        if (el.closest("input,textarea") || el.isContentEditable) return;
+        // pointerup may mount a menu overlay before the browser emits contextmenu.
+        // Capture at the app boundary so the new target cannot bypass suppression.
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onPointerDownCapture={(e) => {
+        // Right-clicking a modal backdrop must keep keyboard ownership (including Esc).
+        const el = e.target as HTMLElement;
+        if (e.button === 2 && (menu || settings || connectionChoice) && !el.closest("input,textarea") && !el.isContentEditable)
+          e.preventDefault();
+      }}
       onFocusCapture={(e) => {
         resolver.cancel();
         const el = e.target as Element;
@@ -679,9 +693,6 @@ export function App() {
           onCompositionEnd={() => {
             composing.current = false;
             editor.focus = "CANVAS";
-          }}
-          onContextMenu={(e) => {
-            e.preventDefault();
           }}
           onDoubleClick={(e) => {
             const b = resolver.mouse(

@@ -48,7 +48,7 @@ navigation 혼합은 pan/zoom 명령의 바인딩만 다른 프리셋에서 가�
 |---|---|
 | Circlith Modern | M Safe Move, G Grid, A/W/V/R, staged Escape, Home/Shift+Home, 기본 mouse navigation |
 | KiCad 9 | G Safe Move. 연결을 끊는 M은 미매핑. E/Delete/Clipboard는 handler가 없어 실행 안 함. Alt+4 및 line-mode parity는 seed의 unmapped 설명 유지 |
-| Altium Designer 2026 | P→W Wire, M→M adapted Safe Move, V→F fit; RMB click/menu vs drag/pan, Ctrl+wheel. Space rotation은 placement/move context에만 해당하며 MOVE 중 rotation은 기존 Editor 지원 한계 유지. double-click Properties는 unavailable |
+| Altium Designer 2026 | P→W Wire, M→M adapted Safe Move, V→F fit; RMB click/menu vs drag/pan, Ctrl+wheel. Space rotation은 placement/move context에 해당하며 MOVE 중 누적 회전을 지원한다. double-click Properties는 unavailable |
 | EasyEDA Pro | W/M/Space/K, RMB click cancel vs drag Pan. cross selection 전용 명령 없음 |
 | Fusion Electronics 2026 | A/M/G/R/F6와 navigation. F6 browser interception의 플랫폼 실측은 미완료. partial |
 | Fusion Navigation | MMB/wheel 중심 2D navigation. Shift+MMB Orbit은 미매핑. navigation-only |
@@ -56,6 +56,8 @@ navigation 혼합은 pan/zoom 명령의 바인딩만 다른 프리셋에서 가�
 | Figma / Modern Canvas | Space+LMB 및 Ctrl+ +/- 참고값. 실제 Figma CAD 호환을 주장하지 않음. reference-only |
 
 source URL/checkedAt/compatibility 값은 공급 데이터의 provenance를 보존한 것이다. 대상 CAD별 공식 문서 전체 재검증 또는 1:1 제품 호환 검증 결과는 아니다. 알 수 없는 command ID/버전/context/잘못된 input/unsafe Move semantics는 검증 실패다. 미래 Orbit·PCB·simulation 명령을 구현하지 않는다.
+
+2026-10-15 우클릭 보정: pointerup에서 메뉴가 열린 뒤 contextmenu의 target이 overlay로 바뀌는 경우를 재현했다. SVG만의 bubble handler 대신 앱 루트 capture에서 기본 동작과 전파를 차단한다. 도면·메뉴·설정의 비텍스트 영역·툴바에서 앱 메뉴와 브라우저 메뉴가 겹치지 않으며, input/textarea/contenteditable의 편집 메뉴는 유지한다. 모달의 비텍스트 영역 우클릭은 키보드 포커스를 유지해 backdrop 우클릭 후에도 Esc로 닫힌다. 프리셋의 RMB click/cancel/drag Pan 바인딩과 회로·history 의미론은 바꾸지 않는다. 실제 우클릭 이벤트의 defaultPrevented/전파, 반복 우클릭과 Esc, 텍스트 입력 메뉴, RMB Pan, 안정된 배선 초안·history 보존을 브라우저 회귀 테스트로 확인한다.
 
 ## 검증
 
