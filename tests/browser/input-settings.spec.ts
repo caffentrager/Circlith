@@ -63,7 +63,7 @@ test("native RMB click opens modal on empty canvas, Escape closes it; MMB pans",
   );
 });
 
-test("KiCad has safe G, unmapped M, and survives reload; unavailable Delete is explicit", async ({
+test("KiCad has safe G, unmapped M, and survives reload; Delete uses the shared command", async ({
   page,
 }) => {
   await part(page);
@@ -80,7 +80,8 @@ test("KiCad has safe G, unmapped M, and survives reload; unavailable Delete is e
   );
   await page.keyboard.press("Escape");
   await page.keyboard.press("Delete");
-  await expect(page.locator("footer")).toContainText("현재 미구현");
+  await expect(page.locator("main [data-component]")).toHaveCount(0);
+  await page.keyboard.press('Control+z');
   await expect(page.locator("main [data-component]")).toHaveCount(1);
   await page.reload();
   const dialog = await settings(page);

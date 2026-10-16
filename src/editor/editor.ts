@@ -13,7 +13,8 @@ import {
   endpointPosition,
   transform,
 } from "../geometry/geometry";
-import { editWirePath, replaceWirePath, simplifyPath, type WireEditKind } from "../geometry/wire-edit";
+import { editWirePath, replaceWirePath, removeWireCorner, simplifyPath, type WireEditKind } from "../geometry/wire-edit";
+import { deleteObjects } from '../model/deletion';
 import { assertCircuit, connectTargets, joinCrossing, targetPosition } from "../model/connections";
 import { anchorOffsets, pointOnSegment, same } from "../geometry/path";
 import { collidingSegments, defaultRouting, planRoute, type RoutingSettings } from "../geometry/routing";
@@ -39,6 +40,7 @@ export class Editor {
   circuit = emptyCircuit();
   routing: RoutingSettings = { ...defaultRouting };
   selection: string[] = [];
+  selectedCorner: {wire:string;index:number}|null=null;
   tool: "SELECT" | "WIRE" = "SELECT";
   draft: Draft | null = null;
   selectionBox: {
@@ -67,6 +69,7 @@ export class Editor {
     this.pruneSelection();
   }
   private pruneSelection() {
+    this.selectedCorner=null;
     this.selection = this.selection.filter(
       (key) => this.circuit.components[key] || this.circuit.geometry.wires[key],
     );
@@ -100,6 +103,7 @@ export class Editor {
       ? [...new Set([...box.base, ...found])]
       : found;
     this.selectionBox = null;
+    this.selectedCorner=null;
   }
   undo() {
     if (this.draft || this.selectionBox) {
@@ -123,6 +127,7 @@ export class Editor {
   }
   setTool(tool: "SELECT" | "WIRE") {
     this.cancel();
+    this.selectedCorner=null;
     this.tool = tool;
   }
   place(kind: Kind, position: Point) {
@@ -150,6 +155,7 @@ export class Editor {
   beginWireEdit(wire: string, index: number, kind: WireEditKind, origin: Point) {
     if (this.draft || this.selectionBox || !this.circuit.geometry.wires[wire]) return;
     this.tool = "SELECT";
+    this.selectedCorner=null;
     this.selection = [wire];
     this.draft = { type: "SEGMENT_MOVE", wire, index, kind, origin, position: origin,
       points: simplifyPath(this.circuit.geometry.wires[wire].points) };
@@ -252,6 +258,7 @@ export class Editor {
   }
   startWire(from: ConnectionTarget) {
     if (this.draft || this.selectionBox) return;
+    this.selectedCorner=null;
     const position = targetPosition(this.circuit, from);
     const sourceSegment = from.type === "wire" ? this.circuit.geometry.wires[from.id].points : [];
     const index = sourceSegment.findIndex((p, i) => i < sourceSegment.length - 1 && pointOnSegment(p, sourceSegment[i + 1], position));
@@ -311,6 +318,7 @@ export class Editor {
     this.commit("Join crossing", joinCrossing(this.circuit, targets));
   }
   selectNet() {
+    this.selectedCorner=null;
     if (this.draft || this.selectionBox) return;
     const nets = new Set(this.selection.flatMap((key) => this.circuit.geometry.wires[key] ? [this.circuit.geometry.wires[key].net] : []));
     this.selection = Object.values(this.circuit.geometry.wires).filter((w) => nets.has(w.net)).map((w) => w.id);
@@ -334,7 +342,23 @@ export class Editor {
   }
   escape() {
     if (this.draft || this.selectionBox) this.cancel();
+    else if (this.selectedCorner) this.selectedCorner=null;
     else if (this.tool === "WIRE") this.tool = "SELECT";
     else this.selection = [];
+  }
+  selectCorner(wire:string,index:number) {
+    if(this.draft||this.selectionBox)return;
+    const points=this.circuit.geometry.wires[wire]?.points;
+    if(!points||index<=0||index>=simplifyPath(points).length-1)return;
+    this.selection=[wire];this.selectedCorner={wire,index};
+  }
+  deleteSelection() {
+    if(this.draft||this.selectionBox)throw new Error('초안을 확정하거나 취소한 후 삭제하세요.');
+    if(this.selectedCorner){
+      const {wire,index}=this.selectedCorner,next=removeWireCorner(this.circuit,wire,index);
+      if(this.routing.overlapMode==='avoid'&&collidingSegments(next,next.geometry.wires[wire].points).length)throw new Error('꺾임점 삭제 경로가 부품과 겹칩니다. 경로 다시 그리기를 사용하세요.');
+      assertCircuit(next);this.commit('Delete wire corner',next);return;
+    }
+    if(this.selection.length)this.commit('Delete selection',deleteObjects(this.circuit,this.selection));
   }
 }

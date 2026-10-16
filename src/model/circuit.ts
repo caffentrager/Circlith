@@ -1,4 +1,4 @@
-export type Kind = "Input" | "AND" | "Output";
+export type Kind = "Input" | "AND" | "OR" | "NOT" | "Output";
 export type Point = { x: number; y: number };
 export type Component = {
   id: string;
@@ -46,7 +46,7 @@ export function addComponent(
   rotation = 0,
 ) {
   const key = id();
-  const count = kind === "AND" ? 3 : 1;
+  const count = kind === "AND" || kind === "OR" ? 3 : kind === "NOT" ? 2 : 1;
   const pins = Array.from({ length: count }, (_, index) => {
     const pin = id();
     c.pins[pin] = {
@@ -54,7 +54,7 @@ export function addComponent(
       component: key,
       index,
       direction:
-        kind === "Input" || (kind === "AND" && index === 2) ? "out" : "in",
+        kind === "Input" || (kind === "NOT" && index === 1) || ((kind === "AND" || kind === "OR") && index === 2) ? "out" : "in",
     };
     return pin;
   });

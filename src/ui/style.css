@@ -42,7 +42,7 @@ input {
 .app {
   display: grid;
   grid-template-columns: 190px 1fr 230px;
-  grid-template-rows: 64px 1fr 42px;
+  grid-template-rows: 64px minmax(0, 1fr) 42px;
   height: 100vh;
   min-height: 500px;
 }
@@ -75,6 +75,7 @@ aside {
   padding: 20px;
   background: #f9fbfd;
 }
+.library { min-height:0; overflow-y:auto; }
 aside button {
   display: block;
   width: 100%;
@@ -136,6 +137,14 @@ svg:focus {
   vector-effect: non-scaling-stroke;
   pointer-events: all;
 }
+.pin-lead { fill:none; stroke:#516d82; stroke-width:2; }
+.gate-bubble { fill:white; stroke:#516d82; stroke-width:2; }
+.library .library-symbol { width:54px; height:32px; background:transparent; flex-shrink:0; overflow:visible; }
+.library button { display:flex; align-items:center; gap:8px; }
+.draft-waypoint { fill:#fff2b5; stroke:#a25a00; stroke-width:2; vector-effect:non-scaling-stroke; }
+.wire-handle.corner.active-corner { fill:#ffce69; stroke:#a24b00; stroke-width:3; }
+.corner-selection { color:#8b4200; }
+.junction.dangling { fill:white; stroke:#b56a00; stroke-width:2; }
 .wire-handle.horizontal { cursor: ns-resize; }
 .wire-handle.vertical { cursor: ew-resize; }
 .wire-handle.corner { cursor: move; }

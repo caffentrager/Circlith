@@ -1,7 +1,7 @@
 import type { Circuit } from "../model/circuit";
 import { simplifyPath } from "../geometry/wire-edit";
 
-export function WireHandles({ circuit, selection, zoom }: { circuit: Circuit; selection: string[]; zoom: number }) {
+export function WireHandles({ circuit, selection, zoom, selectedCorner }: { circuit: Circuit; selection: string[]; zoom: number; selectedCorner?:{wire:string;index:number}|null }) {
   return <g data-layer="wire-handles">
     {selection.flatMap((key) => {
       const wire = circuit.geometry.wires[key];
@@ -10,8 +10,8 @@ export function WireHandles({ circuit, selection, zoom }: { circuit: Circuit; se
       return [
         ...points.slice(1, -1).map((p, n) =>
           <rect key={`${key}-corner-${n}`} data-wire-handle={key} data-kind="corner" data-index={n + 1}
-            x={p.x - 5 / zoom} y={p.y - 5 / zoom} width={10 / zoom} height={10 / zoom} className="wire-handle corner">
-            <title>모서리: 드래그해 이동 · Esc 취소</title>
+            x={p.x - 5 / zoom} y={p.y - 5 / zoom} width={10 / zoom} height={10 / zoom} className={`wire-handle corner${selectedCorner?.wire===key&&selectedCorner.index===n+1?' active-corner':''}`}>
+            <title>꺾임점: 클릭 후 Delete 제거 · 드래그 이동 · Esc 취소</title>
           </rect>),
         ...points.slice(0, -1).flatMap((a, n) => {
           const b = points[n + 1], horizontal = a.y === b.y;

@@ -114,8 +114,8 @@ describe("crossings and cleanup", () => {
   it("uses nearest pins and constant screen thresholds, grid-projected segments and unique junctions", () => {
     const { c, wire } = fixture();
     for (const zoom of [.5, 1, 2]) {
-      expect(connectionHits(c, { x: 220, y: 100 + 5 / zoom }, zoom)[0].target.type).toBe("wire");
-      expect(connectionHits(c, { x: 220, y: 100 + 7 / zoom }, zoom)).toHaveLength(0);
+      expect(connectionHits(c, { x: 220, y: 100 + 11 / zoom }, zoom)[0].target.type).toBe("wire");
+      expect(connectionHits(c, { x: 220, y: 100 + 13 / zoom }, zoom)).toHaveLength(0);
     }
     const a = addComponent(c, "AND", { x: 600, y: 200 });
     expect(connectionHits(c, { x: 560, y: 188 }, .5)[0].target).toEqual({ type: "pin", id: c.components[a].pins[0] });

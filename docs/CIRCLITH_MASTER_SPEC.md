@@ -316,6 +316,10 @@ PAN 종료 시 원래 Tool과 Operation을 그대로 복원한다.
 
 사용자 요청 반영(2026-10-13): 부품 패널에서 도면으로 드래그하면 PLACE 미리보기를 제공하고, 도면에서 놓을 때 하나의 배치 Command로 확정한다. 도면 밖에서 놓거나 Esc·포인터 취소·캡처 상실로 중단하면 확정하지 않는다. 기존 클릭/검색 배치 경로도 유지한다.
 
+### 9.3 기본 게이트 심벌 — 2026-10-16 사용자 요청
+
+AND는 D자, OR는 곡선형, NOT은 삼각형과 출력 반전 원으로 표시한다. AND/OR는 2입력·1출력, NOT은 1입력·1출력이다. 기존 ±40 핀 좌표와 회전·연결 보존 규칙을 유지한다. 라이브러리와 도면은 같은 SVG 심벌을 사용한다. 부품 추가는 편집 모델 범위이며 시뮬레이터 구현을 뜻하지 않는다.
+
 ## 10. 검색 정렬
 
 ### 10.1 검색어가 없을 때
@@ -462,8 +466,8 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 
 ### 13.4 Snap 초기 가설
 
-- pin radius: 9 screen px
-- wire hit distance: 6 screen px
+- pin/junction radius: 13 screen px (2026-10-16 클릭 여유 확대)
+- wire hit distance: 12 screen px (2026-10-16 클릭 여유 확대)
 - drag start: 4 screen px
 - grid: 10 drawing units
 
@@ -482,7 +486,7 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 ### 13.5 분기·배선 합치기와 피드백 — 2026-10-15
 
 - WIRE 대기에서 핀·기존 junction·선분을 클릭하거나, SELECT에서 선분 위 W / 선택 배선의 분기 버튼으로 시작한다. SELECT의 단순 선 클릭·드래그는 선택·경로 편집을 유지한다.
-- 초안 시작·종료 대상은 pin/junction 또는 명시적으로 선택한 wire 위의 투영 좌표다. 선분 내부는 10 단위 grid에 투영하되 가까운 endpoint를 재사용한다. pin/junction 9 screen px → wire 6 screen px 우선이며 최근접 후보를 강조한다.
+- 초안 시작·종료 대상은 pin/junction 또는 명시적으로 선택한 wire 위의 투영 좌표다. 선분 내부는 10 단위 grid에 투영하되 가까운 endpoint를 재사용한다. pin/junction 13 screen px → wire 12 screen px 우선이며 최근접 후보를 강조한다. 12px 안의 직각 교차점은 같은 좌표로 자석 스냅하여 후보를 선택하기 쉽게 하되, 실제 접속은 명시적 확정으로만 생성한다.
 - 시작선 분할·끝선 분할·junction 생성·net 병합·새 경로는 전체 검증 후 하나의 Command로 commit한다. 취소·실패 중에는 기존 회로와 Redo를 보존한다. 같은 선의 서로 다른 두 지점 연결과 기존 junction 재사용을 지원한다.
 - 분기점에 wire를 분할하며 기존 wire ID는 첫 구간에 유지한다. 공유 junction은 이동·회전·경로 정리로 삭제하거나 옮기지 않는다.
 - 단순 교차는 미접속이다. 동거리 대상이 여러 개면 후보 선택 창으로 구분한다. 정확히 같은 내부 교차점의 후보에는 별도 접속 버튼을 제공하며, 명시적으로 누른 경우에만 한 junction으로 합친다.
@@ -525,6 +529,13 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 - 선택한 경로만 제거.
 - 다른 branch 유지.
 - 불필요 junction 정리는 같은 transaction에 포함.
+
+### 14.3 삭제와 꺾임점 조작 — 2026-10-16 사용자 요청
+
+- `edit.delete`를 활성화한다. 선택 부품/배선은 Delete·선택 삭제 버튼·메뉴로 삭제하며 다중 삭제는 하나의 Command다. text/modal/IME 입력 소유권은 유지하고 진행 초안/드래그 중 확정 회로 삭제를 막는다. hover만으로 삭제하지 않는다.
+- 삭제된 pin에 남는 wire가 있으면 해당 위치에 하나의 junction endpoint를 만들고 공유된 wire 끝들을 그 endpoint로 치환한다. 단일 말단은 빈 원으로 표시한다. 선택한 wire는 그 경로만 제거하며 실제 endpoint 그래프로 net을 다시 분할한다. 미사용 junction/net은 정리하고, 남는 경로/부품의 좌표와 wire ID는 유지한다. 전체 검증 후 commit하며 Undo/Redo는 정확한 snapshot을 복원한다.
+- WIRE_DRAFT/WIRE_ROUTE의 클릭 고정 경유점은 번호 있는 사각 마커로 표시한다. 실제 전기 junction(원)과 구분하고 Backspace/Esc로 함께 제거한다.
+- SELECT에서 완성된 wire의 사각 꺾임 핸들을 클릭하면 해당 점을 선택한다. Delete는 wire 전체가 아니라 그 꺾임점만 제거한다. 인접한 고정 좌표 사이를 반대 직각 경로로 재연결하며 endpoint/net/junction을 바꾸지 않는다. 다른 고정 anchor를 잃거나 자동 우회 정책에서 부품과 충돌하면 안내하고 기존 회로/history를 보존한다. 직각을 유지하려면 대체 꺾임점이 생길 수 있다. 실제 junction·양 끝 endpoint는 이 작업으로 삭제하지 않는다.
 
 ## 15. Clipboard
 

@@ -10,7 +10,7 @@
 
 | 파일 | 책임 |
 |---|---|
-| `src/input/registry.ts` | seed 명령 ID·의미·category 및 구현 가능 여부. Delete/Clipboard/Properties/palette는 unavailable |
+| `src/input/registry.ts` | seed 명령 ID·의미·category 및 구현 가능 여부. 사용자 후속 요청으로 Delete를 구현했으며 Clipboard/Properties/palette는 unavailable |
 | `src/input/types.ts` | input/context/profile 모델, canonical input signature, 충돌 분류 |
 | `src/input/resolver.ts` | context/focus 기반 key/chord/sequence/mouse/wheel 해석. Editor state를 소유하지 않음 |
 | `src/input/profiles.ts` | catalog+JSON glob 로드, basePreset 합성, immutable built-in, 사용자 override, JSON Schema/semantic 검증 |
@@ -47,7 +47,7 @@ navigation 혼합은 pan/zoom 명령의 바인딩만 다른 프리셋에서 가�
 | 프리셋 | 현재 적용 / 의미론 차이 |
 |---|---|
 | Circlith Modern | M Safe Move, G Grid, A/W/V/R, staged Escape, Home/Shift+Home, 기본 mouse navigation |
-| KiCad 9 | G Safe Move. 연결을 끊는 M은 미매핑. E/Delete/Clipboard는 handler가 없어 실행 안 함. Alt+4 및 line-mode parity는 seed의 unmapped 설명 유지 |
+| KiCad 9 | G Safe Move. 연결을 끊는 M은 미매핑. Delete는 공통 삭제 명령을 실행한다. E/Clipboard는 handler가 없어 실행 안 함. Alt+4 및 line-mode parity는 seed의 unmapped 설명 유지 |
 | Altium Designer 2026 | P→W Wire, M→M adapted Safe Move, V→F fit; RMB click/menu vs drag/pan, Ctrl+wheel. Space rotation은 placement/move context에 해당하며 MOVE 중 누적 회전을 지원한다. double-click Properties는 unavailable |
 | EasyEDA Pro | W/M/Space/K, RMB click cancel vs drag Pan. cross selection 전용 명령 없음 |
 | Fusion Electronics 2026 | A/M/G/R/F6와 navigation. F6 browser interception의 플랫폼 실측은 미완료. partial |

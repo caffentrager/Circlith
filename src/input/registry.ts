@@ -4,6 +4,7 @@ const implemented = new Set([
   "app.confirm",
   "history.undo",
   "history.redo",
+  "edit.delete",
   "tool.select",
   "component.addSearch",
   "component.moveSafe",

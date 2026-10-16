@@ -75,3 +75,14 @@ export function simpleWirePath(c: Circuit, key: string, horizontal: boolean) {
   const w = c.geometry.wires[key];
   return route(endpointPosition(c, w.from), endpointPosition(c, w.to), horizontal);
 }
+export function removeWireCorner(c:Circuit,key:string,index:number):Circuit {
+  const w=c.geometry.wires[key];if(!w)throw new Error('배선이 없습니다.');
+  const points=simplifyPath(w.points);
+  if(index<=0||index>=points.length-1)throw new Error('양 끝 접속점은 꺾임점 삭제 대상이 아닙니다.');
+  const a=points[index-1],corner=points[index],b=points[index+1];
+  const replacement=route(a,b,a.y!==corner.y);
+  const remaining=w.anchors?.filter(p=>!same(p,corner));
+  const next=replaceWirePath(c,key,[...points.slice(0,index-1),...replacement,...points.slice(index+2)],remaining??[]);
+  if(next.geometry.wires[key].points.some(p=>same(p,corner)))throw new Error('다른 고정 구간 때문에 이 꺾임점을 제거할 수 없습니다. 경로 다시 그리기를 사용하세요.');
+  return next;
+}

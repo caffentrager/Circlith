@@ -14,6 +14,7 @@ import { targetPosition } from "../model/connections";
 import { planWireCleanup } from "../model/wire-cleanup";
 import { Symbols, path } from "../renderer/CircuitSvg";
 import { WireHandles } from "../renderer/WireHandles";
+import {GateBody} from '../renderer/GateBody';
 import { nearestSegment, simplifyPath, type WireEditKind } from "../geometry/wire-edit";
 import { CommandDispatcher } from "../editor/dispatcher";
 import {
@@ -35,7 +36,7 @@ import { InputSettings } from "./InputSettings";
 import { fitView, wheelZoomFactor, zoomView, ZOOM_STEP } from "../geometry/view";
 import { collidingSegments, defaultRouting, routingLabel, routingStorageKey, validateRouting, type RoutingSettings } from "../geometry/routing";
 import "./style.css";
-const kinds: Kind[] = ["AND", "Input", "Output"];
+const kinds: Kind[] = ["AND", "OR", "NOT", "Input", "Output"];
 export function App() {
   const [initialRouting] = useState(() => {
     try {
@@ -289,6 +290,12 @@ export function App() {
       },
       "history.undo": undo,
       "history.redo": redo,
+      "edit.delete":()=>{
+        if(gesture.current)throw new Error('드래그를 끝낸 후 삭제하세요.');
+        const corner=!!editor.selectedCorner;
+        editor.deleteSelection();hover.current=undefined;pointer.current=null;
+        setMessage(corner?'꺾임점을 제거했습니다. 직각 경로와 연결은 유지됩니다.':'선택한 대상을 삭제했습니다. Undo로 복구할 수 있습니다.');
+      },
       "component.place": (p) => editor.place(p.kind, p.position),
       "tool.select": () => editor.setTool("SELECT"),
       "component.addSearch": () => {
@@ -360,6 +367,7 @@ export function App() {
       },
       "grid.toggleVisible": () => setGrid((v) => !v),
       "selection.all": () => {
+        editor.selectedCorner=null;
         if (!editor.draft)
           editor.selection = [
             ...Object.keys(editor.circuit.components),
@@ -367,15 +375,18 @@ export function App() {
           ];
       },
       "selection.replaceItem": (p) => {
+        editor.selectedCorner=null;
         if (p?.key) editor.selection = [p.key];
       },
       "selection.toggleItem": (p) => {
+        editor.selectedCorner=null;
         if (p?.key)
           editor.selection = editor.selection.includes(p.key)
             ? editor.selection.filter((k) => k !== p.key)
             : [...editor.selection, p.key];
       },
       "selection.addItem": (p) => {
+        editor.selectedCorner=null;
         if (p?.key && !editor.selection.includes(p.key))
           editor.selection = [...editor.selection, p.key];
       },
@@ -416,8 +427,10 @@ export function App() {
         if (v) editor.viewport = v;
       },
       "view.contextMenu": (p) => {
-        if (!editor.draft && p?.key && !editor.selection.includes(p.key))
+        if (!editor.draft && p?.key && !editor.selection.includes(p.key)) {
+          editor.selectedCorner=null;
           editor.selection = [p.key];
+        }
         resolver.cancel();
         editor.focus = "MODAL";
         setMenu(true);
@@ -664,7 +677,7 @@ export function App() {
               place(k);
             }}
           >
-            {k}
+            <svg aria-hidden="true" className="library-symbol" viewBox="-45 -25 90 50"><GateBody kind={k}/></svg>{k}
           </button>
         ))}
         <p>
@@ -687,7 +700,7 @@ export function App() {
           문자 단축키 사용
         </label>
         <p className="note">
-          Safe Move 경로는 잠정 규칙입니다. 삭제·저장·시뮬레이션은 후속
+          Safe Move 경로는 잠정 규칙입니다. 저장·시뮬레이션은 후속
           단계입니다.
         </p>
       </aside>
@@ -775,7 +788,8 @@ export function App() {
               return;
             }
             if (button !== "left") return;
-            const pin = target(e.target) ?? hitConnection(e);
+            const editHandle=(e.target as Element).closest('[data-wire-handle]');
+            const pin = editor.tool==='SELECT'&&editHandle?undefined:target(e.target) ?? hitConnection(e);
             hover.current = pin;
             if (editor.draft) {
               editor.update(cursor.current);
@@ -818,6 +832,7 @@ export function App() {
                   dispatch("selection.replaceItem", { key });
                 if (wire) {
                   const handle = (e.target as Element).closest("[data-wire-handle]");
+                  if(handle?.getAttribute('data-kind')==='corner')editor.selectCorner(key,Number(handle.getAttribute('data-index')));
                   gesture.current = {
                     type: "wireEditPending", start: screen(e), view: { x: 0, y: 0 }, moved: false,
                     wireEdit: { wire: key, kind: (handle?.getAttribute("data-kind") ?? "segment") as WireEditKind,
@@ -825,7 +840,7 @@ export function App() {
                       origin: cursor.current },
                   };
                   e.currentTarget.setPointerCapture(e.pointerId);
-                  setMessage("선분·원형 핸들 드래그: 이동 · 사각형: 모서리 이동 · 마름모: 우회 구간 추가 · Esc: 취소");
+                  setMessage("선분·원형 핸들 드래그: 이동 · 사각형: 클릭 후 Delete 제거/드래그 이동 · 마름모: 우회 구간 추가 · Esc: 취소");
                 } else {
                   dispatch("component.moveSafe");
                   gesture.current = {
@@ -993,7 +1008,7 @@ export function App() {
               {collisions.map(([a, b], i) => <polyline key={i} points={path([a, b])} className="wire-collision" />)}
             </g>
             {(!draft || draft.type === "SEGMENT_MOVE") &&
-              <WireHandles circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom} />}
+              <WireHandles circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom} selectedCorner={editor.selectedCorner} />}
             {editor.selectionBox && (
               <rect
                 data-layer="selection-box"
@@ -1035,6 +1050,12 @@ export function App() {
             {draft?.type === "WIRE_DRAFT" && draft.from.type === "wire" &&
               <circle data-layer="pending-junction" cx={draft.from.position.x} cy={draft.from.position.y}
                 r={5 / editor.viewport.zoom} className="pending-junction" pointerEvents="none" />}
+            {(draft?.type==='WIRE_DRAFT'||draft?.type==='WIRE_ROUTE')&&<g data-layer="draft-waypoints" pointerEvents="none">
+              {draft.waypoints.slice(1).map((p,i)=><g key={i} data-draft-waypoint={i+1}>
+                <rect x={p.x-5/editor.viewport.zoom} y={p.y-5/editor.viewport.zoom} width={10/editor.viewport.zoom} height={10/editor.viewport.zoom} className="draft-waypoint"/>
+                <text x={p.x+9/editor.viewport.zoom} y={p.y-9/editor.viewport.zoom} fontSize={11/editor.viewport.zoom}>{i+1}</text>
+              </g>)}
+            </g>}
             <g data-layer="preview" className="preview">
               {draft?.type === "PLACE" &&
                 (!paletteDrag.current?.active ||
@@ -1070,6 +1091,8 @@ export function App() {
         </section>
         <h2>선택</h2>
         <p>{selectedComponents}개 부품 · {selectedWires}개 배선</p>
+        {editor.selectedCorner&&<p className="corner-selection">꺾임점 선택됨 · Delete로 이 점만 제거</p>}
+        <button disabled={!!draft||(!selectedComponents&&!selectedWires)} onClick={()=>{dispatch('edit.delete');svg.current?.focus();}}>{editor.selectedCorner?'선택 꺾임점 제거':'선택 삭제'} {hint('edit.delete')}</button>
         <p className="net-summary">연결망 {Object.keys(editor.circuit.nets).length}개 · 접속점 {Object.keys(editor.circuit.junctions).length}개</p>
         <details className="wiring-help">
           <summary>배선 조작법</summary>
@@ -1207,6 +1230,7 @@ export function App() {
           }}
         >
           <section role="dialog" aria-label="도면 메뉴">
+            <button disabled={!!draft||!editor.selection.length} onClick={()=>{dispatch('edit.delete');setMenu(false);svg.current?.focus();}}>{editor.selectedCorner?'선택 꺾임점 제거':'선택 삭제'}</button>
             <button
               autoFocus
               onClick={() => {

@@ -23,7 +23,7 @@ test.beforeEach(async ({ page }) => { await page.goto(process.env.CIRCLITH_BASE_
 test("toolbar commands restore canvas wheel and keyboard ownership, including Undo and Redo", async ({ page }) => {
   await part(page, "Input", 100, 100);
   const svg = page.locator("main svg"), components = page.locator('main [data-layer="symbols"] [data-component]');
-  await page.getByRole("button", { name: /^선택 / }).click(); await expect(svg).toBeFocused();
+  await page.locator('header').getByRole("button", { name: /^선택 / }).click(); await expect(svg).toBeFocused();
   await wheel(page, 100); expect(await readZoom(page)).toBeLessThan(1);
   await page.keyboard.press("Control+z"); await expect(components).toHaveCount(0);
   await page.keyboard.press("Control+y"); await expect(components).toHaveCount(1);

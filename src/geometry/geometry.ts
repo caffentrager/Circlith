@@ -25,11 +25,11 @@ export function pinPosition(c: Circuit, key: string): Point {
     comp = c.components[pin.component],
     place = c.geometry.components[comp.id];
   const local =
-    comp.kind === "AND"
+    comp.kind === "AND" || comp.kind === "OR"
       ? pin.index === 2
         ? { x: 40, y: 0 }
         : { x: -40, y: pin.index === 0 ? -10 : 10 }
-      : { x: comp.kind === "Input" ? 40 : -40, y: 0 };
+      : { x: pin.direction === "out" ? 40 : -40, y: 0 };
   const p = rotatePoint(local, place.rotation);
   return { x: p.x + place.position.x, y: p.y + place.position.y };
 }
