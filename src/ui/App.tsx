@@ -34,6 +34,7 @@ import {
 import { signature, type UserProfile } from "../input/types";
 import { keyboardAdapter } from "./keyboardAdapter";
 import { InputSettings } from "./InputSettings";
+import { EditorSidebar } from "./EditorSidebar";
 import { fitView, wheelZoomFactor, zoomView, ZOOM_STEP } from "../geometry/view";
 import { collidingSegments, defaultRouting, routingLabel, routingStorageKey, validateRouting, type RoutingSettings } from "../geometry/routing";
 import "./style.css";
@@ -534,83 +535,7 @@ export function App() {
         Number(b.toLowerCase() === search?.toLowerCase()) -
         Number(a.toLowerCase() === search?.toLowerCase()),
     );
-  return (
-    <div
-      className="app"
-      onContextMenuCapture={(e) => {
-        const el = e.target as HTMLElement;
-        if (el.closest("input,textarea") || el.isContentEditable) return;
-        // pointerup may mount a menu overlay before the browser emits contextmenu.
-        // Capture at the app boundary so the new target cannot bypass suppression.
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onPointerDownCapture={(e) => {
-        // Right-clicking a modal backdrop must keep keyboard ownership (including Esc).
-        const el = e.target as HTMLElement;
-        if (e.button === 2 && (menu || settings || connectionChoice || selectionChoice) && !el.closest("input,textarea") && !el.isContentEditable)
-          e.preventDefault();
-      }}
-      onFocusCapture={(e) => {
-        resolver.cancel();
-        const el = e.target as HTMLElement;
-        editor.focus = el.closest("svg")
-          ? "CANVAS"
-          : el.matches('input,textarea') || el.isContentEditable
-            ? "TEXT_EDITOR"
-            : el.closest('.overlay,[role="dialog"]') ? "MODAL" : "CANVAS";
-      }}
-      onClick={(e) => {
-        const button = (e.target as Element).closest("button");
-        if (button && !button.disabled && !button.closest('.overlay,[role="dialog"]')) svg.current?.focus({ preventScroll: true });
-      }}
-    >
-      <header>
-        <strong>
-          Circlith <small>편집 프로토타입</small>
-        </strong>
-        <input aria-label="프로젝트 이름" defaultValue="Untitled circuit" />
-        <button
-          aria-pressed={editor.tool === "SELECT"}
-          onClick={() => {
-            dispatch("tool.select");
-          }}
-        >
-          선택 {hint("tool.select")}
-        </button>
-        <button
-          aria-pressed={editor.tool === "WIRE"}
-          onClick={() => {
-            dispatch("wire.start");
-            svg.current?.focus({ preventScroll: true });
-            refresh();
-          }}
-        >
-          배선 {hint("wire.start")}
-        </button>
-        <button onClick={() => dispatch("history.undo")}>Undo</button>
-        <button onClick={() => dispatch("history.redo")}>Redo</button>
-        <button
-          onClick={() => {
-            rollback();
-            resolver.cancel();
-            setSettings(true);
-          }}
-        >
-          설정
-        </button>
-        <span>{editor.history.length} committed edits</span>
-      </header>
-      <aside className="library">
-        <h2>부품</h2>
-        <button
-          onClick={() => {
-            dispatch("component.addSearch");
-          }}
-        >
-          검색 {hint("component.addSearch")}
-        </button>
-        {kinds.map((k) => (
+  const renderPaletteButton = (k: Kind) => (
           <button
             key={k}
             onPointerDown={(e) => {
@@ -691,7 +616,91 @@ export function App() {
           >
             <svg aria-hidden="true" className="library-symbol" viewBox="-45 -25 90 50"><GateBody kind={k}/></svg>{k}
           </button>
-        ))}
+  );
+  return (
+    <div
+      className="app"
+      onContextMenuCapture={(e) => {
+        const el = e.target as HTMLElement;
+        if (el.closest("input,textarea") || el.isContentEditable) return;
+        // pointerup may mount a menu overlay before the browser emits contextmenu.
+        // Capture at the app boundary so the new target cannot bypass suppression.
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onPointerDownCapture={(e) => {
+        // Right-clicking a modal backdrop must keep keyboard ownership (including Esc).
+        const el = e.target as HTMLElement;
+        if (e.button === 2 && (menu || settings || connectionChoice || selectionChoice) && !el.closest("input,textarea") && !el.isContentEditable)
+          e.preventDefault();
+      }}
+      onFocusCapture={(e) => {
+        resolver.cancel();
+        const el = e.target as HTMLElement;
+        editor.focus = el.closest("svg")
+          ? "CANVAS"
+          : el.matches('input,textarea') || el.isContentEditable
+            ? "TEXT_EDITOR"
+            : el.closest('.overlay,[role="dialog"]') ? "MODAL" : "CANVAS";
+      }}
+      onClick={(e) => {
+        const button = (e.target as Element).closest("button");
+        if (button && !button.disabled && !button.closest('.overlay,[role="dialog"],.sidebar-tabs')) svg.current?.focus({ preventScroll: true });
+      }}
+    >
+      <header>
+        <strong>
+          Circlith <small>편집 프로토타입</small>
+        </strong>
+        <input aria-label="프로젝트 이름" defaultValue="Untitled circuit" />
+        <button
+          aria-pressed={editor.tool === "SELECT"}
+          onClick={() => {
+            dispatch("tool.select");
+          }}
+        >
+          선택 {hint("tool.select")}
+        </button>
+        <button
+          aria-pressed={editor.tool === "WIRE"}
+          onClick={() => {
+            dispatch("wire.start");
+            svg.current?.focus({ preventScroll: true });
+            refresh();
+          }}
+        >
+          배선 {hint("wire.start")}
+        </button>
+        <button onClick={() => dispatch("history.undo")}>Undo</button>
+        <button onClick={() => dispatch("history.redo")}>Redo</button>
+        <button
+          onClick={() => {
+            rollback();
+            resolver.cancel();
+            setSettings(true);
+          }}
+        >
+          설정
+        </button>
+        <span>{editor.history.length} committed edits</span>
+      </header>
+      <EditorSidebar circuit={editor.circuit} selection={editor.selection}
+        renderPart={renderPaletteButton} searchCommand={(<button
+          onClick={() => {
+            dispatch("component.addSearch");
+          }}
+        >
+          검색 {hint("component.addSearch")}
+        </button>)}
+        busy={!!editor.draft || !!editor.selectionBox || !!gesture.current || !!paletteDrag.current}
+        onSelect={(key, additive) => {
+          dispatch(additive ? "selection.toggleItem" : "selection.replaceItem", {key});
+          svg.current?.focus({preventScroll:true});
+        }}
+        onReveal={key => {
+          dispatch("selection.replaceItem", {key}); dispatch("view.fitSelection");
+          svg.current?.focus({preventScroll:true});
+        }}>
         <p>
           부품을 도면으로 드래그
           <br />
@@ -715,7 +724,7 @@ export function App() {
           Safe Move 경로는 잠정 규칙입니다. 저장·시뮬레이션은 후속
           단계입니다.
         </p>
-      </aside>
+      </EditorSidebar>
       <main>
         <svg
           ref={svg}
