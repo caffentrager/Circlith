@@ -8,7 +8,7 @@ import {
   type Point,
 } from "../model/circuit";
 import { snap } from "../geometry/geometry";
-import { connectionHits } from "../geometry/connection-hit";
+import { resolveConnectionHits } from "../input/connection-intent";
 import { nearestWires } from "../geometry/selection-hit";
 import { projectSegment, same } from "../geometry/path";
 import { targetPosition } from "../model/connections";
@@ -160,8 +160,15 @@ export function App() {
       e.clientY <= r.bottom
     );
   };
-  const hitsAt = (e: { clientX: number; clientY: number } | null) =>
-    !e || !insideCanvas(e) ? [] : connectionHits(editor.preview(), drawingPoint(e), editor.viewport.zoom);
+  const hitsAt = (e: { clientX: number; clientY: number } | null) => {
+    if (!e || !insideCanvas(e)) return [];
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const surface = el?.closest('[data-pin]') ? 'pin'
+      : el?.closest('[data-component]') && !el.closest('.pin-lead') ? 'body' : 'other';
+    return resolveConnectionHits(editor.preview(), drawingPoint(e), editor.viewport.zoom, {
+      selecting: editor.tool === 'SELECT' && !editor.draft, surface,
+    });
+  };
   const hitConnection = (e: { clientX: number; clientY: number } | null): ConnectionTarget | undefined => {
     const hits = hitsAt(e);
     return hits.length === 1 ? hits[0].target : undefined;

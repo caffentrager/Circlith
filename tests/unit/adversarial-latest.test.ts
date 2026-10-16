@@ -20,6 +20,7 @@ import { pinPosition, route, transform } from "../../src/geometry/geometry";
 import { removeWireCorner } from "../../src/geometry/wire-edit";
 import { simplifyPath } from "../../src/geometry/path";
 import { connectionHits } from "../../src/geometry/connection-hit";
+import { resolveConnectionHits } from "../../src/input/connection-intent";
 import { defaultRouting, planRoute, type RoutingSettings } from "../../src/geometry/routing";
 
 /* ------------------------------------------------------------------ independent oracles */
@@ -853,12 +854,13 @@ describe("connection hit testing in screen space", () => {
   });
 
   it("a gate's body centre is not swallowed by pin capture at the supported zooms (clicking a body must reach the body)", () => {
-    // Pin capture is a screen-space radius. If it covers the whole body the component can no longer
-    // be selected or dragged by clicking it. 'covered' lists the zooms where the body centre hits a pin.
+    // Approved policy (2026-10-16): a direct body hit in idle SELECT wins over pin capture.
+    // Geometry-only capture is tested separately above and retains its 13px radius.
     const covered: Record<string, number[]> = {};
     for (const kind of ["AND", "OR", "NOT", "Input", "Output"] as Kind[]) {
       const c = emptyCircuit(); addComponent(c, kind, { x: 400, y: 300 });
-      covered[kind] = ZOOMS.filter((z) => connectionHits(c, { x: 400, y: 300 }, z).length > 0);
+      covered[kind] = ZOOMS.filter((z) => resolveConnectionHits(c, { x: 400, y: 300 }, z,
+        { selecting: true, surface: 'body' }).length > 0);
     }
     expect(covered).toEqual({ AND: [], OR: [], NOT: [], Input: [], Output: [] });
   });

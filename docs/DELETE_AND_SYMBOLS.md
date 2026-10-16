@@ -15,7 +15,7 @@
 
 `src/model/deletion.ts`는 clone에서 선택 wire를 제거하고 삭제 pin을 junction endpoint로 치환한 후, 남은 wire의 endpoint ID 인접 그래프로 net을 다시 분할한다. 좌표 일치로 연결하지 않는다. 새로 분리된 연결망에만 새 net ID를 주고 사용하지 않는 net/junction은 제거한다. assertCircuit 성공 후 Editor가 한 Command로 commit한다.
 
-꺾임점 선택은 Editor-only `selectedCorner`이며 circuit/history에 저장하지 않는다. selection/tool 변경과 commit/Undo 시 정리한다. geometry의 removeWireCorner는 wire endpoint/net을 변경하지 않으며 다른 pinned anchor는 검증으로 보호한다. 삭제하지 않은 주변 구간은 유지하고 임의 전체 autoroute는 하지 않는다.
+꺾임점 선택은 Editor-only `selectedCorner`이며 circuit/history에 저장하지 않는다. selection/tool 변경과 commit/Undo/Redo 시 정리한다. geometry의 removeWireCorner는 wire endpoint/net을 변경하지 않으며 다른 pinned anchor는 검증으로 보호한다. 사용자 승인에 따라 직각 유지에 필요한 이웃 비고정 꺾임점의 정리·대체와 핀 출입 방향 변경은 허용한다. 영향받지 않는 주변 구간은 유지하고 임의 전체 autoroute는 하지 않는다. 끝점·연결·다른 고정 경유점을 보존하지 못하거나 현재 충돌 정책에 어긋나면 거부하고, 한 번의 Undo로 원래 경로 전체를 복원한다.
 
 GateBody는 SVG/native asset으로 구현했으며 이미지 생성이나 DOM 상태를 모델에 넣지 않았다. 새로운 심벌의 몸체도 기존 routing bounds 안에 두었다. 부품 수 증가로 창 전체가 스크롤되어 drop 좌표가 흔들리지 않도록 library를 독립 스크롤 패널로 만들었다.
 
