@@ -9,6 +9,7 @@ import {
 } from "../model/circuit";
 import { snap } from "../geometry/geometry";
 import { connectionHits } from "../geometry/connection-hit";
+import { nearestWires } from "../geometry/selection-hit";
 import { projectSegment, same } from "../geometry/path";
 import { targetPosition } from "../model/connections";
 import { planWireCleanup } from "../model/wire-cleanup";
@@ -74,6 +75,7 @@ export function App() {
   const [search, setSearch] = useState<string | null>(null);
   const [menu, setMenu] = useState(false);
   const [connectionChoice, setConnectionChoice] = useState<{ targets: ConnectionTarget[]; action: "start" | "finish" } | null>(null);
+  const [selectionChoice, setSelectionChoice] = useState<{ keys: string[]; command: string } | null>(null);
   const [grid, setGrid] = useState(true);
   const [message, setMessage] = useState(
     "왼쪽 부품을 도면으로 드래그하세요. 접점을 클릭하거나 드래그하면 배선이 시작됩니다.",
@@ -102,7 +104,7 @@ export function App() {
   );
   const contexts = () =>
     activeContexts(
-      settings || menu || connectionChoice
+      settings || menu || connectionChoice || selectionChoice
         ? "MODAL"
         : search !== null
           ? "TEXT_EDITOR"
@@ -215,7 +217,7 @@ export function App() {
     dispatcher.dispatch("component.place", { kind, position: cursor.current });
     setSearch(null);
     setMenu(false);
-    svg.current?.focus();
+    svg.current?.focus({ preventScroll: true });
     refresh();
   };
   const undo = () => {
@@ -239,7 +241,7 @@ export function App() {
       return;
     }
     editor.move(cursor.current);
-    svg.current?.focus();
+    svg.current?.focus({ preventScroll: true });
     refresh();
   };
   const zoomAt = (factor: number, point?: Point) => {
@@ -256,18 +258,21 @@ export function App() {
       "app.cancel": (p) => {
         resolver.cancel();
         if (p?.operation) editor.escape();
-        if (connectionChoice) {
+        if (selectionChoice) {
+          setSelectionChoice(null);
+          svg.current?.focus({ preventScroll: true });
+        } else if (connectionChoice) {
           setConnectionChoice(null);
-          svg.current?.focus();
+          svg.current?.focus({ preventScroll: true });
         } else if (settings) {
           setSettings(false);
-          svg.current?.focus();
+          svg.current?.focus({ preventScroll: true });
         } else if (menu) {
           setMenu(false);
-          svg.current?.focus();
+          svg.current?.focus({ preventScroll: true });
         } else if (search !== null) {
           setSearch(null);
-          svg.current?.focus();
+          svg.current?.focus({ preventScroll: true });
         } else if (gesture.current || paletteDrag.current) rollback();
         else editor.escape();
       },
@@ -322,9 +327,9 @@ export function App() {
         const i = nearestSegment(points, cursor.current);
         const position = projectSegment(points[i], points[i + 1], snap(cursor.current));
         editor.startWire({ type: "wire", id: key, position });
-        svg.current?.focus();
+        svg.current?.focus({ preventScroll: true });
       },
-      "wire.selectNet": () => { editor.selectNet(); svg.current?.focus(); },
+      "wire.selectNet": () => { editor.selectNet(); svg.current?.focus({ preventScroll: true }); },
       "wire.joinCrossing": (p) => {
         editor.joinWires(p?.targets ?? hitsAt(pointer.current).map((hit) => hit.target));
         setMessage("교차점을 접속했습니다. 점이 있는 교차만 전기적으로 연결됩니다.");
@@ -353,17 +358,17 @@ export function App() {
           return;
         }
         editor.rerouteWire(wires[0]);
-        svg.current?.focus();
+        svg.current?.focus({ preventScroll: true });
         setMessage("경유점 클릭 · Shift+Space 꺾임 전환 · Backspace 되돌리기 · Enter 완료 · Esc 취소. 양 끝 연결은 유지됩니다.");
       },
-      "wire.tidyHorizontal": () => { editor.tidyWires(true); svg.current?.focus(); },
-      "wire.tidyVertical": () => { editor.tidyWires(false); svg.current?.focus(); },
-      "wire.tidyConfigured": () => { editor.tidyWires(); svg.current?.focus(); },
+      "wire.tidyHorizontal": () => { editor.tidyWires(true); svg.current?.focus({ preventScroll: true }); },
+      "wire.tidyVertical": () => { editor.tidyWires(false); svg.current?.focus({ preventScroll: true }); },
+      "wire.tidyConfigured": () => { editor.tidyWires(); svg.current?.focus({ preventScroll: true }); },
       "wire.cleanupDuplicates": () => {
         const count = editor.beginWireCleanup();
         setMessage(count ? `중복 배선 ${count}개를 빨간 점선으로 표시했습니다. 초록색 경로는 남습니다. Enter: 정리 · Esc: 취소`
           : "같은 두 접속점을 직접 연결한 중복 배선이 없습니다. 중간 분기가 있는 경로는 보존합니다.");
-        svg.current?.focus();
+        svg.current?.focus({ preventScroll: true });
       },
       "grid.toggleVisible": () => setGrid((v) => !v),
       "selection.all": () => {
@@ -536,7 +541,7 @@ export function App() {
       onPointerDownCapture={(e) => {
         // Right-clicking a modal backdrop must keep keyboard ownership (including Esc).
         const el = e.target as HTMLElement;
-        if (e.button === 2 && (menu || settings || connectionChoice) && !el.closest("input,textarea") && !el.isContentEditable)
+        if (e.button === 2 && (menu || settings || connectionChoice || selectionChoice) && !el.closest("input,textarea") && !el.isContentEditable)
           e.preventDefault();
       }}
       onFocusCapture={(e) => {
@@ -570,7 +575,7 @@ export function App() {
           aria-pressed={editor.tool === "WIRE"}
           onClick={() => {
             dispatch("wire.start");
-            svg.current?.focus();
+            svg.current?.focus({ preventScroll: true });
             refresh();
           }}
         >
@@ -644,7 +649,7 @@ export function App() {
                 if (insideCanvas(e)) {
                   editor.update(world(e));
                   dispatch("app.confirm");
-                  svg.current?.focus();
+                  svg.current?.focus({ preventScroll: true });
                 } else editor.cancel();
                 refresh();
               }
@@ -746,7 +751,7 @@ export function App() {
             const object = (e.target as Element).closest(
               '[data-component],[data-pin],[data-wire],[data-wire-hit],[data-wire-handle],[data-layer="junctions"]',
             );
-            svg.current?.focus();
+            svg.current?.focus({ preventScroll: true });
             pointer.current = { clientX: e.clientX, clientY: e.clientY };
             cursor.current = world(e);
             const button = mouseButton(e.button),
@@ -763,11 +768,14 @@ export function App() {
               modifiers,
               contexts(),
             );
-            const objectKey =
+            let objectKey =
               object?.getAttribute("data-component") ??
               object?.getAttribute("data-wire") ??
               object?.getAttribute("data-wire-hit") ??
               object?.getAttribute("data-wire-handle") ?? undefined;
+            const wireCandidates = object?.hasAttribute('data-wire-hit') || object?.hasAttribute('data-wire')
+              ? nearestWires(editor.circuit, drawingPoint(e), editor.viewport.zoom) : [];
+            if (wireCandidates.length === 1) objectKey = wireCandidates[0];
             if (
               dragBinding?.command === "view.pan" ||
               (button === "right" && clickBinding)
@@ -818,6 +826,13 @@ export function App() {
             const wire = objectKey && editor.circuit.geometry.wires[objectKey];
             if (editor.tool === "WIRE") {
               if (hitsAt(e).length > 1) dispatch("wire.start");
+              return;
+            }
+            if (wireCandidates.length > 1) {
+              resolver.cancel();
+              setSelectionChoice({ keys: wireCandidates, command:
+                clickBinding?.command === 'selection.toggleItem' || clickBinding?.command === 'selection.addItem'
+                  ? clickBinding.command : 'selection.replaceItem' });
               return;
             }
             const key = objectKey;
@@ -1072,14 +1087,14 @@ export function App() {
       <aside className="properties" ref={properties}>
         {cleanup && <section className="cleanup-panel" aria-label="중복 우회 정리 미리보기" onKeyDown={(e) => {
           if (e.nativeEvent.isComposing) return;
-          if (e.code === "Escape") { e.preventDefault(); e.stopPropagation(); dispatch("app.cancel"); svg.current?.focus(); }
+          if (e.code === "Escape") { e.preventDefault(); e.stopPropagation(); dispatch("app.cancel"); svg.current?.focus({ preventScroll: true }); }
         }}>
           <h2>중복 우회 정리</h2>
           <p>선택 배선의 연결망에서<br />빨간 점선 {cleanup.remove.length}개: 제거<br />초록 경로 {cleanup.keep.length}개: 유지</p>
           <p>접속점과 다른 분기는 유지됩니다.</p>
           {cleanupAnchored > 0 && <p>제거할 배선 {cleanupAnchored}개의 수동 경유점도 함께 정리합니다.</p>}
-          <button onClick={() => { dispatch("app.confirm"); svg.current?.focus(); }}>정리 적용</button>
-          <button onClick={() => { dispatch("app.cancel"); svg.current?.focus(); }}>정리 취소</button>
+          <button onClick={() => { dispatch("app.confirm"); svg.current?.focus({ preventScroll: true }); }}>정리 적용</button>
+          <button onClick={() => { dispatch("app.cancel"); svg.current?.focus({ preventScroll: true }); }}>정리 취소</button>
           <p>Enter: 정리 · Esc: 취소<br />확정 후 Ctrl+Z: 전체 복구</p>
         </section>}
         <section className="routing-status" aria-label="현재 배선 설정">
@@ -1092,7 +1107,7 @@ export function App() {
         <h2>선택</h2>
         <p>{selectedComponents}개 부품 · {selectedWires}개 배선</p>
         {editor.selectedCorner&&<p className="corner-selection">꺾임점 선택됨 · Delete로 이 점만 제거</p>}
-        <button disabled={!!draft||(!selectedComponents&&!selectedWires)} onClick={()=>{dispatch('edit.delete');svg.current?.focus();}}>{editor.selectedCorner?'선택 꺾임점 제거':'선택 삭제'} {hint('edit.delete')}</button>
+        <button disabled={!!draft||(!selectedComponents&&!selectedWires)} onClick={()=>{dispatch('edit.delete');svg.current?.focus({ preventScroll: true });}}>{editor.selectedCorner?'선택 꺾임점 제거':'선택 삭제'} {hint('edit.delete')}</button>
         <p className="net-summary">연결망 {Object.keys(editor.circuit.nets).length}개 · 접속점 {Object.keys(editor.circuit.junctions).length}개</p>
         <details className="wiring-help">
           <summary>배선 조작법</summary>
@@ -1109,7 +1124,7 @@ export function App() {
           <button disabled={!!draft} onClick={() => dispatch("wire.tidyHorizontal")}>가로 우선 정리</button>
           <button disabled={!!draft} onClick={() => dispatch("wire.tidyVertical")}>세로 우선 정리</button>
           <button disabled={!!draft} title="기존 경유점을 재설정하고 현재 배선 설정으로 정리합니다" onClick={() => dispatch("wire.tidyConfigured")}>설정대로 정리</button>
-          {draft?.type === "WIRE_ROUTE" && <button onClick={() => { dispatch("app.confirm"); svg.current?.focus(); }}>경로 수정 완료</button>}
+          {draft?.type === "WIRE_ROUTE" && <button onClick={() => { dispatch("app.confirm"); svg.current?.focus({ preventScroll: true }); }}>경로 수정 완료</button>}
           <p className="note">양 끝 연결은 고정됩니다.<br />드래그 후 놓기: 확정<br />Esc: 취소 · Ctrl+Z: 복구</p>
         </section>}
         <button disabled={!selectedComponents} onClick={() => dispatch("component.moveSafe")}>
@@ -1163,6 +1178,21 @@ export function App() {
           ? `순차 키 대기: ${resolver.pending.join(" → ")}`
           : "입력 대기"}
       </footer>
+      {selectionChoice && <div className="overlay" onKeyDown={e => {
+        if (!e.nativeEvent.isComposing && e.key === 'Escape') {
+          e.preventDefault(); e.stopPropagation(); dispatch('app.cancel');
+        }
+      }}>
+        <section role="dialog" aria-label="배선 선택" className="connection-chooser">
+          <h2>선택할 배선을 고르세요</h2>
+          <p>같은 거리에 있는 배선입니다. 선택만 하며 연결은 변경하지 않습니다.</p>
+          {selectionChoice.keys.map((key,i) => <button key={key} autoFocus={i===0} onClick={() => {
+            dispatch(selectionChoice.command, {key}); setSelectionChoice(null);
+            svg.current?.focus({preventScroll:true});
+          }}>{i+1}. {targetLabel({type:'wire',id:key,position:editor.circuit.geometry.wires[key].points[0]})}</button>)}
+          <button onClick={() => dispatch('app.cancel')}>취소</button>
+        </section>
+      </div>}
       {connectionChoice && <div className="overlay" onKeyDown={(e) => {
         if (e.nativeEvent.isComposing) return;
         if (e.key === "Escape") { e.preventDefault(); e.stopPropagation(); dispatch("app.cancel"); }
@@ -1174,11 +1204,11 @@ export function App() {
             onClick={() => {
               setConnectionChoice(null);
               dispatch(connectionChoice.action === "start" ? "wire.start" : "app.confirm", { endpoint: candidate });
-              svg.current?.focus();
+              svg.current?.focus({ preventScroll: true });
             }}>{index + 1}. {targetLabel(candidate)}</button>)}
           {!draft && connectionChoice.targets.every((t) => t.type === "wire" && same(targetPosition(editor.circuit, t), targetPosition(editor.circuit, connectionChoice.targets[0]))) &&
-            <button onClick={() => { dispatch("wire.joinCrossing", { targets: connectionChoice.targets }); setConnectionChoice(null); svg.current?.focus(); }}>이 교차점을 접속</button>}
-          <button onClick={() => { setConnectionChoice(null); svg.current?.focus(); }}>취소</button>
+            <button onClick={() => { dispatch("wire.joinCrossing", { targets: connectionChoice.targets }); setConnectionChoice(null); svg.current?.focus({ preventScroll: true }); }}>이 교차점을 접속</button>}
+          <button onClick={() => { setConnectionChoice(null); svg.current?.focus({ preventScroll: true }); }}>취소</button>
         </section>
       </div>}
       {search !== null && (
@@ -1194,7 +1224,7 @@ export function App() {
                 if (e.nativeEvent.isComposing) return;
                 if (e.key === "Escape") {
                   setSearch(null);
-                  svg.current?.focus();
+                  svg.current?.focus({ preventScroll: true });
                 }
                 if (e.key === "Enter" && results.length === 1)
                   place(results[0]);
@@ -1209,7 +1239,7 @@ export function App() {
             <button
               onClick={() => {
                 setSearch(null);
-                svg.current?.focus();
+                svg.current?.focus({ preventScroll: true });
               }}
             >
               닫기
@@ -1230,13 +1260,13 @@ export function App() {
           }}
         >
           <section role="dialog" aria-label="도면 메뉴">
-            <button disabled={!!draft||!editor.selection.length} onClick={()=>{dispatch('edit.delete');setMenu(false);svg.current?.focus();}}>{editor.selectedCorner?'선택 꺾임점 제거':'선택 삭제'}</button>
+            <button disabled={!!draft||!editor.selection.length} onClick={()=>{dispatch('edit.delete');setMenu(false);svg.current?.focus({ preventScroll: true });}}>{editor.selectedCorner?'선택 꺾임점 제거':'선택 삭제'}</button>
             <button
               autoFocus
               onClick={() => {
                 dispatch("app.cancel", { operation: true });
                 setMenu(false);
-                svg.current?.focus();
+                svg.current?.focus({ preventScroll: true });
                 refresh();
               }}
             >
@@ -1246,7 +1276,7 @@ export function App() {
               onClick={() => {
                 dispatch("history.undo");
                 setMenu(false);
-                svg.current?.focus();
+                svg.current?.focus({ preventScroll: true });
               }}
             >
               Undo
@@ -1254,7 +1284,7 @@ export function App() {
             <button
               onClick={() => {
                 setMenu(false);
-                svg.current?.focus();
+                svg.current?.focus({ preventScroll: true });
               }}
             >
               닫기
@@ -1271,7 +1301,7 @@ export function App() {
           onClose={() => {
             setSettings(false);
             resolver.cancel();
-            svg.current?.focus();
+            svg.current?.focus({ preventScroll: true });
           }}
         />
       )}

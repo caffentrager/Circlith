@@ -123,6 +123,7 @@ export class Editor {
     if (cmd) {
       this.history.push(cmd);
       this.circuit = clone(cmd.after);
+      this.pruneSelection();
     }
   }
   setTool(tool: "SELECT" | "WIRE") {
@@ -356,6 +357,9 @@ export class Editor {
     if(this.draft||this.selectionBox)throw new Error('초안을 확정하거나 취소한 후 삭제하세요.');
     if(this.selectedCorner){
       const {wire,index}=this.selectedCorner,next=removeWireCorner(this.circuit,wire,index);
+      const changed=next.geometry.wires[wire];
+      if(changed.anchors?.length&&anchorOffsets(changed.points,changed.anchors)===null)
+        throw new Error('다른 고정 경유점 때문에 이 꺾임점을 제거할 수 없습니다. 경로 다시 그리기를 사용하세요.');
       if(this.routing.overlapMode==='avoid'&&collidingSegments(next,next.geometry.wires[wire].points).length)throw new Error('꺾임점 삭제 경로가 부품과 겹칩니다. 경로 다시 그리기를 사용하세요.');
       assertCircuit(next);this.commit('Delete wire corner',next);return;
     }

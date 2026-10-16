@@ -137,7 +137,7 @@ describe("explicit deletion transactions", () => {
     c.geometry.wires[wire].anchors = [{ x: 200, y: 100 }];
     e.circuit = c;
     e.selectCorner(wire, 1);
-    expect(() => e.deleteSelection()).toThrow();
+    expect(() => e.deleteSelection()).toThrow('다른 고정 경유점 때문에');
     expect(e.history).toHaveLength(0);
     expect(e.circuit).toEqual(c);
   });
