@@ -74,7 +74,26 @@ export function joinCrossing(c: Circuit, targets: ConnectionTarget[]): Circuit {
   return next;
 }
 
+/**
+ * Total validator: a malformed record never escapes as an exception. The checks below dereference nested records,
+ * so a structural fault is reported as one validation error instead of a TypeError.
+ */
 export function validateCircuit(c: Circuit): string[] {
+  try {
+    if (!c || ![c.components, c.pins, c.nets, c.junctions, c.geometry?.components, c.geometry?.junctions, c.geometry?.wires]
+      .every(record => record && typeof record === "object" && !Array.isArray(record))) return ["회로 구조 오류: 필수 레코드가 없습니다."];
+    // Reference integrity first: later geometry checks assume that every referenced record exists.
+    const missing = Object.values(c.pins).some(pin => !pin || !c.components[pin.component]) ||
+      Object.values(c.components).some(comp => !comp || !Array.isArray(comp.pins)) ||
+      Object.values(c.nets).some(net => !net || !Array.isArray(net.pins) || !Array.isArray(net.junctions)) ||
+      Object.values(c.geometry.wires).some(w => !w || !w.from || !w.to || !Array.isArray(w.points) || w.points.some(p => !p || typeof p !== "object"));
+    if (missing) return ["회로 구조 오류: 부품·핀·연결망·배선 레코드가 손상되었습니다."];
+    return validateRecords(c);
+  } catch (reason) {
+    return [`회로 구조 오류: ${reason instanceof Error ? reason.message : String(reason)}`];
+  }
+}
+function validateRecords(c: Circuit): string[] {
   const errors: string[] = [], ids = new Set<string>(), owners = new Map<string, string>();
   for (const records of [c.components, c.pins, c.nets, c.junctions, c.geometry.wires])
     for (const [key, value] of Object.entries(records)) {
@@ -110,8 +129,9 @@ export function validateCircuit(c: Circuit): string[] {
       ? !!c.geometry.components[c.pins[e.id]?.component]
       : !!c.geometry.junctions[e.id];
     if (!endpointExists(w.from) || !endpointExists(w.to)) { errors.push("끝점 좌표 참조 오류"); continue; }
-    adjacency.set(a, new Set([...(adjacency.get(a) ?? []), b]));
-    adjacency.set(b, new Set([...(adjacency.get(b) ?? []), a]));
+    // Mutate in place: copying the neighbour Set on every wire made high fan-out quadratic.
+    (adjacency.get(a) ?? adjacency.set(a, new Set()).get(a)!).add(b);
+    (adjacency.get(b) ?? adjacency.set(b, new Set()).get(b)!).add(a);
     const pts = w.points;
     if (w.anchors && (w.anchors.some((a) => !Number.isFinite(a.x) || !Number.isFinite(a.y)) || anchorOffsets(pts, w.anchors) === null)) errors.push("배선 경유점 오류");
     if (pts.length < 1 || pts.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y)) ||

@@ -17,7 +17,7 @@ export function ComponentProperties({ circuit, componentId, onApply, onClose }: 
   const count = Number(inputCount), variable = isBinaryGate(component.kind);
   const validCount = Number.isInteger(count) && count >= (variable ? 2 : 1) && count <= MAX_GATE_INPUTS;
   const gate = component.kind !== 'Input' && component.kind !== 'Output';
-  return <div className="overlay" onKeyDown={event => {
+  return <div className="overlay" onMouseDown={event => { if (event.target === event.currentTarget) event.preventDefault(); }} onKeyDown={event => {
     event.stopPropagation();
     if (event.key === 'Escape' && !event.nativeEvent.isComposing) { event.preventDefault(); onClose(); }
     if (event.key === 'Tab') {

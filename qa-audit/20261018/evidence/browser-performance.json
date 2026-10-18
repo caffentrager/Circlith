@@ -1,0 +1,230 @@
+{
+  "100 gates": {
+    "gates": 100,
+    "components": 102,
+    "wires": 135,
+    "simulationOnToToggleVisibleMs": 160,
+    "domNodes": 1695,
+    "inputPanelChange": {
+      "sync": {
+        "n": 30,
+        "median": 16.1,
+        "p95": 37.7,
+        "max": 40.1,
+        "min": 14
+      },
+      "toNextFrame": {
+        "n": 30,
+        "median": 32.1,
+        "p95": 42,
+        "max": 44.1,
+        "min": 19.5
+      }
+    },
+    "inputBodyToggle": {
+      "sync": {
+        "n": 30,
+        "median": 0.1,
+        "p95": 0.3,
+        "max": 0.4,
+        "min": 0.1
+      },
+      "toNextFrame": {
+        "n": 30,
+        "median": 31.6,
+        "p95": 38.6,
+        "max": 42.4,
+        "min": 24
+      }
+    },
+    "wheelZoomStep": {
+      "n": 20,
+      "median": 32.1,
+      "p95": 59.9,
+      "max": 59.9,
+      "min": 28.6
+    },
+    "panMoveToFrame": {
+      "n": 20,
+      "median": 51,
+      "p95": 83,
+      "max": 83,
+      "min": 38
+    },
+    "pageErrors": [],
+    "usedHeapMB": 40
+  },
+  "500 gates": {
+    "gates": 500,
+    "components": 502,
+    "wires": 668,
+    "simulationOnToToggleVisibleMs": 576,
+    "domNodes": 8380,
+    "inputPanelChange": {
+      "sync": {
+        "n": 30,
+        "median": 144.4,
+        "p95": 242.7,
+        "max": 263.9,
+        "min": 130.5
+      },
+      "toNextFrame": {
+        "n": 30,
+        "median": 157.5,
+        "p95": 254.8,
+        "max": 275.4,
+        "min": 141.5
+      }
+    },
+    "inputBodyToggle": {
+      "sync": {
+        "n": 30,
+        "median": 0.2,
+        "p95": 0.4,
+        "max": 0.5,
+        "min": 0.1
+      },
+      "toNextFrame": {
+        "n": 30,
+        "median": 159.5,
+        "p95": 231.9,
+        "max": 234.1,
+        "min": 144.2
+      }
+    },
+    "wheelZoomStep": {
+      "n": 20,
+      "median": 169.7,
+      "p95": 243.8,
+      "max": 243.8,
+      "min": 130
+    },
+    "panMoveToFrame": {
+      "n": 20,
+      "median": 184,
+      "p95": 283,
+      "max": 283,
+      "min": 166
+    },
+    "pageErrors": [],
+    "usedHeapMB": 141
+  },
+  "1000 gates": {
+    "gates": 1000,
+    "components": 1002,
+    "wires": 1335,
+    "simulationOnToToggleVisibleMs": 1438,
+    "domNodes": 16725,
+    "inputPanelChange": {
+      "sync": {
+        "n": 30,
+        "median": 557.9,
+        "p95": 578.4,
+        "max": 579.1,
+        "min": 431.3
+      },
+      "toNextFrame": {
+        "n": 30,
+        "median": 581.8,
+        "p95": 604,
+        "max": 605.3,
+        "min": 451.4
+      }
+    },
+    "inputBodyToggle": {
+      "sync": {
+        "n": 30,
+        "median": 0.3,
+        "p95": 0.6,
+        "max": 0.7,
+        "min": 0.1
+      },
+      "toNextFrame": {
+        "n": 30,
+        "median": 553.1,
+        "p95": 588.3,
+        "max": 597,
+        "min": 455.2
+      }
+    },
+    "wheelZoomStep": {
+      "n": 20,
+      "median": 543,
+      "p95": 622.7,
+      "max": 622.7,
+      "min": 448.3
+    },
+    "panMoveToFrame": {
+      "n": 20,
+      "median": 566,
+      "p95": 601,
+      "max": 601,
+      "min": 454
+    },
+    "pageErrors": [],
+    "usedHeapMB": 150
+  },
+  "2000 gates": {
+    "gates": 2000,
+    "components": 2002,
+    "wires": 2668,
+    "simulationOnToToggleVisibleMs": 4841,
+    "domNodes": 33460,
+    "inputPanelChange": {
+      "sync": {
+        "n": 30,
+        "median": 2075.1,
+        "p95": 2184.9,
+        "max": 2186.5,
+        "min": 1995.2
+      },
+      "toNextFrame": {
+        "n": 30,
+        "median": 2124.4,
+        "p95": 2232.7,
+        "max": 2240.1,
+        "min": 2041.3
+      }
+    },
+    "inputBodyToggle": {
+      "sync": {
+        "n": 30,
+        "median": 0.3,
+        "p95": 0.9,
+        "max": 1.8,
+        "min": 0.2
+      },
+      "toNextFrame": {
+        "n": 30,
+        "median": 2078.7,
+        "p95": 2178,
+        "max": 2245.7,
+        "min": 1985.1
+      }
+    },
+    "wheelZoomStep": {
+      "n": 20,
+      "median": 2104.3,
+      "p95": 2189.9,
+      "max": 2189.9,
+      "min": 1959.4
+    },
+    "panMoveToFrame": {
+      "n": 20,
+      "median": 2100,
+      "p95": 2323,
+      "max": 2323,
+      "min": 2033
+    },
+    "pageErrors": [],
+    "usedHeapMB": 150
+  },
+  "latency 1000 gates": {
+    "selectionPointerdownToFrameMs": 482,
+    "propertiesOpen": {
+      "sync": 1,
+      "frame": 32
+    },
+    "dialogOpen": 0
+  }
+}

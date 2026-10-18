@@ -107,6 +107,8 @@ export function InputSettings({
   return (
     <div
       className="overlay settings-overlay"
+      // A backdrop press must not move focus to BODY, where Escape would no longer reach the dialog.
+      onMouseDown={(e) => { if (e.target === e.currentTarget) e.preventDefault(); }}
       onKeyDown={(e) => {
         if (e.nativeEvent.isComposing) return;
         if (e.key === "Escape") {

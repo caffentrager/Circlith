@@ -40,7 +40,7 @@ import { SimulationPanel } from './SimulationPanel';
 import { compileCircuit, simulate } from '../simulation/simulator';
 import type { LogicValue } from '../simulation/logic';
 import { fitView, wheelZoomFactor, zoomView, ZOOM_STEP } from "../geometry/view";
-import { collidingSegments, defaultRouting, routingLabel, routingStorageKey, validateRouting, type RoutingSettings } from "../geometry/routing";
+import { collidingSegments, collidingSegmentsWith, componentObstacles, defaultRouting, routingLabel, routingStorageKey, validateRouting, type RoutingSettings } from "../geometry/routing";
 import { defaultWireDisplay, validateWireDisplay, wireDisplayStorageKey, type WireDisplaySettings } from '../geometry/wire-bridges';
 import { simulationAvailable } from '../config/app-mode';
 import { ComponentProperties } from './ComponentProperties';
@@ -91,6 +91,7 @@ export function App() {
     inside: boolean;
   } | null>(null);
   const suppressPaletteClick = useRef(false);
+  const toggleStart = useRef<string | null>(null);
   const gesture = useRef<{
     type: "pan" | "move" | "wire" | "box" | "panPending" | "click" | "wireEditPending" | "wireEdit";
     start: Point;
@@ -539,7 +540,8 @@ export function App() {
   }, [draft?.type]);
   const wirePlan = draft?.type === "WIRE_DRAFT" ? editor.wirePlan() : null;
   const blocked = previewResult.blocked || !!wirePlan?.blocked;
-  const collisions = [...Object.values(preview.geometry.wires).flatMap((w) => collidingSegments(preview, w.points)), ...(wirePlan?.collisions ?? [])];
+  const obstacleRects = componentObstacles(preview, 0);
+  const collisions = [...Object.values(preview.geometry.wires).flatMap((w) => collidingSegmentsWith(obstacleRects, w.points)), ...(wirePlan?.collisions ?? [])];
   const selectedComponents = editor.selection.filter((key) => editor.circuit.components[key]).length;
   const selectedWires = editor.selection.filter((key) => editor.circuit.geometry.wires[key]).length;
   const cleanup = draft?.type === "WIRE_CLEANUP" ? draft.plan : null;
@@ -835,6 +837,7 @@ export function App() {
               '[data-component],[data-pin],[data-wire],[data-wire-hit],[data-bridge-hit],[data-wire-handle],[data-layer="junctions"]',
             );
             svg.current?.focus({ preventScroll: true });
+            toggleStart.current = null;
             pointer.current = { clientX: e.clientX, clientY: e.clientY };
             cursor.current = world(e);
             const button = mouseButton(e.button),
@@ -930,6 +933,9 @@ export function App() {
               return;
             }
             const key = objectKey;
+            // A plain left click on an Input toggle selects the Input like any body click; a click without movement toggles it on release.
+            const toggleTarget = (e.target as Element).closest('[data-input-toggle]')?.getAttribute('data-input-toggle');
+            if (toggleTarget && key === toggleTarget && !modifiers.length && editor.tool === 'SELECT') toggleStart.current = toggleTarget;
             if (key) {
               if (
                 clickBinding?.command === "selection.toggleItem" ||
@@ -1047,8 +1053,13 @@ export function App() {
             }
             if (g?.type === "move") {
               if (g.moved && insideCanvas(e)) dispatch("app.confirm", { pointerDrag: true });
-              else editor.cancel();
+              else {
+                editor.cancel();
+                const id = toggleStart.current;
+                if (id && !g.moved) changeInput(id, inputValues[id] === '1' ? '0' : '1');
+              }
             }
+            toggleStart.current = null;
             if (g?.type === "wireEdit") {
               if (insideCanvas(e)) {
                 editor.update(world(e));
@@ -1111,8 +1122,8 @@ export function App() {
             <Symbols circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom}
               wireDisplay={wireDisplay}
               simulation={simulation} inputs={inputValues}
-              onToggleInput={!draft && !editor.selectionBox && !gesture.current && !paletteDrag.current
-                ? id => changeInput(id, inputValues[id] === '1' ? '0' : '1') : undefined}/>
+              onToggleInput={id => changeInput(id, inputValues[id] === '1' ? '0' : '1')}
+              toggleDisabled={!!draft || !!editor.selectionBox || !!gesture.current || !!paletteDrag.current}/>
             {cleanup && <g data-layer="wire-cleanup-preview" pointerEvents="none">
               {cleanup.keep.map((key) => <polyline key={key} data-cleanup-keep={key} points={path(preview.geometry.wires[key].points)} className="wire-cleanup-keep" />)}
               {cleanup.remove.map((key) => <polyline key={key} data-cleanup-remove={key} points={path(preview.geometry.wires[key].points)} className="wire-cleanup-remove" />)}

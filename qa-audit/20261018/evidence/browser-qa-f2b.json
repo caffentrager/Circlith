@@ -1,0 +1,255 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\choi\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a5a02988362ca169\\bin\\node.exe",
+      "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "qa-playwright.config.ts",
+      "qa-browser/f2.spec.ts",
+      "-g",
+      "extension|double-click|modes"
+    ],
+    "configFile": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-playwright.config.ts",
+    "rootDir": "D:/Circlith/build/qa-audit-20261018/work-browser/qa-browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Circlith/build/qa-audit-20261018/work-browser/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "D:/Circlith/build/qa-audit-20261018/work-browser/qa-browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser",
+        "snapshotDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5291",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "D:\\Circlith\\build\\qa-audit-20261018\\evidence\\browser-qa-f2b.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": {
+      "command": "node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5291 --strictPort",
+      "url": "http://127.0.0.1:5291",
+      "reuseExistingServer": false,
+      "timeout": 60000
+    }
+  },
+  "suites": [
+    {
+      "title": "f2.spec.ts",
+      "file": "f2.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "F2 extension: toggle focus owns Space/Delete; stale selection; wire draft + Esc",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 3332,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"NONE\"\u001b[39m\nReceived: \u001b[31m\"WIRE_DRAFT\"\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"NONE\"\u001b[39m\nReceived: \u001b[31m\"WIRE_DRAFT\"\u001b[39m\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts:98:30",
+                    "location": {
+                      "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                      "column": 30,
+                      "line": 98
+                    },
+                    "snippet": "   96 |   saveKey('browser-focus', 'f2-extension', out);\n   97 |   // informational assertions captured in evidence; hard assertion only on Esc ownership\n>  98 |   expect(afterEsc.operation).toBe('NONE');\n      |                              ^\n   99 | });\n  100 |\n  101 | test('double-click on Input with simulation ON: toggles, properties, history', async ({ page }) => {"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                        "column": 30,
+                        "line": 98
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32m\"NONE\"\u001b[39m\nReceived: \u001b[31m\"WIRE_DRAFT\"\u001b[39m\n\n   96 |   saveKey('browser-focus', 'f2-extension', out);\n   97 |   // informational assertions captured in evidence; hard assertion only on Esc ownership\n>  98 |   expect(afterEsc.operation).toBe('NONE');\n      |                              ^\n   99 | });\n  100 |\n  101 | test('double-click on Input with simulation ON: toggles, properties, history', async ({ page }) => {\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts:98:30"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:50:01.682Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results\\f2-F2-extension-toggle-foc-573f2-le-selection-wire-draft-Esc\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                    "column": 30,
+                    "line": 98
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "e7a349ab4be1610682bf-aae9659c0f4ede740c35",
+          "file": "f2.spec.ts",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "double-click on Input with simulation ON: toggles, properties, history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 959,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:50:05.709Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e7a349ab4be1610682bf-11174923bd236da0f7c5",
+          "file": "f2.spec.ts",
+          "line": 101,
+          "column": 1
+        },
+        {
+          "title": "modes: ON then OFF keeps selection, view and circuit; entering ON cancels a draft without committing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 988,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:50:06.779Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "e7a349ab4be1610682bf-8d1f00e90669fb5864ce",
+          "file": "f2.spec.ts",
+          "line": 113,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T14:50:00.640Z",
+    "duration": 7346.02,
+    "expected": 2,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

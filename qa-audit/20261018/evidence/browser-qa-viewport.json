@@ -1,0 +1,321 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\choi\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a5a02988362ca169\\bin\\node.exe",
+      "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "qa-playwright.config.ts",
+      "qa-browser/viewport.spec.ts"
+    ],
+    "configFile": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-playwright.config.ts",
+    "rootDir": "D:/Circlith/build/qa-audit-20261018/work-browser/qa-browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Circlith/build/qa-audit-20261018/work-browser/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "D:/Circlith/build/qa-audit-20261018/work-browser/qa-browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser",
+        "snapshotDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5291",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "D:\\Circlith\\build\\qa-audit-20261018\\evidence\\browser-qa-viewport.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": {
+      "command": "node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5291 --strictPort",
+      "url": "http://127.0.0.1:5291",
+      "reuseExistingServer": false,
+      "timeout": 60000
+    }
+  },
+  "suites": [
+    {
+      "title": "viewport.spec.ts",
+      "file": "viewport.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "viewport 1024x420: layout, overflow, Properties (16 inputs) and Settings modals",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 924,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:59:26.280Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "24876809b35b098bf297-3612f9ccfcc86dcf822d",
+          "file": "viewport.spec.ts",
+          "line": 22,
+          "column": 3
+        },
+        {
+          "title": "viewport 1024x768: layout, overflow, Properties (16 inputs) and Settings modals",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 873,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:59:27.305Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "24876809b35b098bf297-8b0d5c76b637f59580e6",
+          "file": "viewport.spec.ts",
+          "line": 22,
+          "column": 3
+        },
+        {
+          "title": "viewport 1440x900: layout, overflow, Properties (16 inputs) and Settings modals",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 929,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:59:28.189Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "24876809b35b098bf297-8242b9dc4fb6d550f1fe",
+          "file": "viewport.spec.ts",
+          "line": 22,
+          "column": 3
+        },
+        {
+          "title": "viewport 1920x1080: layout, overflow, Properties (16 inputs) and Settings modals",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 964,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:59:29.132Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "24876809b35b098bf297-424c3567001fc6d5cff9",
+          "file": "viewport.spec.ts",
+          "line": 22,
+          "column": 3
+        },
+        {
+          "title": "zoom 10%..200%: hit testing, selection and Properties on a 16-input gate and wiring remain accurate",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 5752,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: not \u001b[32m1.999999999278\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: not \u001b[32m1.999999999278\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n    at wheelToZoom (D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\viewport.spec.ts:17:49)\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\viewport.spec.ts:74:5",
+                    "location": {
+                      "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\viewport.spec.ts",
+                      "column": 49,
+                      "line": 17
+                    },
+                    "snippet": "  15 |     const delta = Math.max(-200, Math.min(200, -Math.log(target / current) * 100 / Math.log(1.1)));\n  16 |     await page.mouse.wheel(0, delta);\n> 17 |     await expect.poll(() => readZoom(page)).not.toBe(current);\n     |                                                 ^\n  18 |   }\n  19 | }\n  20 |"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\viewport.spec.ts",
+                        "column": 49,
+                        "line": 17
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mnot\u001b[2m.\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: not \u001b[32m1.999999999278\u001b[39m\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate\n\n  15 |     const delta = Math.max(-200, Math.min(200, -Math.log(target / current) * 100 / Math.log(1.1)));\n  16 |     await page.mouse.wheel(0, delta);\n> 17 |     await expect.poll(() => readZoom(page)).not.toBe(current);\n     |                                                 ^\n  18 |   }\n  19 | }\n  20 |\n    at wheelToZoom (D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\viewport.spec.ts:17:49)\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\viewport.spec.ts:74:5"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:59:30.114Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results\\viewport-zoom-10-200-hit-t-c39ab--and-wiring-remain-accurate\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\viewport.spec.ts",
+                    "column": 49,
+                    "line": 17
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "24876809b35b098bf297-918077c7ccaf57bfda66",
+          "file": "viewport.spec.ts",
+          "line": 63,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T14:59:25.330Z",
+    "duration": 10763.099,
+    "expected": 4,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

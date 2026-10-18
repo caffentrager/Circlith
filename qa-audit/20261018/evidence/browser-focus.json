@@ -1,0 +1,109 @@
+{
+  "f2-extension": {
+    "afterToggle": {
+      "viewport": "translate(0 0) scale(1)",
+      "selected": 1,
+      "transforms": [
+        "translate(100 150) rotate(0)",
+        "translate(320 150) rotate(0)",
+        "translate(540 150) rotate(0)"
+      ],
+      "menu": false,
+      "props": false,
+      "values": [
+        "1",
+        null,
+        "0"
+      ],
+      "history": "5 committed edits",
+      "active": "g#input-toggle",
+      "operation": "NONE",
+      "components": 3,
+      "wires": 2
+    },
+    "spaceDragAfterToggle": [
+      {
+        "attempt": 1,
+        "panned": false,
+        "moved": false,
+        "selectionChanged": true,
+        "valueChanged": false,
+        "menuOpened": false,
+        "propertiesOpened": false,
+        "historyChanged": false,
+        "componentCountChanged": false,
+        "activeBefore": "g#input-toggle",
+        "activeAfter": "svg",
+        "selectionBox": "NONE"
+      },
+      {
+        "attempt": 2,
+        "panned": true,
+        "moved": false,
+        "selectionChanged": false,
+        "valueChanged": false,
+        "menuOpened": false,
+        "propertiesOpened": false,
+        "historyChanged": false,
+        "componentCountChanged": false,
+        "activeBefore": "svg",
+        "activeAfter": "svg",
+        "selectionBox": "NONE"
+      }
+    ],
+    "spaceDragControl": {
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "valueChanged": false,
+      "menuOpened": false,
+      "propertiesOpened": false,
+      "historyChanged": false,
+      "componentCountChanged": false
+    },
+    "wireDraftEsc": {
+      "afterW": {
+        "operation": "WIRE_DRAFT",
+        "active": "BODY"
+      },
+      "afterEsc": {
+        "operation": "WIRE_DRAFT",
+        "active": "BODY"
+      }
+    },
+    "staleSelectionDelete": {
+      "selectedBeforeToggle": 1,
+      "selectedAfterToggle": 1,
+      "componentsBefore": 3,
+      "componentsAfter": 2,
+      "remainingKinds": [
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  },
+  "input-dblclick-sim-on": {
+    "panned": false,
+    "moved": false,
+    "selectionChanged": false,
+    "valueChanged": false,
+    "menuOpened": false,
+    "propertiesOpened": true,
+    "historyChanged": false,
+    "componentCountChanged": false,
+    "valueBefore": "0",
+    "valueAfter": "0",
+    "propsOpen": true,
+    "historyBefore": "5 committed edits",
+    "historyAfter": "5 committed edits"
+  },
+  "sim-toggle": {
+    "selectionKept": true,
+    "viewportKept": true,
+    "draftOperation": "WIRE_DRAFT",
+    "afterEnter": "NONE",
+    "historyAfterEnter": "6 committed edits"
+  }
+}

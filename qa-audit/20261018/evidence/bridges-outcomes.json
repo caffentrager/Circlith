@@ -1,0 +1,12 @@
+{
+  "crossing 10 from endpoint": [
+    5
+  ],
+  "2 coincident verticals x 1 horizontal (horizontal axis)": 1,
+  "2 coincident verticals x 1 horizontal (vertical axis)": 2,
+  "random bridge fields": {
+    "fields": 300,
+    "bridgesTotal": 6249,
+    "violations": 353
+  }
+}

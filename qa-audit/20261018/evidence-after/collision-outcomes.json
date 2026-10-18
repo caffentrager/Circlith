@@ -1,0 +1,13 @@
+{
+  "resize wire/body crossings": {
+    "rows": {
+      "scenarios": 320,
+      "validAfter": 320,
+      "introduced": 0,
+      "introducedOwnBody": 0,
+      "introducedOtherBody": 0,
+      "introducedWithBlockedReroute": 0
+    },
+    "examples": []
+  }
+}

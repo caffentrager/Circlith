@@ -1,0 +1,2016 @@
+{
+  "f2-across-presets": [
+    {
+      "preset": "circlith-modern",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": true,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "circlith-modern",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": true,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "kicad-9",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": true,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "altium-designer-2026",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "easyeda-pro",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": true,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": true,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "fusion-navigation",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": true,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": false,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": false,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": true,
+      "selectionChanged": true,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": false,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": false,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": true,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": false,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": true,
+      "gesture": "MMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": true,
+      "gesture": "RMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": true,
+      "gesture": "LMB drag",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": true,
+      "gesture": "Space+LMB drag",
+      "position": "background",
+      "panned": true,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "input centre",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": false,
+      "valueChanged": false
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "simulation": true,
+      "gesture": "RMB click",
+      "position": "background",
+      "panned": false,
+      "moved": false,
+      "selectionChanged": false,
+      "menuOpened": true,
+      "valueChanged": false
+    }
+  ],
+  "lost-effects-with-simulation-on": [
+    {
+      "preset": "circlith-modern",
+      "gesture": "MMB drag",
+      "lost": "panned"
+    },
+    {
+      "preset": "circlith-modern",
+      "gesture": "LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "circlith-modern",
+      "gesture": "LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "circlith-modern",
+      "gesture": "Space+LMB drag",
+      "lost": "panned"
+    },
+    {
+      "preset": "circlith-modern",
+      "gesture": "RMB click",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "circlith-modern",
+      "gesture": "RMB click",
+      "lost": "menuOpened"
+    },
+    {
+      "preset": "kicad-9",
+      "gesture": "MMB drag",
+      "lost": "panned"
+    },
+    {
+      "preset": "kicad-9",
+      "gesture": "LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "kicad-9",
+      "gesture": "LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "kicad-9",
+      "gesture": "Space+LMB drag",
+      "lost": "panned"
+    },
+    {
+      "preset": "kicad-9",
+      "gesture": "RMB click",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "kicad-9",
+      "gesture": "RMB click",
+      "lost": "menuOpened"
+    },
+    {
+      "preset": "altium-designer-2026",
+      "gesture": "RMB drag",
+      "lost": "panned"
+    },
+    {
+      "preset": "altium-designer-2026",
+      "gesture": "LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "altium-designer-2026",
+      "gesture": "LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "altium-designer-2026",
+      "gesture": "Space+LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "altium-designer-2026",
+      "gesture": "Space+LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "altium-designer-2026",
+      "gesture": "RMB click",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "altium-designer-2026",
+      "gesture": "RMB click",
+      "lost": "menuOpened"
+    },
+    {
+      "preset": "easyeda-pro",
+      "gesture": "RMB drag",
+      "lost": "panned"
+    },
+    {
+      "preset": "easyeda-pro",
+      "gesture": "LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "easyeda-pro",
+      "gesture": "LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "easyeda-pro",
+      "gesture": "Space+LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "easyeda-pro",
+      "gesture": "Space+LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "gesture": "MMB drag",
+      "lost": "panned"
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "gesture": "LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "gesture": "LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "gesture": "Space+LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "gesture": "Space+LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "gesture": "RMB click",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "fusion-electronics-2026",
+      "gesture": "RMB click",
+      "lost": "menuOpened"
+    },
+    {
+      "preset": "fusion-navigation",
+      "gesture": "MMB drag",
+      "lost": "panned"
+    },
+    {
+      "preset": "fusion-navigation",
+      "gesture": "LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "fusion-navigation",
+      "gesture": "LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "fusion-navigation",
+      "gesture": "Space+LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "fusion-navigation",
+      "gesture": "Space+LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "fusion-navigation",
+      "gesture": "RMB click",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "fusion-navigation",
+      "gesture": "RMB click",
+      "lost": "menuOpened"
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "gesture": "MMB drag",
+      "lost": "panned"
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "gesture": "LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "gesture": "LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "gesture": "Space+LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "gesture": "Space+LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "gesture": "RMB click",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "shapr3d-navigation",
+      "gesture": "RMB click",
+      "lost": "menuOpened"
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "gesture": "LMB drag",
+      "lost": "moved"
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "gesture": "LMB drag",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "gesture": "Space+LMB drag",
+      "lost": "panned"
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "gesture": "RMB click",
+      "lost": "selectionChanged"
+    },
+    {
+      "preset": "figma-modern-canvas",
+      "gesture": "RMB click",
+      "lost": "menuOpened"
+    }
+  ]
+}

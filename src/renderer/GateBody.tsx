@@ -22,9 +22,12 @@ export function GateBody({
     const y = inputY(index, inputCount);
     // The auxiliary XOR curve stays far enough from x=-40 for an input bubble.
     const edge = curved ? -14 - 10 * (y / height) ** 2 - (kind === 'XOR' || kind === 'XNOR' ? 5 : 0) : -26;
+    // Dense XOR/XNOR bodies leave less than 8 units between the pin and the curve; shrink the bubble so the lead
+    // never runs backwards and the pin centre never ends up inside the bubble.
+    const radius = Math.min(4, Math.max(2, (edge + 40) / 2 - 0.5));
     return <g key={index}>
-      <path d={`M -40 ${y} H ${invertedInputs[index] ? edge - 8 : edge}`} className="pin-lead"/>
-      {invertedInputs[index] && <circle data-input-bubble={index} cx={edge - 4} cy={y} r="4" className="gate-bubble"/>}
+      <path d={`M -40 ${y} H ${invertedInputs[index] ? edge - 2 * radius : edge}`} className="pin-lead"/>
+      {invertedInputs[index] && <circle data-input-bubble={index} cx={edge - radius} cy={y} r={radius} className="gate-bubble"/>}
       {showPinLabels && <text data-pin-name={`I${index}`} x={curved ? edge + 9 : -21} y={y + 2.5} className="gate-pin-name">I{index}</text>}
     </g>;
   });

@@ -1,0 +1,17 @@
+{
+  "net=constructor": "correct",
+  "pin=constructor": "correct",
+  "component=constructor": "correct",
+  "net=toString": "correct",
+  "pin=toString": "correct",
+  "component=toString": "correct",
+  "net=hasOwnProperty": "correct",
+  "pin=hasOwnProperty": "correct",
+  "component=hasOwnProperty": "correct",
+  "net=__proto__": "correct",
+  "pin=__proto__": "correct",
+  "component=__proto__": "correct",
+  "net=valueOf": "correct",
+  "pin=valueOf": "correct",
+  "component=valueOf": "correct"
+}
