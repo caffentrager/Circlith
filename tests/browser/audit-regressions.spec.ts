@@ -99,3 +99,33 @@ test('modal backdrop click keeps keyboard ownership: Escape still closes Propert
   await page.keyboard.press('Escape');
   await expect(settings).toHaveCount(0);
 });
+
+test('shrinking an anchored gate removes retracing in one Undo while preserving the fixed waypoint', async ({ page }) => {
+  await place(page, 'Input', 100, 160); await place(page, 'AND', 400, 300);
+  const gate = page.locator('main [data-gate-shape="AND"]');
+  const dialog = page.getByRole('dialog', { name: 'Properties · 부품 속성', exact: true });
+  await gate.dblclick(); await dialog.getByLabel('입력 수', { exact: true }).fill('16');
+  await dialog.getByRole('button', { name: '적용', exact: true }).click();
+  const box = (await page.locator('main svg').boundingBox())!;
+  const click = (x: number, y: number) => page.mouse.click(box.x + x, box.y + y);
+  await click(140, 160); await click(340, 300); await click(360, 150); await page.keyboard.press('Escape');
+  const wire = page.locator('main [data-wire]');
+  await expect(wire).toHaveCount(1);
+  const before = await wire.getAttribute('points');
+  await gate.dblclick(); await dialog.getByLabel('입력 수', { exact: true }).fill('2');
+  await dialog.getByRole('button', { name: '적용', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator('main [data-pin]')).toHaveCount(4);
+  const after = await wire.getAttribute('points');
+  const points = after!.split(' ').map(point => point.split(',').map(Number));
+  expect(points.some((b, i) => i > 0 && ((b[0] === 340 && points[i - 1][0] === 340 && Math.min(b[1], points[i - 1][1]) <= 300 && Math.max(b[1], points[i - 1][1]) >= 300) ||
+    (b[1] === 300 && points[i - 1][1] === 300 && Math.min(b[0], points[i - 1][0]) <= 340 && Math.max(b[0], points[i - 1][0]) >= 340)))).toBe(true);
+  for (let i = 2; i < points.length; i++) {
+    const [a, b, c] = points.slice(i - 2, i + 1);
+    if (a[0] === b[0] && b[0] === c[0]) expect((b[1] - a[1]) * (c[1] - b[1])).toBeGreaterThanOrEqual(0);
+    if (a[1] === b[1] && b[1] === c[1]) expect((b[0] - a[0]) * (c[0] - b[0])).toBeGreaterThanOrEqual(0);
+  }
+  await page.keyboard.press('Control+z'); await expect(wire).toHaveAttribute('points', before!);
+  await expect(page.locator('main [data-pin]')).toHaveCount(18);
+  await page.keyboard.press('Control+Shift+z'); await expect(wire).toHaveAttribute('points', after!);
+});

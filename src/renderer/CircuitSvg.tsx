@@ -27,6 +27,7 @@ export function Symbols({
   wireDisplay?: WireDisplaySettings;
 }) {
   const maskPrefix = useId().replace(/:/g, '');
+  const circuitInvalid = !!simulation?.diagnostics.some(d => d.code === 'INVALID_CIRCUIT');
   const bridges = useMemo(() => wireBridges(circuit, wireDisplay, zoom), [circuit, wireDisplay, zoom]);
   // Computed once per circuit: the pin layer previously rescanned every net for every pin (O(P*N)).
   const connectedPins = useMemo(() => new Set(Object.values(circuit.nets).flatMap(n => n.pins)), [circuit.nets]);
@@ -67,10 +68,10 @@ export function Symbols({
               data-value={simulation?.nets[w.net]}
               mask={byWire.has(w.id) ? `url(#${maskPrefix}-wire-${w.id})` : undefined}
               points={path(w.points)}
-              className={`wire${selection.includes(w.id) ? ' selected' : ''}${simulation ? ` signal-${simulation.nets[w.net] ?? 'X'}` : ''}`}
+              className={`wire${selection.includes(w.id) ? ' selected' : ''}${simulation ? ` signal-${circuitInvalid ? 'invalid' : simulation.nets[w.net] ?? 'X'}` : ''}`}
               pointerEvents="none"
             />
-            {simulation && <text data-wire-value={w.id} x={(w.points[0].x + (w.points[1]?.x ?? w.points[0].x)) / 2 + 6 / zoom}
+            {simulation && !circuitInvalid && <text data-wire-value={w.id} x={(w.points[0].x + (w.points[1]?.x ?? w.points[0].x)) / 2 + 6 / zoom}
               y={(w.points[0].y + (w.points[1]?.y ?? w.points[0].y)) / 2 - 6 / zoom}
               style={{ fontSize: 12 / zoom }} className="signal-label">{simulation.nets[w.net] ?? 'X'}</text>}
           </g>
@@ -84,7 +85,7 @@ export function Symbols({
             <path d={bridge.arc} data-wire-bridge={bridge.wire} data-bridge-axis={bridge.axis}
               data-bridge-x={bridge.point.x} data-bridge-y={bridge.point.y} data-bridge-radius={bridge.radius}
               data-selected={selected || undefined} data-value={simulation?.nets[wire.net]}
-              className={`wire-bridge${simulation ? ` signal-${simulation.nets[wire.net] ?? 'X'}` : ''}`}/>
+              className={`wire-bridge${simulation ? ` signal-${circuitInvalid ? 'invalid' : simulation.nets[wire.net] ?? 'X'}` : ''}`}/>
             <path d={bridge.arc} data-bridge-hit={bridge.wire} fill="none" stroke="transparent"
               strokeWidth={Math.max(4 / zoom, 2)} pointerEvents="stroke"/>
           </g>;
@@ -103,13 +104,13 @@ export function Symbols({
             <g
               key={c.id}
               data-component={c.id}
-              data-value={simulation ? (c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? simulation.outputs[c.id] ?? 'X' : undefined) : undefined}
+              data-value={simulation ? (c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? circuitInvalid ? undefined : simulation.outputs[c.id] ?? 'X' : undefined) : undefined}
               transform={`translate(${p.position.x} ${p.position.y}) rotate(${p.rotation})`}
             >
               <GateBody kind={c.kind} selected={selection.includes(c.id)} inputCount={gateInputCount(c)}
                 showPinLabels
                 invertedInputs={c.pins.filter(id => circuit.pins[id].direction === 'in').map(id => !!circuit.pins[id].inverted)}
-                value={c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? simulation ? simulation.outputs[c.id] ?? 'X' : '—' : undefined}/>
+                value={c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? circuitInvalid ? '오류' : simulation ? simulation.outputs[c.id] ?? 'X' : '—' : undefined}/>
               {simulation && c.kind === 'Input' && onToggleInput && <g role="button" tabIndex={0} aria-disabled={toggleDisabled || undefined}
                 aria-label={`입력 토글 ${inputIndex.get(c.id)}: ${inputs[c.id] ?? '0'}`}
                 data-input-toggle={c.id} className="input-toggle"
@@ -148,7 +149,7 @@ export function Symbols({
               className={connectedPins.has(pin.id) ? "pin connected" : "pin"}
             >
               <title>
-                {pin.direction} {pin.index + 1}{simulation ? ` · ${simulation.pins[pin.id] ?? 'X'}` : ''}
+                {`${pin.direction} ${pin.index + 1}${simulation ? circuitInvalid ? ' · 계산 중단' : ` · ${simulation.pins[pin.id] ?? 'X'}` : ''}`}
               </title>
             </circle>
           </g>;

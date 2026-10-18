@@ -2,7 +2,7 @@ import { gateKinds, isBinaryGate, MAX_GATE_INPUTS, type Circuit, type Component,
 import { validateCircuit } from '../model/connections';
 import { evaluateGate, invert, logicValues, resolveDrivers, type LogicValue } from './logic';
 
-export type DiagnosticCode = 'FLOATING_INPUT' | 'MULTIPLE_DRIVERS' | 'DRIVE_CONFLICT' | 'COMBINATIONAL_FEEDBACK' | 'INVALID_CIRCUIT';
+export type DiagnosticCode = 'FLOATING_INPUT' | 'MULTIPLE_DRIVERS' | 'DRIVE_CONFLICT' | 'COMBINATIONAL_FEEDBACK' | 'INVALID_CIRCUIT' | 'INVALID_INPUT';
 export type Diagnostic = {
   code: DiagnosticCode;
   message: string;
@@ -126,10 +126,27 @@ export function simulate(plan: Plan, inputs: Readonly<Record<string, LogicValue>
     return result;
   }
   const { circuit, signals, floating, pinSignals } = plan;
+  const names = new Map<string, number>(), labels = new Map<string, string>();
+  for (const component of Object.values(circuit.components)) {
+    const ordinal = (names.get(component.name) ?? 0) + 1;
+    names.set(component.name, ordinal);
+    const { x, y } = circuit.geometry.components[component.id].position;
+    labels.set(component.id, `${component.name} ${ordinal} (${x}, ${y})`);
+  }
+  const invalidInput = (message: string, objects: string[]) => result.diagnostics.push({ code: 'INVALID_INPUT', severity: 'error', message, objects });
+  const isRecord = inputs && typeof inputs === 'object' && (Object.getPrototypeOf(inputs) === Object.prototype || Object.getPrototypeOf(inputs) === null);
+  const values = isRecord ? inputs : {};
+  if (values !== inputs) invalidInput('입력값 목록이 손상되었습니다. 입력별 0/1/X/Z 값을 지정하세요.', []);
+  for (const [id, value] of Object.entries(values)) {
+    const component = Object.hasOwn(circuit.components, id) ? circuit.components[id] : undefined;
+    if (component?.kind !== 'Input') invalidInput(`입력값 대상 '${id}': 입력 소자가 아닙니다.`, component ? [id] : []);
+    else if (!logicValues.includes(value)) invalidInput(`${labels.get(id)}: 입력값은 0/1/X/Z여야 합니다. 이 입력을 X로 계산합니다.`, [id]);
+  }
   const drives: Record<string, LogicValue> = {};
   for (const component of Object.values(circuit.components)) {
+    const provided = Object.hasOwn(values, component.id), value = values[component.id];
     for (const pin of component.pins) if (circuit.pins[pin].direction === 'out')
-      drives[pin] = component.kind === 'Input' ? (logicValues.includes(inputs[component.id]) ? inputs[component.id] : '0') : 'X';
+      drives[pin] = component.kind === 'Input' ? (values !== inputs ? 'X' : provided ? logicValues.includes(value) ? value : 'X' : '0') : 'X';
   }
   const read = (pin: string) => resolveDrivers(pinSignals.get(pin)!.drivers.map(id => drives[id]));
   for (const gate of plan.order) {
@@ -155,7 +172,7 @@ export function simulate(plan: Plan, inputs: Readonly<Record<string, LogicValue>
     if (resolved === 'Z') for (const pin of signal.pins.filter(id => circuit.pins[id].direction === 'in')) {
       const component = circuit.components[circuit.pins[pin].component];
       result.diagnostics.push({ code: 'FLOATING_INPUT', severity: 'warning', objects: [...new Set([component.id, ...signal.objects])],
-        message: `${component.name} 입력 ${circuit.pins[pin].index + 1}: 구동 신호가 없습니다(Z).` });
+        message: `${labels.get(component.id)} 입력 ${circuit.pins[pin].index + 1}: 구동 신호가 없습니다(Z).` });
     }
   }
   for (const component of Object.values(circuit.components)) if (component.kind === 'Output')

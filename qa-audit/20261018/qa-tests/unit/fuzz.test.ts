@@ -51,7 +51,8 @@ function runSeed(seed: number, steps: number): { failure: Failure | null; stats:
         e.startWire({ type: 'pin', id: pa }); e.update(pinPosition(c, pb), to); e.confirm(to);
         e.cancel(); e.setTool('SELECT');
       } else if (r < 0.50) {
-        const wires = Object.values(c.geometry.wires);
+        // A wire whose endpoints coincide is valid but has no segment on which to choose a branch midpoint.
+        const wires = Object.values(c.geometry.wires).filter(wire => wire.points.length > 1);
         if (wires.length) {
           const w = pick(wires), i = Math.floor(rand() * (w.points.length - 1));
           const a = w.points[i], b = w.points[i + 1];
