@@ -1,0 +1,27 @@
+{
+  "fuzz": {
+    "seed 1": {
+      "committed": 750,
+      "rejected": 156,
+      "unexpected": 0,
+      "spur": 0,
+      "simChecks": 1000,
+      "undo": 70,
+      "redo": 52,
+      "ok:place": 181,
+      "ok:wire": 211,
+      "ok:props": 132,
+      "ok:branch": 81,
+      "ok:undo": 70,
+      "ok:move": 17,
+      "ok:delete": 81,
+      "ok:rotate": 19,
+      "ok:redo": 52,
+      "rejected:rotate": 42,
+      "rejected:move": 84,
+      "rejected:wire": 14,
+      "rejected:branch": 9,
+      "rejected:props": 7
+    }
+  }
+}

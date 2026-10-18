@@ -1,0 +1,19 @@
+{
+  "p3-11": {
+    "output": "X",
+    "diagnostics": [
+      "오류\n\n회로 데이터 오류: 배선 경로 오류"
+    ],
+    "wireValues": [
+      null,
+      null
+    ],
+    "pinTitles": [
+      "out 1 · X",
+      "in 1 · X",
+      "out 2 · X",
+      "in 1 · X"
+    ],
+    "inputBody": "0"
+  }
+}

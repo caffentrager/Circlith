@@ -1,0 +1,20 @@
+{
+  "seed": 1,
+  "step": 1000,
+  "op": "final redo",
+  "problem": "redo-all does not reproduce the final circuit",
+  "log": [
+    "988: wire fa57ac3e-6d6f-4b2d-8fd1-56e88cb32df5->2214df32-7909-4c8f-9974-8464456ef918",
+    "989: undo",
+    "990: move 6c9f7d9b-2db4-46c1-b195-25030e1243bd,917924e9-824b-4fcf-9e21-74e82bf69fdd by -20,-60 rot 0 !! Error: 우회 경로가 없습니다. 고정 경유점이나 부품 위치를 조정하세요.",
+    "991: wire ed7d78a6-7d84-4932-a31e-a8cc8b8da92b->7b5556bd-dacb-4848-910f-f6a9ecc7e92b",
+    "992: props XNOR b892c3aa-25fe-4510-b2cc-1d6e73f4addd count=4",
+    "993: move cf6ea053-6b8d-4580-a8c8-bd22e4d5867d,1490303e-88e6-4dde-ae49-e5f978feaab7 by 20,-80 rot 180 !! Error: 우회 경로가 없습니다. 고정 경유점이나 부품 위치를 조정하세요.",
+    "994: wire e8aa7257-7c74-47d3-989e-f01936a50bd4->6895a65a-0228-44cc-a0c5-b03e3b193ed3",
+    "995: wire 339e88ff-cd36-4fee-84f0-5e022e4e531e->09468417-5d08-4509-95f2-62c0b00da52b",
+    "996: wire 4078230e-c21c-4e42-8e95-e9040f3f74e4->752684d1-e8d2-4ab5-8cb6-4c25cab4d9d7 !! Error: 우회 경로가 없습니다. 고정 경유점이나 부품 위치를 조정하세요.",
+    "997: undo",
+    "998: branch cf954b9f-05c8-4fcc-8a67-a2944977ac2c@1330,682.5 -> 1b0efc9c-4724-44d6-9959-1ad8f508124e !! Error: 우회 경로가 없습니다. 고정 경유점이나 부품 위치를 조정하세요.",
+    "999: redo"
+  ]
+}

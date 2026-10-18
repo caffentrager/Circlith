@@ -1,0 +1,332 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\choi\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a5a02988362ca169\\bin\\node.exe",
+      "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "qa-playwright.config.ts",
+      "qa-browser/f2.spec.ts"
+    ],
+    "configFile": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-playwright.config.ts",
+    "rootDir": "D:/Circlith/build/qa-audit-20261018/work-browser/qa-browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Circlith/build/qa-audit-20261018/work-browser/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "D:/Circlith/build/qa-audit-20261018/work-browser/qa-browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser",
+        "snapshotDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5291",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "D:\\Circlith\\build\\qa-audit-20261018\\evidence\\browser-qa-f2.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": {
+      "command": "node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5291 --strictPort",
+      "url": "http://127.0.0.1:5291",
+      "reuseExistingServer": false,
+      "timeout": 60000
+    }
+  },
+  "suites": [
+    {
+      "title": "f2.spec.ts",
+      "file": "f2.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "F2 matrix: gesture x position x simulation ON/OFF on an Input body",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 900000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 37929,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 47\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"LMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"LMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"moved\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"LMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"Shift+LMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"MMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"panned\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"RMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"RMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"menuOpened\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"Space+LMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"panned\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"Alt+LMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 47\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"LMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"LMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"moved\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"LMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"Shift+LMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"MMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"panned\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"RMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"RMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"menuOpened\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"Space+LMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"panned\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"Alt+LMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts:50:16",
+                    "location": {
+                      "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                      "column": 16,
+                      "line": 50
+                    },
+                    "snippet": "  48 |   }\n  49 |   save('browser-f2-lost-effects', lost);\n> 50 |   expect(lost).toEqual([]);\n     |                ^\n  51 | });\n  52 |\n  53 | test('F2 extension: toggle focus owns Space/Delete; stale selection; wire draft + Esc', async ({ page }) => {"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                        "column": 16,
+                        "line": 50
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 47\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"LMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"LMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"moved\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"LMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"Shift+LMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"MMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"panned\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"RMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"RMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"menuOpened\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"Space+LMB drag\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"panned\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"gesture\": \"Alt+LMB click\",\u001b[39m\n\u001b[31m+     \"lostEffect\": \"selectionChanged\",\u001b[39m\n\u001b[31m+     \"position\": \"center\",\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  48 |   }\n  49 |   save('browser-f2-lost-effects', lost);\n> 50 |   expect(lost).toEqual([]);\n     |                ^\n  51 | });\n  52 |\n  53 | test('F2 extension: toggle focus owns Space/Delete; stale selection; wire draft + Esc', async ({ page }) => {\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts:50:16"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:49:09.492Z",
+                  "annotations": [
+                    {
+                      "type": "serial",
+                      "location": {
+                        "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                        "line": 0,
+                        "column": 0
+                      }
+                    }
+                  ],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results\\f2-F2-matrix-gesture-x-pos-d105d-ion-ON-OFF-on-an-Input-body\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                    "column": 16,
+                    "line": 50
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "e7a349ab4be1610682bf-89e6885a71104ed19a5f",
+          "file": "f2.spec.ts",
+          "line": 24,
+          "column": 1
+        },
+        {
+          "title": "F2 extension: toggle focus owns Space/Delete; stale selection; wire draft + Esc",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:49:47.588Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "e7a349ab4be1610682bf-aae9659c0f4ede740c35",
+          "file": "f2.spec.ts",
+          "line": 53,
+          "column": 1
+        },
+        {
+          "title": "double-click on Input with simulation ON: toggles, properties, history",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:49:47.588Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "e7a349ab4be1610682bf-11174923bd236da0f7c5",
+          "file": "f2.spec.ts",
+          "line": 102,
+          "column": 1
+        },
+        {
+          "title": "modes: ON then OFF keeps selection, view and circuit; entering ON cancels a draft without committing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [
+                {
+                  "type": "serial",
+                  "location": {
+                    "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\f2.spec.ts",
+                    "line": 0,
+                    "column": 0
+                  }
+                }
+              ],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": -1,
+                  "parallelIndex": -1,
+                  "status": "skipped",
+                  "duration": 0,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:49:47.588Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "skipped"
+            }
+          ],
+          "id": "e7a349ab4be1610682bf-8d1f00e90669fb5864ce",
+          "file": "f2.spec.ts",
+          "line": 114,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T14:49:07.944Z",
+    "duration": 39841.946,
+    "expected": 0,
+    "skipped": 3,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

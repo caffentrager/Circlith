@@ -1,0 +1,407 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\choi\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a5a02988362ca169\\bin\\node.exe",
+      "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "qa-playwright.config.ts",
+      "qa-browser/props.spec.ts"
+    ],
+    "configFile": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-playwright.config.ts",
+    "rootDir": "D:/Circlith/build/qa-audit-20261018/work-browser/qa-browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Circlith/build/qa-audit-20261018/work-browser/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "D:/Circlith/build/qa-audit-20261018/work-browser/qa-browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser",
+        "snapshotDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5291",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "D:\\Circlith\\build\\qa-audit-20261018\\evidence\\browser-qa-props.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": {
+      "command": "node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5291 --strictPort",
+      "url": "http://127.0.0.1:5291",
+      "reuseExistingServer": false,
+      "timeout": 60000
+    }
+  },
+  "suites": [
+    {
+      "title": "props.spec.ts",
+      "file": "props.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "modal key isolation: editor shortcuts typed in the name field do nothing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 751,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:50:41.622Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3a6448fcc705bb98f84d-12589c3ad078586fc192",
+          "file": "props.spec.ts",
+          "line": 7,
+          "column": 1
+        },
+        {
+          "title": "modal: Tab trap, Escape, focus restore, outside click, repeat open",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 681,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:50:42.490Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3a6448fcc705bb98f84d-294cc389cd7a67495e9f",
+          "file": "props.spec.ts",
+          "line": 26,
+          "column": 1
+        },
+        {
+          "title": "modal: open/close focus returns to canvas and shortcuts work afterwards (Input toggle -> Properties -> Escape -> W -> Escape -> Space pan -> Delete)",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 1076,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:50:43.183Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "3a6448fcc705bb98f84d-fd2905d4d524ea53aa07",
+          "file": "props.spec.ts",
+          "line": 52,
+          "column": 1
+        },
+        {
+          "title": "name edge cases through the UI: 81 chars, whitespace, HTML text is inert, history unchanged on rejection",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "timedOut",
+                  "duration": 30030,
+                  "error": {
+                    "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m",
+                    "stack": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                  },
+                  "errors": [
+                    {
+                      "message": "\u001b[31mTest timeout of 30000ms exceeded.\u001b[39m"
+                    },
+                    {
+                      "location": {
+                        "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts",
+                        "column": 14,
+                        "line": 88
+                      },
+                      "message": "Error: locator.fill: Test timeout of 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('dialog', { name: 'Properties · 부품 속성', exact: true }).getByLabel('이름', { exact: true })\u001b[22m\n\n\n  86 |   out.alert81 = (await dialog.getByRole('alert').count()) ? await dialog.getByRole('alert').innerText() : null;\n  87 |   out.historyAfter81 = (await snap(page)).history === h0;\n> 88 |   await name.fill('   ');\n     |              ^\n  89 |   await dialog.getByRole('button', { name: '적용', exact: true }).click();\n  90 |   out.alertBlank = (await dialog.getByRole('alert').count()) ? await dialog.getByRole('alert').innerText() : (await name.evaluate((e: HTMLInputElement) => e.validationMessage));\n  91 |   const html = `<img src=x onerror=\"window.__xss=1\"><b>bold</b>`;\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts:88:14"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:50:44.271Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results\\props-name-edge-cases-thro-ed1a4-tory-unchanged-on-rejection\\error-context.md"
+                    }
+                  ]
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "3a6448fcc705bb98f84d-fd4e0c7be33c25dbaacf",
+          "file": "props.spec.ts",
+          "line": 75,
+          "column": 1
+        },
+        {
+          "title": "16-input XOR with all bubbles: DOM geometry of bubbles vs pins in the real browser, rotation 0 and 90",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 1404,
+                  "error": {
+                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 16\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"bubbleRadius\": 4,\u001b[39m\n\u001b[31m+     \"distance\": 2.51,\u001b[39m\n\u001b[31m+     \"index\": 0,\u001b[39m\n\u001b[31m+     \"pinInsideBubble\": true,\u001b[39m\n\u001b[31m+     \"pinRadius\": 5,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"bubbleRadius\": 4,\u001b[39m\n\u001b[31m+     \"distance\": 2.51,\u001b[39m\n\u001b[31m+     \"index\": 15,\u001b[39m\n\u001b[31m+     \"pinInsideBubble\": true,\u001b[39m\n\u001b[31m+     \"pinRadius\": 5,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m",
+                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 16\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"bubbleRadius\": 4,\u001b[39m\n\u001b[31m+     \"distance\": 2.51,\u001b[39m\n\u001b[31m+     \"index\": 0,\u001b[39m\n\u001b[31m+     \"pinInsideBubble\": true,\u001b[39m\n\u001b[31m+     \"pinRadius\": 5,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"bubbleRadius\": 4,\u001b[39m\n\u001b[31m+     \"distance\": 2.51,\u001b[39m\n\u001b[31m+     \"index\": 15,\u001b[39m\n\u001b[31m+     \"pinInsideBubble\": true,\u001b[39m\n\u001b[31m+     \"pinRadius\": 5,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts:138:52",
+                    "location": {
+                      "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts",
+                      "column": 52,
+                      "line": 138
+                    },
+                    "snippet": "  136 |   await page.screenshot({ path: `${SCREENS}/xor16-inverted-rot90-closeup.png`, clip: { x: clip.x - 20, y: clip.y - 20, width: Math.min(clip.width + 40, 600), height: Math.min(clip.height + 40, 700) } });\n  137 |   saveKey(FILE, 'xor16-bubble-geometry', { rot0: r0.filter((x: any) => x.pinInsideBubble), rot90: r90.filter((x: any) => x.pinInsideBubble), counts: [r0.length, r90.length] });\n> 138 |   expect(r0.filter((x: any) => x.pinInsideBubble)).toEqual([]);\n      |                                                    ^\n  139 | });\n  140 |\n  141 | test('Input-toggle role in Properties: Input/Output/NOT dialog content and apply on a live circuit', async ({ page }) => {"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts",
+                        "column": 52,
+                        "line": 138
+                      },
+                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoEqual\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // deep equality\u001b[22m\n\n\u001b[32m- Expected  -  1\u001b[39m\n\u001b[31m+ Received  + 16\u001b[39m\n\n\u001b[32m- Array []\u001b[39m\n\u001b[31m+ Array [\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"bubbleRadius\": 4,\u001b[39m\n\u001b[31m+     \"distance\": 2.51,\u001b[39m\n\u001b[31m+     \"index\": 0,\u001b[39m\n\u001b[31m+     \"pinInsideBubble\": true,\u001b[39m\n\u001b[31m+     \"pinRadius\": 5,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+   Object {\u001b[39m\n\u001b[31m+     \"bubbleRadius\": 4,\u001b[39m\n\u001b[31m+     \"distance\": 2.51,\u001b[39m\n\u001b[31m+     \"index\": 15,\u001b[39m\n\u001b[31m+     \"pinInsideBubble\": true,\u001b[39m\n\u001b[31m+     \"pinRadius\": 5,\u001b[39m\n\u001b[31m+   },\u001b[39m\n\u001b[31m+ ]\u001b[39m\n\n  136 |   await page.screenshot({ path: `${SCREENS}/xor16-inverted-rot90-closeup.png`, clip: { x: clip.x - 20, y: clip.y - 20, width: Math.min(clip.width + 40, 600), height: Math.min(clip.height + 40, 700) } });\n  137 |   saveKey(FILE, 'xor16-bubble-geometry', { rot0: r0.filter((x: any) => x.pinInsideBubble), rot90: r90.filter((x: any) => x.pinInsideBubble), counts: [r0.length, r90.length] });\n> 138 |   expect(r0.filter((x: any) => x.pinInsideBubble)).toEqual([]);\n      |                                                    ^\n  139 | });\n  140 |\n  141 | test('Input-toggle role in Properties: Input/Output/NOT dialog content and apply on a live circuit', async ({ page }) => {\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts:138:52"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:51:14.840Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results\\props-16-input-XOR-with-al-a7a4c-l-browser-rotation-0-and-90\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts",
+                    "column": 52,
+                    "line": 138
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "3a6448fcc705bb98f84d-33bc46fd74bda4beae80",
+          "file": "props.spec.ts",
+          "line": 108,
+          "column": 1
+        },
+        {
+          "title": "Input-toggle role in Properties: Input/Output/NOT dialog content and apply on a live circuit",
+          "ok": false,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "failed",
+                  "duration": 942,
+                  "error": {
+                    "message": "Error: locator.innerText: Error: Node is not an HTMLElement\nCall log:\n\u001b[2m  - waiting for locator('main [data-layer=\"symbols\"] [data-component]').nth(2).locator('.label')\u001b[22m\n",
+                    "stack": "Error: locator.innerText: Error: Node is not an HTMLElement\nCall log:\n\u001b[2m  - waiting for locator('main [data-layer=\"symbols\"] [data-component]').nth(2).locator('.label')\u001b[22m\n\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts:149:62",
+                    "location": {
+                      "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts",
+                      "column": 62,
+                      "line": 149
+                    },
+                    "snippet": "  147 |   await propsDialog(page).getByLabel('이름', { exact: true }).fill('Y');\n  148 |   await propsDialog(page).getByRole('button', { name: '적용', exact: true }).click();\n> 149 |   out.outputLabel = await sym(page).nth(2).locator('.label').innerText();\n      |                                                              ^\n  150 |   await page.mouse.dblclick(b.x + 320, b.y + 150);                       // NOT\n  151 |   await propsDialog(page).getByLabel('입력 1 반전', { exact: true }).check();\n  152 |   await propsDialog(page).getByRole('button', { name: '적용', exact: true }).click();"
+                  },
+                  "errors": [
+                    {
+                      "location": {
+                        "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts",
+                        "column": 62,
+                        "line": 149
+                      },
+                      "message": "Error: locator.innerText: Error: Node is not an HTMLElement\nCall log:\n\u001b[2m  - waiting for locator('main [data-layer=\"symbols\"] [data-component]').nth(2).locator('.label')\u001b[22m\n\n\n  147 |   await propsDialog(page).getByLabel('이름', { exact: true }).fill('Y');\n  148 |   await propsDialog(page).getByRole('button', { name: '적용', exact: true }).click();\n> 149 |   out.outputLabel = await sym(page).nth(2).locator('.label').innerText();\n      |                                                              ^\n  150 |   await page.mouse.dblclick(b.x + 320, b.y + 150);                       // NOT\n  151 |   await propsDialog(page).getByLabel('입력 1 반전', { exact: true }).check();\n  152 |   await propsDialog(page).getByRole('button', { name: '적용', exact: true }).click();\n    at D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts:149:62"
+                    }
+                  ],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T14:51:16.806Z",
+                  "annotations": [],
+                  "attachments": [
+                    {
+                      "name": "error-context",
+                      "contentType": "text/markdown",
+                      "path": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results\\props-Input-toggle-role-in-6e2e7-and-apply-on-a-live-circuit\\error-context.md"
+                    }
+                  ],
+                  "errorLocation": {
+                    "file": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser\\props.spec.ts",
+                    "column": 62,
+                    "line": 149
+                  }
+                }
+              ],
+              "status": "unexpected"
+            }
+          ],
+          "id": "3a6448fcc705bb98f84d-ce5bfcf0a35746a69bd2",
+          "file": "props.spec.ts",
+          "line": 141,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T14:50:40.005Z",
+    "duration": 38109.042,
+    "expected": 3,
+    "skipped": 0,
+    "unexpected": 3,
+    "flaky": 0
+  }
+}

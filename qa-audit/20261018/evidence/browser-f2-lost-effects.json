@@ -1,0 +1,47 @@
+[
+  {
+    "position": "center",
+    "gesture": "LMB click",
+    "lostEffect": "selectionChanged"
+  },
+  {
+    "position": "center",
+    "gesture": "LMB drag",
+    "lostEffect": "moved"
+  },
+  {
+    "position": "center",
+    "gesture": "LMB drag",
+    "lostEffect": "selectionChanged"
+  },
+  {
+    "position": "center",
+    "gesture": "Shift+LMB click",
+    "lostEffect": "selectionChanged"
+  },
+  {
+    "position": "center",
+    "gesture": "MMB drag",
+    "lostEffect": "panned"
+  },
+  {
+    "position": "center",
+    "gesture": "RMB click",
+    "lostEffect": "selectionChanged"
+  },
+  {
+    "position": "center",
+    "gesture": "RMB click",
+    "lostEffect": "menuOpened"
+  },
+  {
+    "position": "center",
+    "gesture": "Space+LMB drag",
+    "lostEffect": "panned"
+  },
+  {
+    "position": "center",
+    "gesture": "Alt+LMB click",
+    "lostEffect": "selectionChanged"
+  }
+]

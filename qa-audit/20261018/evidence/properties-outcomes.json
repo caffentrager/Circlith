@@ -1,0 +1,311 @@
+{
+  "name length unit": "UTF-16 code units (41 emoji rejected although 41 characters)",
+  "transitions AND": 36,
+  "transitions OR": 36,
+  "transitions XOR": 36,
+  "transitions NAND": 36,
+  "transitions NOR": 36,
+  "transitions XNOR": 36,
+  "connected removal matrix": 21,
+  "wire reconstruction": {
+    "rows": {
+      "total": 140,
+      "threw": 0,
+      "spur": 0,
+      "nonOrth": 0,
+      "endpointMoved": 0,
+      "idChanged": 0,
+      "collideSelf": 58,
+      "collideOthers": 0
+    },
+    "throws": {}
+  },
+  "waypoint preservation": {
+    "corner (x mid, y of src) 2->4 pin0": "anchors kept",
+    "corner (x mid, y of src) 2->4 pin1": "anchors kept",
+    "corner (x mid, y of src) 2->16 pin0": "anchors kept",
+    "corner (x mid, y of src) 2->16 pin1": "anchors kept",
+    "corner (x mid, y of src) 8->3 pin0": "anchors kept",
+    "corner (x mid, y of src) 8->3 pin1": "anchors kept",
+    "corner (x mid, y of src) 16->2 pin0": "anchors kept",
+    "corner (x mid, y of src) 16->2 pin1": "anchors kept",
+    "z-shape two waypoints 2->4 pin0": "anchors kept",
+    "z-shape two waypoints 2->4 pin1": "anchors kept",
+    "z-shape two waypoints 2->16 pin0": "anchors kept",
+    "z-shape two waypoints 2->16 pin1": "anchors kept",
+    "z-shape two waypoints 8->3 pin0": "anchors kept",
+    "z-shape two waypoints 8->3 pin1": "anchors kept",
+    "z-shape two waypoints 16->2 pin0": "REJECTED: 배선 경유점 오류",
+    "z-shape two waypoints 16->2 pin1": "anchors kept",
+    "near-pin (-60 from gate) 2->4 pin0": "anchors kept",
+    "near-pin (-60 from gate) 2->4 pin1": "anchors kept",
+    "near-pin (-60 from gate) 2->16 pin0": "anchors kept",
+    "near-pin (-60 from gate) 2->16 pin1": "anchors kept",
+    "near-pin (-60 from gate) 8->3 pin0": "REJECTED: 배선 경유점 오류",
+    "near-pin (-60 from gate) 8->3 pin1": "REJECTED: 배선 경유점 오류",
+    "near-pin (-60 from gate) 16->2 pin0": "REJECTED: 배선 경유점 오류",
+    "near-pin (-60 from gate) 16->2 pin1": "REJECTED: 배선 경유점 오류",
+    "u-turn waypoint beyond gate 2->4 pin0": "anchors kept",
+    "u-turn waypoint beyond gate 2->4 pin1": "anchors kept",
+    "u-turn waypoint beyond gate 2->16 pin0": "anchors kept",
+    "u-turn waypoint beyond gate 2->16 pin1": "anchors kept",
+    "u-turn waypoint beyond gate 8->3 pin0": "anchors kept",
+    "u-turn waypoint beyond gate 8->3 pin1": "anchors kept",
+    "u-turn waypoint beyond gate 16->2 pin0": "anchors kept",
+    "u-turn waypoint beyond gate 16->2 pin1": "anchors kept",
+    "obstacle-adjacent waypoint 2->4 pin0": "anchors kept",
+    "obstacle-adjacent waypoint 2->4 pin1": "anchors kept",
+    "obstacle-adjacent waypoint 2->16 pin0": "anchors kept",
+    "obstacle-adjacent waypoint 2->16 pin1": "anchors kept",
+    "obstacle-adjacent waypoint 8->3 pin0": "anchors kept",
+    "obstacle-adjacent waypoint 8->3 pin1": "anchors kept",
+    "obstacle-adjacent waypoint 16->2 pin0": "anchors kept",
+    "obstacle-adjacent waypoint 16->2 pin1": "anchors kept"
+  },
+  "waypoint problems": [
+    [
+      "z-shape two waypoints 16->2 pin0",
+      "REJECTED: 배선 경유점 오류"
+    ],
+    [
+      "near-pin (-60 from gate) 8->3 pin0",
+      "REJECTED: 배선 경유점 오류"
+    ],
+    [
+      "near-pin (-60 from gate) 8->3 pin1",
+      "REJECTED: 배선 경유점 오류"
+    ],
+    [
+      "near-pin (-60 from gate) 16->2 pin0",
+      "REJECTED: 배선 경유점 오류"
+    ],
+    [
+      "near-pin (-60 from gate) 16->2 pin1",
+      "REJECTED: 배선 경유점 오류"
+    ]
+  ],
+  "self feedback": [
+    {
+      "rotation": 0,
+      "from": 2,
+      "to": 4,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 0,
+      "from": 2,
+      "to": 4,
+      "pinIndex": 1,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 0,
+      "from": 4,
+      "to": 16,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 0,
+      "from": 4,
+      "to": 16,
+      "pinIndex": 3,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 0,
+      "from": 16,
+      "to": 3,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 0,
+      "from": 3,
+      "to": 2,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 90,
+      "from": 2,
+      "to": 4,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 90,
+      "from": 2,
+      "to": 4,
+      "pinIndex": 1,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 90,
+      "from": 4,
+      "to": 16,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 90,
+      "from": 4,
+      "to": 16,
+      "pinIndex": 3,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 90,
+      "from": 16,
+      "to": 3,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 90,
+      "from": 3,
+      "to": 2,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 180,
+      "from": 2,
+      "to": 4,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 180,
+      "from": 2,
+      "to": 4,
+      "pinIndex": 1,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 180,
+      "from": 4,
+      "to": 16,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 180,
+      "from": 4,
+      "to": 16,
+      "pinIndex": 3,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 180,
+      "from": 16,
+      "to": 3,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 180,
+      "from": 3,
+      "to": 2,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 270,
+      "from": 2,
+      "to": 4,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 270,
+      "from": 2,
+      "to": 4,
+      "pinIndex": 1,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 270,
+      "from": 4,
+      "to": 16,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 270,
+      "from": 4,
+      "to": 16,
+      "pinIndex": 3,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 270,
+      "from": 16,
+      "to": 3,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    },
+    {
+      "rotation": 270,
+      "from": 3,
+      "to": 2,
+      "pinIndex": 0,
+      "bad": null,
+      "feedback": true,
+      "errors": []
+    }
+  ],
+  "self feedback problems": [],
+  "foreign wire vs enlarged body": {
+    "crossingBefore": 0,
+    "crossingAfter": 0,
+    "validatorErrors": []
+  }
+}
