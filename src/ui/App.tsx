@@ -851,7 +851,11 @@ export function App() {
             }
             if (button !== "left") return;
             const editHandle=(e.target as Element).closest('[data-wire-handle]');
-            const pin = editor.tool==='SELECT'&&(editHandle || (bridgeHit && !editor.draft))?undefined:target(e.target) ?? hitConnection(e);
+            const bridgeWire = bridgeHit ? editor.preview().geometry.wires[bridgeHit] : undefined;
+            const bridgeSegment = bridgeWire ? nearestSegment(bridgeWire.points, drawingPoint(e)) : 0;
+            const bridgeTarget: ConnectionTarget | undefined = bridgeWire ? { type: 'wire', id: bridgeWire.id,
+              position: projectSegment(bridgeWire.points[bridgeSegment], bridgeWire.points[bridgeSegment + 1], cursor.current) } : undefined;
+            const pin = editor.tool==='SELECT'&&(editHandle || (bridgeHit && !editor.draft))?undefined:target(e.target) ?? bridgeTarget ?? hitConnection(e);
             hover.current = pin;
             if (editor.draft) {
               editor.update(cursor.current);

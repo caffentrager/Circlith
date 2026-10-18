@@ -76,6 +76,25 @@ test('an explicit connection removes the bridge and Undo/Redo restores the match
   await page.keyboard.press('Control+Shift+z'); await expect(page.locator('[data-wire-bridge]')).toHaveCount(0);
 });
 
+for (const axis of ['horizontal', 'vertical'] as const) test(`the wire tool branches from the visible ${axis} bridge rather than the line underneath it`, async ({ page }) => {
+  await fixture(page); await place(page, 'Output', 650, 500);
+  if (axis === 'vertical') {
+    const dialog = await settings(page); await dialog.getByLabel('점프할 배선', { exact: true }).selectOption('vertical');
+    await dialog.getByRole('button', { name: '닫기', exact: true }).click();
+  }
+  await page.getByRole('button', { name: /^배선 W/ }).click();
+  await point(page, axis === 'horizontal' ? 330 : 335, axis === 'horizontal' ? 195 : 200);
+  await expect(page.locator('main svg')).toHaveAttribute('data-operation', 'WIRE_DRAFT');
+  await page.locator('main [data-layer="pins"] [data-pin]').nth(4).click();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('main svg')).toHaveAttribute('data-net-count', '2');
+  await page.getByRole('button', { name: '시뮬레이션', exact: true }).click();
+  await page.getByRole('combobox', { name: axis === 'horizontal' ? 'Input 1 값' : 'Input 2 값', exact: true }).selectOption('1');
+  const outputs = page.locator('[data-output]');
+  await expect(outputs.nth(0)).toHaveText(axis === 'horizontal' ? '1' : '0');
+  await expect(outputs.nth(1)).toHaveText(axis === 'horizontal' ? '0' : '1'); await expect(outputs.nth(2)).toHaveText('1');
+});
+
 test('bad stored display settings recover and unavailable storage still applies to the session', async ({ page }) => {
   await page.goto('/');
   await page.evaluate(() => localStorage.setItem('circlith.simulation.wire-display.v1', '{"version":9}'));
