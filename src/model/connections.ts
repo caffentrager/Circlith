@@ -86,7 +86,11 @@ export function validateCircuit(c: Circuit): string[] {
     if (!p || !Number.isFinite(p.position.x) || !Number.isFinite(p.position.y) || !Number.isFinite(p.rotation)) errors.push("부품 좌표 오류");
     if (new Set(comp.pins).size !== comp.pins.length || comp.pins.some((key) => c.pins[key]?.component !== comp.id)) errors.push("부품 핀 참조 오류");
   }
-  for (const pin of Object.values(c.pins)) if (!c.components[pin.component]?.pins.includes(pin.id)) errors.push("핀 소유권 오류");
+  for (const pin of Object.values(c.pins)) {
+    if (!c.components[pin.component]?.pins.includes(pin.id)) errors.push("핀 소유권 오류");
+    if (pin.inverted !== undefined && (typeof pin.inverted !== 'boolean' || pin.direction !== 'in' || ['Input', 'Output'].includes(c.components[pin.component]?.kind)))
+      errors.push('입력 반전 설정 오류');
+  }
   for (const net of Object.values(c.nets)) {
     for (const [kind, list] of [["pin", net.pins], ["junction", net.junctions]] as const) {
       if (new Set(list).size !== list.length) errors.push("중복 연결망 구성원");

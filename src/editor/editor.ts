@@ -19,6 +19,7 @@ import { assertCircuit, connectTargets, joinCrossing, targetPosition } from "../
 import { anchorOffsets, pointOnSegment, same } from "../geometry/path";
 import { collidingSegments, defaultRouting, planRoute, type RoutingSettings } from "../geometry/routing";
 import { applyWireCleanup, planWireCleanup, type WireCleanupPlan } from "../model/wire-cleanup";
+import { updateComponentProperties, type ComponentProperties } from '../model/component-properties';
 export type Draft =
   | { type: "PLACE"; kind: Kind; position: Point; rotation: number }
   | { type: "MOVE"; origin: Point; position: Point; selection: string[]; rotation: number }
@@ -130,6 +131,10 @@ export class Editor {
     this.cancel();
     this.selectedCorner=null;
     this.tool = tool;
+  }
+  updateProperties(key: string, properties: ComponentProperties) {
+    if (this.draft || this.selectionBox) throw new Error('진행 중인 작업을 완료하거나 취소하세요.');
+    this.commit('부품 속성 변경', updateComponentProperties(this.circuit, key, properties));
   }
   place(kind: Kind, position: Point) {
     this.cancel();

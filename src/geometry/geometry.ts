@@ -1,6 +1,9 @@
 import {
   clone,
   isBinaryGate,
+  gateInputCount,
+  gateHalfHeight,
+  inputY,
   type Circuit,
   type Endpoint,
   type Point,
@@ -27,9 +30,9 @@ export function pinPosition(c: Circuit, key: string): Point {
     place = c.geometry.components[comp.id];
   const local =
     isBinaryGate(comp.kind)
-      ? pin.index === 2
+      ? pin.direction === "out"
         ? { x: 40, y: 0 }
-        : { x: -40, y: pin.index === 0 ? -10 : 10 }
+        : { x: -40, y: inputY(pin.index, gateInputCount(comp)) }
       : { x: pin.direction === "out" ? 40 : -40, y: 0 };
   const p = rotatePoint(local, place.rotation);
   return { x: p.x + place.position.x, y: p.y + place.position.y };
@@ -47,11 +50,12 @@ export function boxComponents(c: Circuit, start: Point, end: Point): string[] {
   const crossing = end.x < start.x;
   return Object.keys(c.components).filter((key) => {
     const placement = c.geometry.components[key];
+    const height = gateHalfHeight(gateInputCount(c.components[key]));
     const corners = [
-      { x: -40, y: -20 },
-      { x: 40, y: -20 },
-      { x: 40, y: 20 },
-      { x: -40, y: 20 },
+      { x: -40, y: -height },
+      { x: 40, y: -height },
+      { x: 40, y: height },
+      { x: -40, y: height },
     ].map((p) => {
       const r = rotatePoint(p, placement.rotation);
       return { x: r.x + placement.position.x, y: r.y + placement.position.y };

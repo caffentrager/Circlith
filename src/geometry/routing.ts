@@ -1,4 +1,4 @@
-import type { Circuit, ConnectionTarget, Point } from "../model/circuit";
+import { gateHalfHeight, gateInputCount, type Circuit, type ConnectionTarget, type Point } from "../model/circuit";
 import { rotatePoint, route } from "./geometry";
 import { anchorOffsets, clean, pointOnSegment, same, simplifyPath } from "./path";
 import { settingsKey } from '../config/app-mode';
@@ -20,8 +20,9 @@ export function validateRouting(value: unknown): RoutingSettings {
 }
 type Rect = { left: number; right: number; top: number; bottom: number };
 export function componentObstacles(c: Circuit, margin = 10): Rect[] {
-  return Object.values(c.geometry.components).map((p) => {
-    const vertical = p.rotation % 180 !== 0, x = (vertical ? 20 : 30) + margin, y = (vertical ? 30 : 20) + margin;
+  return Object.entries(c.geometry.components).map(([key, p]) => {
+    const height = gateHalfHeight(gateInputCount(c.components[key]));
+    const vertical = p.rotation % 180 !== 0, x = (vertical ? height : 30) + margin, y = (vertical ? 30 : height) + margin;
     return { left: p.position.x - x, right: p.position.x + x, top: p.position.y - y, bottom: p.position.y + y };
   });
 }

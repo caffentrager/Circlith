@@ -1,6 +1,6 @@
-import { gateKinds, type Circuit, type Component, type GateKind } from '../model/circuit';
+import { gateKinds, isBinaryGate, MAX_GATE_INPUTS, type Circuit, type Component, type GateKind } from '../model/circuit';
 import { validateCircuit } from '../model/connections';
-import { evaluateGate, logicValues, resolveDrivers, type LogicValue } from './logic';
+import { evaluateGate, invert, logicValues, resolveDrivers, type LogicValue } from './logic';
 
 export type DiagnosticCode = 'FLOATING_INPUT' | 'MULTIPLE_DRIVERS' | 'DRIVE_CONFLICT' | 'COMBINATIONAL_FEEDBACK' | 'INVALID_CIRCUIT';
 export type Diagnostic = {
@@ -65,8 +65,9 @@ export function compileCircuit(circuit: Circuit): Plan {
   const signals = new Map<string, Signal>(), pinSignals = new Map<string, string>();
   const errors = validateCircuit(circuit);
   for (const component of Object.values(circuit.components)) {
-    const expected = component.kind === 'Input' || component.kind === 'Output' ? 1 : component.kind === 'NOT' ? 2 : 3;
+    const expected = component.kind === 'Input' || component.kind === 'Output' ? 1 : component.kind === 'NOT' ? 2 : component.pins.length;
     if (!['Input', 'Output', ...gateKinds].includes(component.kind) || component.pins.length !== expected ||
+      (isBinaryGate(component.kind) && (expected < 3 || expected > MAX_GATE_INPUTS + 1)) ||
       component.pins.some((id, i) => circuit.pins[id]?.index !== i || circuit.pins[id]?.direction !==
         (component.kind === 'Input' || (component.kind !== 'Output' && i === expected - 1) ? 'out' : 'in')))
       errors.push(`지원하지 않거나 잘못된 부품 핀: ${component.name}`);
@@ -126,7 +127,8 @@ export function simulate(plan: Plan, inputs: Readonly<Record<string, LogicValue>
   }
   const read = (pin: string) => resolveDrivers(signals.get(pinSignals.get(pin)!)!.drivers.map(id => drives[id]));
   for (const gate of plan.order) {
-    const inputs = gate.pins.filter(id => circuit.pins[id].direction === 'in').map(read);
+    const inputs = gate.pins.filter(id => circuit.pins[id].direction === 'in')
+      .map(id => circuit.pins[id].inverted ? invert(read(id)) : read(id));
     const output = gate.pins.find(id => circuit.pins[id].direction === 'out')!;
     drives[output] = evaluateGate(gate.kind as GateKind, inputs);
   }

@@ -3,6 +3,10 @@ export type GateKind = typeof gateKinds[number];
 export type Kind = "Input" | GateKind | "Output";
 export const componentKinds: Kind[] = [...gateKinds, "Input", "Output"];
 export const isBinaryGate = (kind: Kind) => kind !== "Input" && kind !== "Output" && kind !== "NOT";
+export const MAX_GATE_INPUTS = 16;
+export const gateInputCount = (component: Component) => isBinaryGate(component.kind) ? component.pins.length - 1 : 1;
+export const gateHalfHeight = (count: number) => Math.max(20, count * 10);
+export const inputY = (index: number, count: number) => (index - (count - 1) / 2) * 20;
 export type Point = { x: number; y: number };
 export type Component = {
   id: string;
@@ -15,6 +19,7 @@ export type Pin = {
   component: string;
   index: number;
   direction: "in" | "out";
+  inverted?: boolean;
 };
 export type Endpoint = { type: "pin" | "junction"; id: string };
 // A wire hit stays a draft reference until the explicit connection is committed.

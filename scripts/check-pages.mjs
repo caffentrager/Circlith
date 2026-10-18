@@ -98,8 +98,24 @@ try {
   assert.equal(await simulation.locator('[data-output]').innerText(), '1');
   await simulation.getByRole('combobox', { name: 'Input 1 값', exact: true }).selectOption('1');
   assert.equal(await simulation.locator('[data-output]').innerText(), '0');
+  // Properties belongs to the shared editor, and input bubbles affect the simulation build.
+  const editorPinCount = await editor.locator('main [data-pin]').count();
+  await place(editor, 'AND', 700, 250);
+  await editor.locator('main [data-gate-shape="AND"]').dblclick();
+  const editorProperties = editor.getByRole('dialog', { name: 'Properties · 부품 속성', exact: true });
+  await editorProperties.getByLabel('이름', { exact: true }).fill('Enable');
+  await editorProperties.getByLabel('입력 수', { exact: true }).fill('4');
+  await editorProperties.getByLabel('입력 4 반전', { exact: true }).check();
+  await editorProperties.getByRole('button', { name: '적용', exact: true }).click();
+  assert.equal(await editor.locator('main [data-input-bubble]').count(), 1);
+  assert.equal(await editor.locator('main [data-pin]').count(), editorPinCount + 5);
+  await simulation.locator('main [data-gate-shape="NOT"]').dblclick();
+  const simulationProperties = simulation.getByRole('dialog', { name: 'Properties · 부품 속성', exact: true });
+  await simulationProperties.getByLabel('입력 1 반전', { exact: true }).check();
+  await simulationProperties.getByRole('button', { name: '적용', exact: true }).click();
+  assert.equal(await simulation.locator('[data-output]').innerText(), '1');
   assert.deepEqual(errors, []);
-  console.log(JSON.stringify({ base, source: manifest.source, editorMode: 'passed', simulationMode: 'passed', commonBridges: 'passed', isolatedSettings: 'passed', assetErrors: errors }));
+  console.log(JSON.stringify({ base, source: manifest.source, editorMode: 'passed', simulationMode: 'passed', commonBridges: 'passed', commonProperties: 'passed', isolatedSettings: 'passed', assetErrors: errors }));
 } finally {
   await browser?.close();
   if (server) await new Promise(accept => server.close(accept));
