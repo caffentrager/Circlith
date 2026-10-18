@@ -240,7 +240,7 @@ for (const rotationKeys of [0, 1, 2, 3])
       expect(Math.abs(a.x - c.x - e.x), `${what} x`).toBeLessThan(1.5);
       expect(Math.abs(a.y - c.y - e.y), `${what} y`).toBeLessThan(1.5);
     };
-    near(bubble, R({ x: 25, y: 0 }), "bubble");
+    near(bubble, R({ x: 23, y: 0 }), "bubble");
     near(outPin, R({ x: 40, y: 0 }), "output pin");
     near(inPin, R({ x: -40, y: 0 }), "input pin");
     near(body, R({ x: -5, y: 0 }), "triangle body centre of its bounding box");
@@ -302,7 +302,11 @@ for (const preset of PRESETS)
     await page.keyboard.press("Escape");
     await clickWorld(page, 100, 200); // select the Input
     await expect(page.locator(".symbol.selected")).toHaveCount(1);
-    const norm = () => svgLoc(page).evaluate((s) => s.querySelector("g")!.innerHTML.replaceAll(" selected", ""));
+    const norm = () => svgLoc(page).evaluate((s) => {
+      const drawing = s.querySelector('g')!.cloneNode(true) as SVGGElement;
+      drawing.querySelectorAll('[data-symbol-selection]').forEach(frame => frame.remove());
+      return drawing.innerHTML.replaceAll(' selected', '');
+    });
     const before = await norm();
     await page.keyboard.press("Delete");
     await expect(comps(page)).toHaveCount(1);

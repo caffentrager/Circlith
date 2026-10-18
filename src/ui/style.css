@@ -170,8 +170,19 @@ svg:focus {
   vector-effect: non-scaling-stroke;
   pointer-events: all;
 }
-.pin-lead { fill:none; stroke:#516d82; stroke-width:2; }
-.gate-bubble { fill:white; stroke:#516d82; stroke-width:2; }
+.pin-lead { fill:none; stroke:#28558b; stroke-width:1.6; stroke-linecap:round; }
+.gate-outline { fill:none; stroke:#28558b; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.gate-bubble { fill:white; stroke:#28558b; stroke-width:1.6; }
+.gate-pin-name { fill:#28558b; font:7px ui-monospace,Consolas,monospace; }
+.port-value { fill:#28558b; font:12px ui-monospace,Consolas,monospace; }
+.port-value.value-0 { fill:#913f4b; }
+.port-value.value-1 { fill:#08744c; }
+.port-value.value-X { fill:#b13d24; }
+.port-value.value-Z { fill:#7152a5; }
+.symbol-selection { fill:none; stroke:#008c83; stroke-width:1.2; stroke-dasharray:5 3; vector-effect:non-scaling-stroke; }
+.symbol.selected { fill:#f3fbfa; stroke:#28558b; stroke-width:1.6; stroke-dasharray:none; }
+.pin-marker { fill:white; stroke:#28558b; stroke-width:1; }
+.pin-marker.connected { fill:#28558b; }
 .library .library-symbol { width:54px; height:32px; background:transparent; flex-shrink:0; overflow:visible; }
 .library button { display:flex; align-items:center; gap:8px; }
 .draft-waypoint { fill:#fff2b5; stroke:#a25a00; stroke-width:2; vector-effect:non-scaling-stroke; }
@@ -215,7 +226,7 @@ svg:focus {
 button:disabled { opacity: .45; cursor: default; }
 button[aria-pressed="true"] { background: #dff5f5; border-color: #008cab; box-shadow: inset 0 -2px #008cab; }
 .junction { fill: #167887; stroke: white; stroke-width: 1; vector-effect: non-scaling-stroke; cursor: crosshair; }
-.pin.connected { fill: #147e94; }
+.pin.connected { fill: transparent; }
 .snap-marker { fill: #00a08022; stroke: #008b72; stroke-width: 1.5; vector-effect: non-scaling-stroke; }
 .snap-marker.ambiguous { fill: #e8a00022; stroke: #b57500; stroke-dasharray: 3 2; }
 .snap-label { paint-order: stroke; stroke: #fff; stroke-width: 4px; stroke-linejoin: round; fill: #086352; }
@@ -226,9 +237,10 @@ button[aria-pressed="true"] { background: #dff5f5; border-color: #008cab; box-sh
 .wiring-help summary { cursor: pointer; font-weight: 600; }
 svg[data-tool="WIRE"] { cursor: crosshair; }
 .symbol {
-  fill: #f8fcff;
-  stroke: #516d82;
-  stroke-width: 2;
+  fill: #fff;
+  stroke: #28558b;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
 }
 .selected {
   stroke: #008cab;
@@ -236,14 +248,15 @@ svg[data-tool="WIRE"] { cursor: crosshair; }
   stroke-dasharray: 5 2;
 }
 .pin {
-  fill: white;
-  stroke: #147e94;
-  stroke-width: 2;
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 1;
   cursor: crosshair;
 }
 .pin:hover {
-  fill: #45cbd5;
-  stroke-width: 4;
+  fill: #008c831a;
+  stroke: #008c83;
+  stroke-width: 1.2;
 }
 text {
   font-size: 12px;
@@ -251,9 +264,11 @@ text {
   fill: #203247;
 }
 .label {
-  font-size: 10px;
-  fill: #617487;
+  font-family: Inter, "Segoe UI", sans-serif;
+  font-size: 13px;
+  fill: #28558b;
 }
+.label.port-label { font-size:12px; fill:#425d76; }
 .preview {
   opacity: 0.55;
   pointer-events: none;
