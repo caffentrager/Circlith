@@ -1,4 +1,4 @@
-import type { Circuit, Point } from "../model/circuit";
+import { gateHalfHeight, gateInputCount, type Circuit, type Point } from "../model/circuit";
 import { pinPosition } from "../geometry/geometry";
 import {GateBody} from './GateBody';
 import type { SimulationResult } from '../simulation/simulator';
@@ -96,13 +96,13 @@ export function Symbols({
               data-value={simulation ? (c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? simulation.outputs[c.id] ?? 'X' : undefined) : undefined}
               transform={`translate(${p.position.x} ${p.position.y}) rotate(${p.rotation})`}
             >
-              <GateBody kind={c.kind} selected={selection.includes(c.id)}
+              <GateBody kind={c.kind} selected={selection.includes(c.id)} inputCount={gateInputCount(c)}
+                invertedInputs={c.pins.filter(id => circuit.pins[id].direction === 'in').map(id => !!circuit.pins[id].inverted)}
                 value={simulation ? (c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? simulation.outputs[c.id] ?? 'X' : undefined) : undefined}/>
               {simulation && c.kind === 'Input' && onToggleInput && <g role="button" tabIndex={0}
                 aria-label={`입력 토글 ${Object.values(circuit.components).filter(part => part.kind === 'Input').findIndex(part => part.id === c.id) + 1}: ${inputs[c.id] ?? '0'}`}
                 data-input-toggle={c.id} className="input-toggle"
                 onPointerDown={e => { e.stopPropagation(); e.preventDefault(); e.currentTarget.focus(); }}
-                onDoubleClick={e => e.stopPropagation()}
                 onClick={e => { e.stopPropagation(); onToggleInput(c.id); }}
                 onKeyDown={e => {
                   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (e.key === 'Enter' && !e.repeat) onToggleInput(c.id); }
@@ -110,7 +110,7 @@ export function Symbols({
                 <rect x="-25" y="-16" width="50" height="32" rx="3" fill="transparent"/>
                 <title>클릭 또는 Enter: 입력 0/1 전환 · 오른쪽 패널에서 X/Z 지정</title>
               </g>}
-              <text textAnchor="middle" y="-29" className="label">
+              <text textAnchor="middle" y={-gateHalfHeight(gateInputCount(c)) - 9} className="label">
                 {c.name}
               </text>
             </g>

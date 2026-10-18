@@ -1,4 +1,4 @@
-import { type Circuit, type Point } from "../model/circuit";
+import { gateHalfHeight, gateInputCount, type Circuit, type Point } from "../model/circuit";
 export const MIN_ZOOM = 0.1, MAX_ZOOM = 2, ZOOM_STEP = 1.1;
 const stable = (value: number) => Number(value.toFixed(12));
 const clampZoom = (zoom: number) => stable(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom)));
@@ -22,11 +22,14 @@ export function fitView(
   const chosen = selection ? new Set(selection) : null;
   const points: Point[] = [];
   for (const [key, p] of Object.entries(c.geometry.components))
-    if (!chosen || chosen.has(key))
+    if (!chosen || chosen.has(key)) {
+      const extent = gateHalfHeight(gateInputCount(c.components[key])) + 30;
+      const x = p.rotation % 180 ? extent : 50, y = p.rotation % 180 ? 50 : extent;
       points.push(
-        { x: p.position.x - 50, y: p.position.y - 50 },
-        { x: p.position.x + 50, y: p.position.y + 50 },
+        { x: p.position.x - x, y: p.position.y - y },
+        { x: p.position.x + x, y: p.position.y + y },
       );
+    }
   for (const wire of Object.values(c.geometry.wires))
     if (!chosen || chosen.has(wire.id))
       points.push(...wire.points);

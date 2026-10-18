@@ -43,6 +43,7 @@ import { fitView, wheelZoomFactor, zoomView, ZOOM_STEP } from "../geometry/view"
 import { collidingSegments, defaultRouting, routingLabel, routingStorageKey, validateRouting, type RoutingSettings } from "../geometry/routing";
 import { defaultWireDisplay, validateWireDisplay, wireDisplayStorageKey, type WireDisplaySettings } from '../geometry/wire-bridges';
 import { simulationAvailable } from '../config/app-mode';
+import { ComponentProperties } from './ComponentProperties';
 import "./style.css";
 const kinds = componentKinds;
 export function App() {
@@ -122,6 +123,12 @@ export function App() {
   });
   const [user, setUser] = useState<UserProfile>(initial.user);
   const [settings, setSettings] = useState(false);
+  const [propertyComponent, setPropertyComponent] = useState<string | null>(null);
+  const closeProperties = () => {
+    setPropertyComponent(null);
+    resolver.cancel();
+    svg.current?.focus({ preventScroll: true });
+  };
   const dispatchRef = useRef<(command: string) => void>(() => {});
   const wheelHandlerRef = useRef<(event: WheelEvent) => void>(() => {});
   const [resolver] = useState(
@@ -132,7 +139,7 @@ export function App() {
   );
   const contexts = () =>
     activeContexts(
-      settings || menu || connectionChoice || selectionChoice
+      settings || propertyComponent || menu || connectionChoice || selectionChoice
         ? "MODAL"
         : search !== null
           ? "TEXT_EDITOR"
@@ -307,6 +314,8 @@ export function App() {
         } else if (connectionChoice) {
           setConnectionChoice(null);
           svg.current?.focus({ preventScroll: true });
+        } else if (propertyComponent) {
+          closeProperties();
         } else if (settings) {
           setSettings(false);
           svg.current?.focus({ preventScroll: true });
@@ -666,7 +675,7 @@ export function App() {
       onPointerDownCapture={(e) => {
         // Right-clicking a modal backdrop must keep keyboard ownership (including Esc).
         const el = e.target as HTMLElement;
-        if (e.button === 2 && (menu || settings || connectionChoice || selectionChoice) && !el.closest("input,textarea") && !el.isContentEditable)
+        if (e.button === 2 && (menu || settings || propertyComponent || connectionChoice || selectionChoice) && !el.closest("input,textarea") && !el.isContentEditable)
           e.preventDefault();
       }}
       onFocusCapture={(e) => {
@@ -708,7 +717,16 @@ export function App() {
         </button>
         <button onClick={() => dispatch("history.undo")}>Undo</button>
         <button onClick={() => dispatch("history.redo")}>Redo</button>
-        {simulationAvailable && <button aria-pressed={simulationEnabled} onClick={() => setSimulationEnabled(value => !value)}>시뮬레이션</button>}
+        {simulationAvailable && <button aria-pressed={simulationEnabled} onClick={() => {
+          if (!simulationEnabled) {
+            rollback();
+            resolver.cancel();
+            editor.setTool('SELECT');
+            setConnectionChoice(null);
+            setSelectionChoice(null);
+          }
+          setSimulationEnabled(value => !value);
+        }}>시뮬레이션</button>}
         <button
           onClick={() => {
             rollback();
@@ -788,6 +806,19 @@ export function App() {
             editor.focus = "CANVAS";
           }}
           onDoubleClick={(e) => {
+            // Pointer capture can retarget the click to the SVG canvas after mouseup.
+            const hit = document.elementFromPoint(e.clientX, e.clientY);
+            const component = ((e.target as Element).closest('[data-component]') ?? hit?.closest('[data-component]'))?.getAttribute('data-component');
+            if (e.button === 0 && component && editor.circuit.components[component] && !editor.draft) {
+              e.preventDefault();
+              rollback();
+              resolver.cancel();
+              editor.selection = [component];
+              editor.selectedCorner = null;
+              setPropertyComponent(component);
+              refresh();
+              return;
+            }
             const b = resolver.mouse(
               "mouseDoubleClick",
               mouseButton(e.button),
@@ -884,6 +915,11 @@ export function App() {
             const wire = objectKey && editor.circuit.geometry.wires[objectKey];
             if (editor.tool === "WIRE") {
               if (hitsAt(e).length > 1) dispatch("wire.start");
+              else if (!object && hitsAt(e).length === 0) {
+                editor.selection = [];
+                editor.selectedCorner = null;
+                refresh();
+              }
               return;
             }
             if (wireCandidates.length > 1) {
@@ -1365,6 +1401,13 @@ export function App() {
           </section>
         </div>
       )}
+      {propertyComponent && editor.circuit.components[propertyComponent] && <ComponentProperties
+        circuit={editor.circuit} componentId={propertyComponent} onClose={closeProperties}
+        onApply={values => {
+          editor.updateProperties(propertyComponent, values);
+          closeProperties();
+          refresh();
+        }}/>}
       {settings && (
         <InputSettings
           user={user}

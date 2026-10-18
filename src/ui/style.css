@@ -410,3 +410,10 @@ select:focus-visible { outline: 3px solid #0792b3; }
 .cleanup-panel { padding: 12px; margin-bottom: 16px; border: 1px solid #b9cbd6; border-radius: 6px; background: #f6fbf9; }
 .cleanup-panel h2 { margin-bottom: 8px; }
 .cleanup-panel p { margin: 10px 0; font-size: 12px; line-height: 1.65; }
+.component-properties { width: min(460px, calc(100vw - 40px)); max-height: 85vh; overflow-y: auto; }
+.component-properties label { display: block; margin: 12px 0; }
+.component-properties fieldset { margin: 18px 0; border: 1px solid #b9cbd6; border-radius: 6px; }
+.overlay .component-properties input[type="checkbox"] { display: inline-block; width: auto; margin: 0 8px 0 0; }
+.component-properties p { font-size: 13px; line-height: 1.6; }
+.component-properties [role="alert"] { color: #b91c1c; }
+.property-actions { display: flex; gap: 12px; }
