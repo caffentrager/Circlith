@@ -19,9 +19,12 @@ export function GateBody({
   const inputLeads = (curved: boolean) => Array.from({ length: inputCount }, (_, index) => {
     const y = inputY(index, inputCount);
     const edge = curved ? -17.5 - 12.5 * (y / height) ** 2 - (kind === 'XOR' || kind === 'XNOR' ? 5 : 0) : -30;
+    // Dense XOR/XNOR bodies leave less than 8 units between the pin and the curve; shrink the bubble so the lead
+    // never runs backwards and the pin centre never ends up inside the bubble.
+    const radius = Math.min(4, Math.max(2, (edge + 40) / 2 - 0.5));
     return <g key={index}>
-      <path d={`M -40 ${y} H ${invertedInputs[index] ? edge - 8 : edge}`} className="pin-lead"/>
-      {invertedInputs[index] && <circle data-input-bubble={index} cx={edge - 4} cy={y} r="4" className="gate-bubble"/>}
+      <path d={`M -40 ${y} H ${invertedInputs[index] ? edge - 2 * radius : edge}`} className="pin-lead"/>
+      {invertedInputs[index] && <circle data-input-bubble={index} cx={edge - radius} cy={y} r={radius} className="gate-bubble"/>}
     </g>;
   });
   if (kind === "AND" || kind === "NAND")

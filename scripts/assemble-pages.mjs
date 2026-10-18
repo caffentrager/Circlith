@@ -13,9 +13,18 @@ for (const [directory, base] of [[editor, '/Circlith/'], [simulation, '/Circlith
   if (!html.includes(`src="${base}assets/`) || !html.includes(`href="${base}assets/`))
     throw new Error(`Incorrect asset base in ${directory}: expected ${base}`);
 }
-const revision = directory => execFileSync('git', ['-C', dirname(directory), 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
-const sourceCommit = revision(editor);
-if (sourceCommit !== revision(simulation)) throw new Error('Both modes must be built from the same source commit.');
+const head = execFileSync('git', ['-C', dirname(editor), 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+// The stamp is written into each bundle at build time, so a stale directory cannot pass as the current commit.
+const stamp = (directory, mode) => {
+  const file = resolve(directory, 'build-info.json');
+  if (!existsSync(file)) throw new Error(`Missing build-info.json in ${directory}; rebuild it.`);
+  const info = JSON.parse(readFileSync(file, 'utf8'));
+  if (info.mode !== mode) throw new Error(`${directory} was built for mode ${info.mode}, expected ${mode}.`);
+  return info.commit;
+};
+const sourceCommit = stamp(editor, 'editor');
+if (sourceCommit !== stamp(simulation, 'simulation')) throw new Error('Both modes must be built from the same source commit.');
+if (sourceCommit !== head) throw new Error(`Builds are from ${sourceCommit} but the working tree is at ${head}; rebuild both modes.`);
 const manifest = {
   version: 2,
   source: { commit: sourceCommit },

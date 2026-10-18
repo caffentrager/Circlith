@@ -1,12 +1,13 @@
 import { clone, gateInputCount, id, isBinaryGate, MAX_GATE_INPUTS, type Circuit } from './circuit';
 import { endpointPosition, pinPosition, route } from '../geometry/geometry';
-import { same, simplifyPath } from '../geometry/path';
+import { anchorOffsets, clean, same, simplifyPath } from '../geometry/path';
+import { collidingSegmentsWith, componentObstacles, defaultRouting, planRoute, type RoutingSettings } from '../geometry/routing';
 import { assertCircuit } from './connections';
 
 export type ComponentProperties = { name: string; inputCount: number; invertedInputs: boolean[] };
 
 /** Preserve retained pin IDs (including the output), nets and manually fixed wire anchors. */
-export function updateComponentProperties(circuit: Circuit, key: string, properties: ComponentProperties): Circuit {
+export function updateComponentProperties(circuit: Circuit, key: string, properties: ComponentProperties, routing: RoutingSettings = defaultRouting): Circuit {
   const original = circuit.components[key];
   if (!original) throw new Error('부품을 찾을 수 없습니다.');
   const name = properties.name.trim(), variable = isBinaryGate(original.kind);
@@ -46,9 +47,24 @@ export function updateComponentProperties(circuit: Circuit, key: string, propert
         // Keep the original first point as a route stop when it is a pinned waypoint.
         const keep = wire.anchors?.some(anchor => same(anchor, points[0]));
         const stop = keep ? points[0] : fixed;
-        const stretched = simplifyPath([...route(start, stop, points[0].y === fixed.y), ...points.slice(keep ? 1 : 2)]);
+        const joined = [...route(start, stop, points[0].y === fixed.y), ...points.slice(keep ? 1 : 2)];
+        // Collapsing collinear points can erase a pinned waypoint that sits on a retraced spur; keep the unsimplified path then.
+        const simple = simplifyPath(joined), stretched = wire.anchors?.length && anchorOffsets(side === 'from' ? simple : [...simple].reverse(), wire.anchors) === null ? clean(joined) : simple;
         wire.points = side === 'from' ? stretched : stretched.reverse();
       }
+    }
+  }
+  if (variable && count !== gateInputCount(original) && routing.overlapMode === 'avoid') {
+    // A larger body can swallow routes that used to pass beside it. Re-plan those (respecting fixed waypoints) or refuse.
+    const before = componentObstacles(circuit, 0), after = componentObstacles(next, 0);
+    for (const wire of Object.values(next.geometry.wires)) {
+      if (!collidingSegmentsWith(after, wire.points).length) continue;
+      const old = circuit.geometry.wires[wire.id];
+      if (old && collidingSegmentsWith(before, old.points).length) continue;
+      const plan = planRoute(next, endpointPosition(next, wire.from), endpointPosition(next, wire.to), routing,
+        { from: wire.from, to: wire.to, anchors: wire.anchors });
+      if (plan.blocked) throw new Error('입력 수를 바꾸면 몸체가 배선과 겹치고 우회할 수 없습니다. 해당 배선의 경로를 먼저 정리하세요.');
+      wire.points = plan.points;
     }
   }
   assertCircuit(next);

@@ -1,0 +1,272 @@
+{
+  "F1 prefix=\"pin:\"": {
+    "validatorErrors": [],
+    "mismatches": 0
+  },
+  "F1 prefix=\"junction:\"": {
+    "validatorErrors": [],
+    "mismatches": 0
+  },
+  "F1 prefix=\"net:\"": {
+    "validatorErrors": [],
+    "mismatches": 0
+  },
+  "F1 prefix=\"\"": {
+    "validatorErrors": [
+      "중복 또는 잘못된 ID: 76810b0c-ea75-4320-abda-15d3bb35094c"
+    ],
+    "mismatches": 96
+  },
+  "F1 prefix=\"x-\"": {
+    "validatorErrors": [],
+    "mismatches": 0
+  },
+  "F1 prefix=\"a b \"": {
+    "validatorErrors": [],
+    "mismatches": 0
+  },
+  "F1 prefix=\"../\"": {
+    "validatorErrors": [],
+    "mismatches": 0
+  },
+  "F1 prefix=\"🙂\"": {
+    "validatorErrors": [],
+    "mismatches": 0
+  },
+  "F1 prefix=\"pin:pin:\"": {
+    "validatorErrors": [],
+    "mismatches": 0
+  },
+  "F3 delete component record only": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 delete component + geometry, pins/wires remain": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 component = null": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 component.pins = undefined": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 geometry.components missing": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 geometry undefined": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 components missing": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 pins missing": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 nets missing": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 pin record deleted": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 net record deleted": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 net.pins undefined": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 wire endpoint undefined": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 wire.points undefined": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 wire.points = []": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 wire.points has null": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 junction record missing for wire endpoint": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 geometry.components entry missing": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 geometry.components entry null": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 wrong pin direction": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 wrong pin index": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 unsupported gate kind": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 duplicate net member": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "F3 pin.component points elsewhere": {
+    "threw": false,
+    "codes": [
+      "INVALID_CIRCUIT"
+    ]
+  },
+  "P3-6 Q": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 null": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 undefined": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 NaN": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 2": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 {}": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 []": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 ": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 x": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 0": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 1": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-6 true": {
+    "out": "1",
+    "diagnostics": []
+  },
+  "P3-7 00": [
+    "MULTIPLE_DRIVERS/warning"
+  ],
+  "P3-7 11": [
+    "MULTIPLE_DRIVERS/warning"
+  ],
+  "P3-7 X1": [
+    "MULTIPLE_DRIVERS"
+  ],
+  "P3-7 X0": [
+    "MULTIPLE_DRIVERS"
+  ],
+  "P3-7 XX": [
+    "MULTIPLE_DRIVERS"
+  ],
+  "P3-7 01": [
+    "MULTIPLE_DRIVERS/warning/4",
+    "DRIVE_CONFLICT/error/4"
+  ],
+  "P3-8 floating objects": [
+    "e0d691eb-828e-44b3-9c40-75ac73ad276b"
+  ],
+  "P3-8 identical messages": [
+    "AND 입력 1: 구동 신호가 없습니다(Z).",
+    "AND 입력 2: 구동 신호가 없습니다(Z).",
+    "AND 입력 1: 구동 신호가 없습니다(Z).",
+    "AND 입력 2: 구동 신호가 없습니다(Z)."
+  ],
+  "severity": {
+    "MULTIPLE_DRIVERS": "warning",
+    "DRIVE_CONFLICT": "error"
+  },
+  "P3-9 xor(x,x)": "X",
+  "P3-12 geometry bad": {
+    "codes": [
+      "INVALID_CIRCUIT"
+    ],
+    "pins": 0,
+    "outputs": {}
+  }
+}

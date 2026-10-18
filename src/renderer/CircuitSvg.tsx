@@ -14,6 +14,7 @@ export function Symbols({
   simulation,
   inputs = {},
   onToggleInput,
+  toggleDisabled = false,
   wireDisplay = defaultWireDisplay,
 }: {
   circuit: Circuit;
@@ -22,10 +23,19 @@ export function Symbols({
   simulation?: SimulationResult;
   inputs?: Readonly<Record<string, LogicValue>>;
   onToggleInput?: (id: string) => void;
+  toggleDisabled?: boolean;
   wireDisplay?: WireDisplaySettings;
 }) {
   const maskPrefix = useId().replace(/:/g, '');
   const bridges = useMemo(() => wireBridges(circuit, wireDisplay, zoom), [circuit, wireDisplay, zoom]);
+  // Computed once per circuit: the pin layer previously rescanned every net for every pin (O(P*N)).
+  const connectedPins = useMemo(() => new Set(Object.values(circuit.nets).flatMap(n => n.pins)), [circuit.nets]);
+  const inputIndex = useMemo(() => new Map(Object.values(circuit.components).filter(part => part.kind === 'Input').map((part, i) => [part.id, i + 1])), [circuit.components]);
+  const junctionDegree = useMemo(() => {
+    const degree = new Map<string, number>();
+    for (const w of Object.values(circuit.geometry.wires)) for (const e of [w.from, w.to]) if (e.type === 'junction') degree.set(e.id, (degree.get(e.id) ?? 0) + 1);
+    return degree;
+  }, [circuit.geometry.wires]);
   const byWire = new Map<string, typeof bridges>();
   for (const bridge of bridges) {
     const group = byWire.get(bridge.wire) ?? [];
@@ -82,7 +92,7 @@ export function Symbols({
       </g>
       <g data-layer="junctions">
         {Object.entries(circuit.geometry.junctions).map(([id, p]) => {
-          const dangling=Object.values(circuit.geometry.wires).filter(w=>[w.from,w.to].some(e=>e.type==='junction'&&e.id===id)).length===1;
+          const dangling=junctionDegree.get(id)===1;
           return <circle key={id} data-junction={id} data-dangling={dangling||undefined} cx={p.x} cy={p.y} r={4 / zoom} className={dangling?'junction dangling':'junction'}><title>{dangling?'미연결 끝점 · 클릭하여 다시 연결':'접속점 · 클릭하여 분기'}</title></circle>;
         })}
       </g>
@@ -99,14 +109,14 @@ export function Symbols({
               <GateBody kind={c.kind} selected={selection.includes(c.id)} inputCount={gateInputCount(c)}
                 invertedInputs={c.pins.filter(id => circuit.pins[id].direction === 'in').map(id => !!circuit.pins[id].inverted)}
                 value={simulation ? (c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? simulation.outputs[c.id] ?? 'X' : undefined) : undefined}/>
-              {simulation && c.kind === 'Input' && onToggleInput && <g role="button" tabIndex={0}
-                aria-label={`입력 토글 ${Object.values(circuit.components).filter(part => part.kind === 'Input').findIndex(part => part.id === c.id) + 1}: ${inputs[c.id] ?? '0'}`}
+              {simulation && c.kind === 'Input' && onToggleInput && <g role="button" tabIndex={0} aria-disabled={toggleDisabled || undefined}
+                aria-label={`입력 토글 ${inputIndex.get(c.id)}: ${inputs[c.id] ?? '0'}`}
                 data-input-toggle={c.id} className="input-toggle"
-                onPointerDown={e => { e.stopPropagation(); e.preventDefault(); e.currentTarget.focus(); }}
-                onClick={e => { e.stopPropagation(); onToggleInput(c.id); }}
-                onKeyDown={e => {
-                  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (e.key === 'Enter' && !e.repeat) onToggleInput(c.id); }
-                }} onKeyUp={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); } }}>
+                // Keep the canvas as the focus owner; the press itself still bubbles to the canvas gesture logic.
+                onPointerDown={e => { if (e.button === 0) e.preventDefault(); }}
+                // Pointer input is resolved by the canvas (a click without movement toggles). Only the keyboard path lives here,
+                // and only Enter is consumed so Space keeps driving temporary panning.
+                onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); if (!e.repeat && !toggleDisabled) onToggleInput(c.id); } }}>
                 <rect x="-25" y="-16" width="50" height="32" rx="3" fill="transparent"/>
                 <title>클릭 또는 Enter: 입력 0/1 전환 · 오른쪽 패널에서 X/Z 지정</title>
               </g>}
@@ -128,7 +138,7 @@ export function Symbols({
               cx={p.x}
               cy={p.y}
               r="5"
-              className={Object.values(circuit.nets).some((n) => n.pins.includes(pin.id)) ? "pin connected" : "pin"}
+              className={connectedPins.has(pin.id) ? "pin connected" : "pin"}
             >
               <title>
                 {pin.direction} {pin.index + 1}{simulation ? ` · ${simulation.pins[pin.id] ?? 'X'}` : ''}

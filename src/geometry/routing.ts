@@ -32,9 +32,12 @@ function intersects(a: Point, b: Point, r: Rect) {
     ? a.y > r.top && a.y < r.bottom && Math.max(a.x, b.x) > r.left && Math.min(a.x, b.x) < r.right
     : a.x > r.left && a.x < r.right && Math.max(a.y, b.y) > r.top && Math.min(a.y, b.y) < r.bottom;
 }
-export function collidingSegments(c: Circuit, points: Point[], margin = 0): [Point, Point][] {
-  const rects = componentObstacles(c, margin);
+/** Same test against pre-computed obstacle rectangles, so callers checking many wires build the rectangles once. */
+export function collidingSegmentsWith(rects: Rect[], points: Point[]): [Point, Point][] {
   return points.slice(1).flatMap((b, i) => rects.some((r) => intersects(points[i], b, r)) ? [[points[i], b] as [Point, Point]] : []);
+}
+export function collidingSegments(c: Circuit, points: Point[], margin = 0): [Point, Point][] {
+  return collidingSegmentsWith(componentObstacles(c, margin), points);
 }
 function escape(c: Circuit, p: Point, toward: Point, target?: ConnectionTarget): Point {
   if (target?.type === "wire") {
