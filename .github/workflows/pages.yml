@@ -1,0 +1,19 @@
+name: Publish Circlith Pages
+
+on:
+  push:
+    branches: [main, feat/editor-prototype, codex/logic-simulation]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    uses: caffentrager/Circlith/.github/workflows/deploy-pages.yml@codex/logic-simulation
