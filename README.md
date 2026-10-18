@@ -4,11 +4,13 @@
 
 **설계와 구현의 유일한 기준은 [CIRCLITH_MASTER_SPEC.md](docs/CIRCLITH_MASTER_SPEC.md)입니다.** 다른 문서와 충돌하면 Master Spec을 우선합니다.
 
-현재는 편집 프로토타입 단계입니다. AND/OR/NOT/Input/Output을 옆 부품 패널에서 도면으로 드래그해 배치하고, 접점을 클릭하거나 접점 간 드래그로 배선할 수 있습니다. 선택, 연결 유지 이동·회전, 직각 배선, Delete, Esc, Undo/Redo도 제공합니다. `CURRENT`는 현재 구현 기준이며, `PROVISIONAL`, `EXPERIMENTAL`, `DEFERRED`는 확정되거나 사용성이 검증된 기능을 뜻하지 않습니다.
+현재 `codex/logic-simulation`은 **조합논리 시뮬레이션 프로토타입**입니다. AND/OR/NOT/XOR/NAND/NOR/XNOR/Input/Output을 옆 부품 패널에서 도면으로 드래그해 배치하고, 접점을 클릭하거나 접점 간 드래그로 배선할 수 있습니다. 선택, 연결 유지 이동·회전, 직각 배선, Delete, Esc, Undo/Redo도 제공합니다. `CURRENT`는 현재 구현 기준이며, `PROVISIONAL`, `EXPERIMENTAL`, `DEFERRED`는 확정되거나 사용성이 검증된 기능을 뜻하지 않습니다.
 
 **`feat/editor-prototype` 브랜치는 조작·제어와 UI/UX 성숙이 우선입니다.** 기존 선택·드래그·배선·회전·화면 이동의 일관성, 피드백, 취소·Undo와 브라우저 충돌을 먼저 다듬습니다. 사용자 요청으로 Delete와 OR/NOT을 추가했으며, 저장·클립보드·추가 부품·시뮬레이션은 별도 단계입니다. 미구현 목록은 즉시 개발할 우선순위가 아닙니다.
 
-Node.js 22.23.3 이상에서 `npm ci` 후 `npm run dev`로 실행합니다. `npm run build`, `npm test`, `npx playwright install chromium`, `npm run test:browser`로 검증합니다. 현재 회로는 메모리에만 유지되며 파일 저장·시뮬레이션은 후속 단계입니다.
+**2026-10-18 사용자 요청으로 새 브랜치에서 로드맵 3~4단계를 진행합니다.** 상단 **시뮬레이션**을 켜고 도면의 Input 중앙을 클릭하거나 오른쪽 패널에서 입력을 바꾸면 확정된 회로를 재계산합니다. 출력·배선에 0/1/X/Z를 표시하며 미연결·다중 구동·출력 충돌·조합 피드백을 진단합니다. 입력 변경은 편집 Undo 기록에 포함하지 않습니다. 순차회로·Clock·시간 파형·사용자 테스트벤치는 후속 단계입니다. [시뮬레이션 사용법과 검증](docs/SIMULATION.md)을 참고하세요.
+
+Node.js 22.23.3 이상에서 `npm ci` 후 `npm run dev`로 실행합니다. `npm run build`, `npm test`, `npx playwright install chromium`, `npm run test:browser`로 검증합니다. 현재 회로와 시뮬레이션 입력은 메모리에만 유지되며 파일 저장은 후속 단계입니다.
 
 공개 프로토타입: [GitHub Pages](https://caffentrager.github.io/Circlith/). `main` 또는 `feat/editor-prototype`에 push하면 단위·브라우저 테스트와 빌드 성공 후 GitHub Actions로 배포합니다. 로컬 개발은 `/`, Pages 빌드는 `/Circlith/` 경로를 사용합니다.
 
@@ -34,6 +36,7 @@ Node.js 22.23.3 이상에서 `npm ci` 후 `npm run dev`로 실행합니다. `npm
 - [편집 프로토타입 구현 기록](docs/EDITOR_PROTOTYPE.md): 구조, 범위, 잠정 설계 판단, 입력 매트릭스, 검증과 한계.
 - [입력 프리셋 구현 기록](docs/INPUT_CONTROLS.md): 명령/resolver/dispatcher 경계, 프리셋 의미론, 사용자 설정, 검증과 미지원 명령.
 - [배선 경로 편집](docs/WIRE_EDITING.md): 공식 문서 비교, 핸들·선분 드래그·경로 다시 그리기와 검증 범위.
+- [조합논리 시뮬레이션](docs/SIMULATION.md): 입력·출력 사용법, 4상태 표시, 진단과 검증 범위.
 - [이전 문서 목록](docs/archive/README.md): 통합 이전 계획, 단축키 제안, 검토 및 회신 이력.
 - [업로드 전 정보 검토 기록](docs/INFORMATION_REVIEW.md): 제거한 정보와 검토 범위.
 

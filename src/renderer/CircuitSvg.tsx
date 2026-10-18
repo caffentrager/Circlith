@@ -1,16 +1,24 @@
 import type { Circuit, Point } from "../model/circuit";
 import { pinPosition } from "../geometry/geometry";
 import {GateBody} from './GateBody';
+import type { SimulationResult } from '../simulation/simulator';
+import type { LogicValue } from '../simulation/logic';
 export const path = (points: Point[]) =>
   points.map((p) => `${p.x},${p.y}`).join(" ");
 export function Symbols({
   circuit,
   selection,
   zoom = 1,
+  simulation,
+  inputs = {},
+  onToggleInput,
 }: {
   circuit: Circuit;
   selection: string[];
   zoom?: number;
+  simulation?: SimulationResult;
+  inputs?: Readonly<Record<string, LogicValue>>;
+  onToggleInput?: (id: string) => void;
 }) {
   return (
     <>
@@ -24,10 +32,14 @@ export function Symbols({
             />
             <polyline
               data-wire={w.id}
+              data-value={simulation?.nets[w.net]}
               points={path(w.points)}
-              className={selection.includes(w.id) ? "wire selected" : "wire"}
+              className={`wire${selection.includes(w.id) ? ' selected' : ''}${simulation ? ` signal-${simulation.nets[w.net] ?? 'X'}` : ''}`}
               pointerEvents="none"
             />
+            {simulation && <text data-wire-value={w.id} x={(w.points[0].x + (w.points[1]?.x ?? w.points[0].x)) / 2 + 6 / zoom}
+              y={(w.points[0].y + (w.points[1]?.y ?? w.points[0].y)) / 2 - 6 / zoom}
+              style={{ fontSize: 12 / zoom }} className="signal-label">{simulation.nets[w.net] ?? 'X'}</text>}
           </g>
         ))}
       </g>
@@ -44,9 +56,23 @@ export function Symbols({
             <g
               key={c.id}
               data-component={c.id}
+              data-value={simulation ? (c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? simulation.outputs[c.id] ?? 'X' : undefined) : undefined}
               transform={`translate(${p.position.x} ${p.position.y}) rotate(${p.rotation})`}
             >
-              <GateBody kind={c.kind} selected={selection.includes(c.id)}/>
+              <GateBody kind={c.kind} selected={selection.includes(c.id)}
+                value={simulation ? (c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? simulation.outputs[c.id] ?? 'X' : undefined) : undefined}/>
+              {simulation && c.kind === 'Input' && onToggleInput && <g role="button" tabIndex={0}
+                aria-label={`입력 토글 ${Object.values(circuit.components).filter(part => part.kind === 'Input').findIndex(part => part.id === c.id) + 1}: ${inputs[c.id] ?? '0'}`}
+                data-input-toggle={c.id} className="input-toggle"
+                onPointerDown={e => { e.stopPropagation(); e.preventDefault(); e.currentTarget.focus(); }}
+                onDoubleClick={e => e.stopPropagation()}
+                onClick={e => { e.stopPropagation(); onToggleInput(c.id); }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (e.key === 'Enter' && !e.repeat) onToggleInput(c.id); }
+                }} onKeyUp={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); } }}>
+                <rect x="-25" y="-16" width="50" height="32" rx="3" fill="transparent"/>
+                <title>클릭 또는 Enter: 입력 0/1 전환 · 오른쪽 패널에서 X/Z 지정</title>
+              </g>}
               <text textAnchor="middle" y="-29" className="label">
                 {c.name}
               </text>
@@ -61,13 +87,14 @@ export function Symbols({
             <circle
               key={pin.id}
               data-pin={pin.id}
+              data-value={simulation?.pins[pin.id]}
               cx={p.x}
               cy={p.y}
               r="5"
               className={Object.values(circuit.nets).some((n) => n.pins.includes(pin.id)) ? "pin connected" : "pin"}
             >
               <title>
-                {pin.direction} {pin.index + 1}
+                {pin.direction} {pin.index + 1}{simulation ? ` · ${simulation.pins[pin.id] ?? 'X'}` : ''}
               </title>
             </circle>
           );

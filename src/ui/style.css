@@ -178,6 +178,32 @@ svg:focus {
 .wire-tools { border-top: 1px solid #c5cfdb; padding-top: 15px; margin-bottom: 15px; }
 .wire-tools h2 { margin-bottom: 8px; }
 .properties { overflow-y: auto; }
+.gate-caption { font-size: 9px; }
+.simulation-panel { padding-bottom: 16px; margin-bottom: 18px; border-bottom: 1px solid #c5cfdb; }
+.simulation-panel h2 { margin-bottom: 8px; }
+.simulation-panel h3 { font-size: 12px; margin: 16px 0 8px; }
+.simulation-panel p { font-size: 12px; margin: 6px 0; line-height: 1.6; }
+.simulation-input { display: flex; gap: 5px; align-items: center; margin-bottom: 6px; }
+.simulation-input button { flex: 1; margin: 0; padding: 7px; }
+.simulation-input strong { float: right; }
+.simulation-input select { font: inherit; padding: 6px 2px; border: 1px solid #c5cfdb; border-radius: 4px; }
+.simulation-output { display: flex; align-items: center; justify-content: space-between; margin: 6px 0; font-size: 12px; }
+.signal-badge { font: bold 14px monospace; padding: 4px 9px; border: 1px solid; border-radius: 4px; }
+.signal-0 { color: #3a6379; stroke: #3a6379; }
+.signal-1 { color: #08744c; stroke: #08744c; }
+.signal-X { color: #b13d24; stroke: #b13d24; }
+.signal-Z { color: #7152a5; stroke: #7152a5; }
+.wire.signal-X { stroke-dasharray: 3 3; }
+.wire.signal-Z { stroke-dasharray: 9 4; }
+.wire.selected { stroke-width: 4; }
+.signal-label { paint-order: stroke; stroke: white; stroke-width: 4px; stroke-linejoin: round; font-weight: bold; }
+.input-toggle { cursor: pointer; }
+.input-toggle:hover rect, .input-toggle:focus rect { stroke: #08744c; stroke-width: 2; }
+.simulation-diagnostics { padding: 0; list-style: none; }
+.simulation-diagnostics li { padding: 9px 0; border-top: 1px solid #dce3eb; }
+.simulation-diagnostics button { padding: 5px; margin: 6px 0 0; font-size: 11px; }
+.diagnostic-severity { font-size: 11px; font-weight: bold; color: #855619; }
+.diagnostic-severity.error { color: #b13d24; }
 button:disabled { opacity: .45; cursor: default; }
 button[aria-pressed="true"] { background: #dff5f5; border-color: #008cab; box-shadow: inset 0 -2px #008cab; }
 .junction { fill: #167887; stroke: white; stroke-width: 1; vector-effect: non-scaling-stroke; cursor: crosshair; }

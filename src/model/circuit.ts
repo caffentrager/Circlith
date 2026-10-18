@@ -1,4 +1,8 @@
-export type Kind = "Input" | "AND" | "OR" | "NOT" | "Output";
+export const gateKinds = ["AND", "OR", "NOT", "XOR", "NAND", "NOR", "XNOR"] as const;
+export type GateKind = typeof gateKinds[number];
+export type Kind = "Input" | GateKind | "Output";
+export const componentKinds: Kind[] = [...gateKinds, "Input", "Output"];
+export const isBinaryGate = (kind: Kind) => kind !== "Input" && kind !== "Output" && kind !== "NOT";
 export type Point = { x: number; y: number };
 export type Component = {
   id: string;
@@ -46,7 +50,7 @@ export function addComponent(
   rotation = 0,
 ) {
   const key = id();
-  const count = kind === "AND" || kind === "OR" ? 3 : kind === "NOT" ? 2 : 1;
+  const count = isBinaryGate(kind) ? 3 : kind === "NOT" ? 2 : 1;
   const pins = Array.from({ length: count }, (_, index) => {
     const pin = id();
     c.pins[pin] = {
@@ -54,7 +58,7 @@ export function addComponent(
       component: key,
       index,
       direction:
-        kind === "Input" || (kind === "NOT" && index === 1) || ((kind === "AND" || kind === "OR") && index === 2) ? "out" : "in",
+        kind === "Input" || (kind === "NOT" && index === 1) || (isBinaryGate(kind) && index === 2) ? "out" : "in",
     };
     return pin;
   });

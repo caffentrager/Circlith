@@ -1,5 +1,6 @@
 import {
   clone,
+  isBinaryGate,
   type Circuit,
   type Endpoint,
   type Point,
@@ -25,7 +26,7 @@ export function pinPosition(c: Circuit, key: string): Point {
     comp = c.components[pin.component],
     place = c.geometry.components[comp.id];
   const local =
-    comp.kind === "AND" || comp.kind === "OR"
+    isBinaryGate(comp.kind)
       ? pin.index === 2
         ? { x: 40, y: 0 }
         : { x: -40, y: pin.index === 0 ? -10 : 10 }

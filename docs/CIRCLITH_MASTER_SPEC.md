@@ -141,7 +141,7 @@ Circlith에 가져올 핵심은 다음이다.
 
 ### 4.3 왼쪽 라이브러리·도면 트리 — 2026-10-16 사용자 요청
 
-- 왼쪽을 라이브러리와 도면 트리 두 탭으로 제공한다. 라이브러리는 논리 게이트(AND/OR/NOT)·입출력(Input/Output)을 접고 펼치는 목록이며 클릭 배치·드래그 배치를 유지한다.
+- 왼쪽을 라이브러리와 도면 트리 두 탭으로 제공한다. 라이브러리는 논리 게이트(AND/OR/NOT, 조합논리 브랜치에서 XOR/NAND/NOR/XNOR 추가)·입출력(Input/Output)을 접고 펼치는 목록이며 클릭 배치·드래그 배치를 유지한다.
 - 도면 트리는 확정된 회로만 표시한다. 부품 목록과 연결망별 배선 목록을 제공하고, 같은 Editor selection을 사용해 도면과 강조를 동기화한다. 클릭은 선택, Shift+클릭은 추가/해제, 더블클릭은 해당 항목 화면 맞춤이다. 선택·탐색으로 회로나 편집 history를 변경하지 않는다.
 - 두 탭의 검색어와 폴더 접기 상태는 현재 세션에서 독립적으로 유지한다. 검색 중 관련 폴더를 펼쳐 일치 항목을 보여주며 검색 해제 후 원래 접기 상태로 돌아간다. 배선 검색은 연결망 표시 이름과 연결된 부품·핀 이름도 대상으로 한다.
 - 배치·배선·편집 초안 또는 진행 제스처가 있으면 도면 트리의 객체 선택·화면 맞춤을 비활성화한다. 삭제·Undo/Redo 결과는 현재 circuit에서 즉시 반영한다.
@@ -172,6 +172,10 @@ Circlith에 가져올 핵심은 다음이다.
 
 이 브랜치는 조작과 제어, UI/UX 성숙을 우선한다. 기존 선택·드래그·배선·회전·뷰 조작의 일관성, 입력 소유권, 상태 피드백, 취소·Undo/Redo와 브라우저 충돌을 먼저 다듬는다. Delete·클립보드·저장·추가 부품·시뮬레이션 등 미구현 목록은 즉시 구현할 작업 순서가 아니다. 추가 기능은 조작 흐름이 충분히 성숙한 뒤 진행한다. 위 단계별 표는 장기 제품 범위이며 이 브랜치의 현재 구현 우선순위를 덮어쓰지 않는다.
 
+### 5.2 `codex/logic-simulation` — 2026-10-18 사용자 요청
+
+새 브랜치에서 조합논리 시뮬레이션(로드맵 3~4단계)을 구현한다. 최초 3~6단계 요청은 후속 지시로 순차회로 이전까지로 축소했다. 기본 7종 게이트, 입력 토글·0/1/X/Z 지정, 출력·배선 값 표시, 미연결·다중 구동·충돌·조합 피드백 진단을 범위로 한다. 회로 저장·클립보드, Clock·래치·플립플롭, 시간 실행·파형·사용자 테스트벤치는 이번 범위에 포함하지 않는다. 입력 변경은 편집 history를 만들지 않으며 회로 편집·Undo/Redo와 계산 결과는 분리한다.
+
 ---
 
 # Part II. 결정 레지스트리
@@ -189,7 +193,7 @@ Circlith에 가져올 핵심은 다음이다.
 | DEC-007 | Safe Move geometry | `PROVISIONAL` | 전체 autoroute 금지. 선택 내부는 강체 이동, 외부 연결만 최소 orthogonal stretch |
 | DEC-008 | 우클릭 | `CURRENT` | Master Spec 기본 구현 정정: Modern은 짧은 RMB 메뉴, MMB/Space+LMB Pan. RMB drag Pan은 호환 프리셋 또는 사용자 바인딩 |
 | DEC-009 | 다중 Properties | `PROVISIONAL` | 의미적으로 호환되는 공통 속성만 일괄 편집. 혼합값 표시, 원자적 변경, 1 Undo |
-| DEC-010 | 0/1/X/Z resolution | `PROVISIONAL` | 4상태 논리와 진단을 분리. Simulator 단계 전 확정 |
+| DEC-010 | 0/1/X/Z resolution | `CURRENT` | 조합논리 브랜치는 §24의 4상태 논리·해석적 계산·보수적 피드백 진단을 사용. 물리적 전압·지연 모델 아님 |
 | DEC-011 | 미연결 배선 종료 | `PROVISIONAL` | v1에서 빈 공간 더블클릭 종료 제외. 필요 시 명시적 Finish Unconnected 명령 |
 | DEC-012 | 그룹/서브회로 | `DEFERRED` | 그룹=비전기적 편집 묶음, 서브회로=포트·내부 회로·저장 경계가 있는 전기적 단위 |
 | DEC-013 | 시간 Step | `DEFERRED` | 이벤트 Step과 clock edge/period를 분리. 동시 이벤트 semantics 이후 키 확정 |
@@ -825,9 +829,9 @@ keyup / focus loss에서 이동 transaction을 마감한다.
 - 0/1/X/Z를 값과 line style로 표시.
 - diagnosis에서 원인 object 선택/fit-to-view로 연결.
 
-## 24. 4상태 Net Resolution — 후보 규칙
+## 24. 조합논리의 4상태 Net Resolution
 
-**상태: `PROVISIONAL`. Simulator 구현 전에 확정.**
+**상태: `CURRENT` — 2026-10-18 조합논리 구현 기준.**
 
 첫 모델은 drive strength·pull-up/down 없는 4상태 논리로 제한한다.
 
@@ -838,24 +842,26 @@ keyup / focus loss에서 이동 transaction을 마감한다.
 | **X** | X | X | X | X |
 | **Z** | 0 | 1 | X | Z |
 
-규칙 후보:
+규칙:
 
 - Z는 active drive를 하지 않음.
 - driver가 없거나 모두 Z면 net = Z.
-- 일반 gate input에서 Z를 읽으면 X로 해석하는 안을 우선 검토.
+- 일반 gate input에서 Z를 읽으면 X로 해석한다. AND의 0, OR의 1은 다른 입력의 X/Z보다 우선한다. NOT의 X/Z는 X이며 XOR/XNOR는 모든 입력이 0/1일 때만 확정값을 낸다. NAND/NOR/XNOR는 각각 AND/OR/XOR 결과를 반전한다.
 - 0과 1 active drive 충돌 → X + conflict diagnostic.
 - 같은 값의 다중 active driver는 값 유지 가능하되 `MULTIPLE_DRIVERS` 진단.
 - X propagation과 physical driver conflict 진단은 구분.
 
-진단 코드 후보:
+진단 코드:
 
 - `FLOATING_INPUT`
 - `MULTIPLE_DRIVERS`
 - `DRIVE_CONFLICT`
-- `UNSUPPORTED_COMPONENT`
-- `UNSTABLE_COMBINATIONAL_FEEDBACK`
+- `COMBINATIONAL_FEEDBACK`
+- `INVALID_CIRCUIT`
 
-각 gate의 X/Z truth table과 combinational feedback 안정성 규칙은 별도 simulator spec에서 확정한다.
+엔진은 순환에 속한 게이트를 강결합 성분으로 찾고 그 출력은 X로 둔다. 안정·진동 여부나 기억 상태를 추정하지 않는다. 순환 밖 게이트는 이 X를 입력으로 정상 계산하므로 AND 0 등의 지배값은 전파된다. 이는 0 지연 조합논리의 보수적 규칙이며 실제 발진·지연 재현이 아니다. 순환 자체와 물리적 불안정을 혼동하지 않도록 진단 코드도 분리한다.
+
+입력 소자는 기본값 0, 사용자 지정값은 0/1/X/Z다. 시뮬레이션은 명시적인 표시 켜기/끄기로 제어하며 시간 Run/Step을 제공하지 않는다. 입력값은 별도 세션 상태이고 편집 history를 만들지 않는다. 표시를 껐다 켜도 존재하는 입력값은 유지된다. 삭제된 입력의 상태는 제거하며 Undo로 복원된 입력은 기본값 0으로 시작한다. 회로 변경·Undo/Redo는 확정된 회로를 재계산하며 편집 초안은 계산하지 않는다. 신호는 색과 함께 0/1/X/Z 문자 및 X/Z의 선 패턴으로 구분한다. 진단은 관련 부품/연결망의 선택·화면 맞춤으로 이동한다. 회로 데이터의 참조·연결 무결성 검증이 실패하면 계산을 중단하고 INVALID_CIRCUIT를 표시한다.
 
 ## 25. 시간 시뮬레이션
 
@@ -1078,8 +1084,8 @@ pointermove마다 전체 circuit을 재계산하지 않고, 필요하면 최신 
 
 ## 37. 해당 기능 착수 전에 결정할 항목
 
-- 0/1/X/Z truth/resolution 상세
-- combinational feedback stabilization
+- 0/1/X/Z truth/resolution 상세 — 조합논리 브랜치 기준은 §24에서 확정
+- combinational feedback stabilization — 조합논리는 §24의 보수적 X 처리, 시간 기반 안정화는 후속
 - group/subcircuit model
 - hierarchy navigation
 - event queue/time Step semantics
@@ -1104,7 +1110,7 @@ pointermove마다 전체 circuit을 재계산하지 않고, 필요하면 최신 
 | Esc/Tab/input 우선순위 | **정리**: input ownership hierarchy 정의 |
 | 우클릭 기본 미정 | **정정**: 기존 문서에 context menu가 있었음. 남은 것은 대상 정책 |
 | 다중 E 규칙 없음 | **정정**: 공통 속성 원칙은 있었음. semantic compatibility를 추가 |
-| 0/1/X/Z table | **후속 명세**: 후보 table 포함, simulator 전에 확정 |
+| 0/1/X/Z table | **조합논리 기준 확정**: §24와 DEC-010 참고 |
 | Group/Subcircuit | **DEFERRED** |
 | Step 의미 | **DEFERRED** |
 | dangling double-click | **v1 제외 권장** |

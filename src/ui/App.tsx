@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Editor } from "../editor/editor";
 import {
   emptyCircuit,
   addComponent,
+  componentKinds,
   type ConnectionTarget,
   type Kind,
   type Point,
@@ -35,10 +36,13 @@ import { signature, type UserProfile } from "../input/types";
 import { keyboardAdapter } from "./keyboardAdapter";
 import { InputSettings } from "./InputSettings";
 import { EditorSidebar } from "./EditorSidebar";
+import { SimulationPanel } from './SimulationPanel';
+import { compileCircuit, simulate } from '../simulation/simulator';
+import type { LogicValue } from '../simulation/logic';
 import { fitView, wheelZoomFactor, zoomView, ZOOM_STEP } from "../geometry/view";
 import { collidingSegments, defaultRouting, routingLabel, routingStorageKey, validateRouting, type RoutingSettings } from "../geometry/routing";
 import "./style.css";
-const kinds: Kind[] = ["AND", "OR", "NOT", "Input", "Output"];
+const kinds = componentKinds;
 export function App() {
   const [initialRouting] = useState(() => {
     try {
@@ -47,6 +51,20 @@ export function App() {
     } catch { return { value: { ...defaultRouting }, error: "배선 설정을 복구하지 못해 기본값을 사용합니다." }; }
   });
   const [editor] = useState(() => { const e = new Editor(); e.routing = initialRouting.value; return e; });
+  const [simulationEnabled, setSimulationEnabled] = useState(false);
+  const [inputValues, setInputValues] = useState<Record<string, LogicValue>>({});
+  const plan = useMemo(() => simulationEnabled ? compileCircuit(editor.circuit) : null, [simulationEnabled, editor.circuit]);
+  const simulation = useMemo(() => plan ? simulate(plan, inputValues) : undefined, [plan, inputValues]);
+  useEffect(() => {
+    setInputValues(previous => {
+      const entries = Object.entries(previous).filter(([id]) => editor.circuit.components[id]?.kind === 'Input');
+      return entries.length === Object.keys(previous).length ? previous : Object.fromEntries(entries);
+    });
+  }, [editor.circuit]);
+  const changeInput = (id: string, value: LogicValue) => {
+    if (!editor.draft && !editor.selectionBox && editor.circuit.components[id]?.kind === 'Input')
+      setInputValues(previous => ({ ...previous, [id]: value }));
+  };
   const [, render] = useState(0);
   const refresh = () => render((v) => v + 1);
   const svg = useRef<SVGSVGElement>(null);
@@ -645,12 +663,12 @@ export function App() {
       }}
       onClick={(e) => {
         const button = (e.target as Element).closest("button");
-        if (button && !button.disabled && !button.closest('.overlay,[role="dialog"],.sidebar-tabs')) svg.current?.focus({ preventScroll: true });
+        if (button && !button.disabled && !button.closest('.overlay,[role="dialog"],.sidebar-tabs,.simulation-panel')) svg.current?.focus({ preventScroll: true });
       }}
     >
       <header>
         <strong>
-          Circlith <small>편집 프로토타입</small>
+          Circlith <small>조합논리 프로토타입</small>
         </strong>
         <input aria-label="프로젝트 이름" defaultValue="Untitled circuit" />
         <button
@@ -673,6 +691,7 @@ export function App() {
         </button>
         <button onClick={() => dispatch("history.undo")}>Undo</button>
         <button onClick={() => dispatch("history.redo")}>Redo</button>
+        <button aria-pressed={simulationEnabled} onClick={() => setSimulationEnabled(value => !value)}>시뮬레이션</button>
         <button
           onClick={() => {
             rollback();
@@ -721,8 +740,8 @@ export function App() {
           문자 단축키 사용
         </label>
         <p className="note">
-          Safe Move 경로는 잠정 규칙입니다. 저장·시뮬레이션은 후속
-          단계입니다.
+          Safe Move 경로는 잠정 규칙입니다. 회로 저장은 후속 단계입니다.
+          시뮬레이션을 켜면 확정된 조합회로를 계산합니다.
         </p>
       </EditorSidebar>
       <main>
@@ -1030,7 +1049,10 @@ export function App() {
                 fill="url(#grid)"
               />
             )}
-            <Symbols circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom} />
+            <Symbols circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom}
+              simulation={simulation} inputs={inputValues}
+              onToggleInput={!draft && !editor.selectionBox && !gesture.current && !paletteDrag.current
+                ? id => changeInput(id, inputValues[id] === '1' ? '0' : '1') : undefined}/>
             {cleanup && <g data-layer="wire-cleanup-preview" pointerEvents="none">
               {cleanup.keep.map((key) => <polyline key={key} data-cleanup-keep={key} points={path(preview.geometry.wires[key].points)} className="wire-cleanup-keep" />)}
               {cleanup.remove.map((key) => <polyline key={key} data-cleanup-remove={key} points={path(preview.geometry.wires[key].points)} className="wire-cleanup-remove" />)}
@@ -1101,6 +1123,17 @@ export function App() {
         </svg>
       </main>
       <aside className="properties" ref={properties}>
+        {simulation && <SimulationPanel circuit={editor.circuit} result={simulation} inputs={inputValues}
+          busy={!!draft || !!editor.selectionBox || !!gesture.current || !!paletteDrag.current}
+          onInput={changeInput} onReset={() => setInputValues({})}
+          onLocate={diagnostic => {
+            const keys = diagnostic.objects.filter(id => editor.circuit.components[id] || editor.circuit.geometry.wires[id]);
+            if (!keys.length) return;
+            editor.selectedCorner = null;
+            editor.selection = keys;
+            dispatch('view.fitSelection');
+            svg.current?.focus({ preventScroll: true });
+          }} />}
         {cleanup && <section className="cleanup-panel" aria-label="중복 우회 정리 미리보기" onKeyDown={(e) => {
           if (e.nativeEvent.isComposing) return;
           if (e.code === "Escape") { e.preventDefault(); e.stopPropagation(); dispatch("app.cancel"); svg.current?.focus({ preventScroll: true }); }

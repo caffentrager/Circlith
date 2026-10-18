@@ -1,8 +1,9 @@
 import { useState, type ReactNode } from 'react';
 import type { Circuit, Kind } from '../model/circuit';
+import { gateKinds } from '../model/circuit';
 
 const categories: { name: string; kinds: Kind[] }[] = [
-  { name: '논리 게이트', kinds: ['AND', 'OR', 'NOT'] },
+  { name: '논리 게이트', kinds: [...gateKinds] },
   { name: '입출력', kinds: ['Input', 'Output'] },
 ];
 

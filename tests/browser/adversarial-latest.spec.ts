@@ -206,15 +206,21 @@ test("library scroll: dropping a part after scrolling the palette lands exactly 
 
 /* ------------------------------------------------------------------ 7 gates in the browser */
 test("library and canvas draw gates from the same geometry (no drift), including after rotation", async ({ page }) => {
-  for (const kind of ["AND", "OR", "NOT"]) await place(page, kind, kind === "AND" ? 200 : kind === "OR" ? 400 : 600, 300);
+  const kinds = ["AND", "OR", "NOT", "XOR", "NAND", "NOR", "XNOR"];
+  for (const [index, kind] of kinds.entries()) {
+    await place(page, kind, 120 + (index % 4) * 170, 180 + Math.floor(index / 4) * 170);
+    await page.keyboard.press('r');
+    await expect(comps(page).last()).toHaveAttribute('transform', /rotate\(270\)/);
+  }
   const libShapes = await page.locator(".library svg.library-symbol").evaluateAll((els) =>
-    els.map((s) => [...s.querySelectorAll("path,circle")].map((n) => [n.tagName, n.getAttribute("d") ?? `${n.getAttribute("cx")},${n.getAttribute("cy")},${n.getAttribute("r")}`])));
+    Object.fromEntries(els.filter(s => s.querySelector('[data-gate-shape]')).map((s) => [s.querySelector('[data-gate-shape]')!.getAttribute('data-gate-shape'),
+      [...s.querySelectorAll("path,circle")].map((n) => [n.tagName, n.getAttribute("d") ?? `${n.getAttribute("cx")},${n.getAttribute("cy")},${n.getAttribute("r")}`])])));
   const canvas = await comps(page).evaluateAll((els) =>
-    els.map((g) => [...g.querySelectorAll("path,circle")].map((n) => [n.tagName, n.getAttribute("d") ?? `${n.getAttribute("cx")},${n.getAttribute("cy")},${n.getAttribute("r")}`])));
-  // library order: AND, Input, OR, NOT, Output (see kinds[] in App.tsx) -> map by gate shape
-  const byShape = (shapes: string[][][]) => Object.fromEntries(shapes.map((s) => [s.find((n) => n[0] === "path" && n[1].startsWith("M"))![1].slice(0, 20), JSON.stringify(s)]));
-  const lib = byShape(libShapes), can = byShape(canvas);
-  for (const k of Object.keys(can)) expect(lib[k], `library glyph for canvas shape ${k}`).toBe(can[k]);
+    Object.fromEntries(els.map((g) => [g.querySelector('[data-gate-shape]')!.getAttribute('data-gate-shape'),
+      [...g.querySelectorAll("path,circle")].map((n) => [n.tagName, n.getAttribute("d") ?? `${n.getAttribute("cx")},${n.getAttribute("cy")},${n.getAttribute("r")}`])])));
+  // AND/NAND and OR/XOR/NOR/XNOR share body paths; identify each complete glyph by kind.
+  expect(Object.keys(canvas)).toEqual(kinds);
+  for (const kind of kinds) expect(libShapes[kind], `library glyph for ${kind}`).toEqual(canvas[kind]);
 });
 
 for (const rotationKeys of [0, 1, 2, 3])
