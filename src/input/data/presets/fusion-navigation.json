@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "1.0",
+  "id": "fusion-navigation",
+  "name": "Fusion Navigation",
+  "kind": "navigation-reference",
+  "description": "Autodesk Fusion의 기본 mouse navigation을 따르는 보기 조작 프리셋. 2D Circlith에서 Orbit은 사용하지 않는다.",
+  "basePreset": "circlith-modern",
+  "compatibility": {
+    "target": "Autodesk Fusion",
+    "level": "navigation-only",
+    "notes": [
+      "MMB drag = Pan, wheel = Zoom.",
+      "Shift+MMB Orbit은 2D Circlith에 대응 명령이 없어 제외한다."
+    ]
+  },
+  "behavior": {
+    "zoomFocus": "cursor"
+  },
+  "sources": [
+    {
+      "title": "Fusion keyboard shortcuts reference",
+      "url": "https://help.autodesk.com/cloudhelp/ENU/Fusion-GetStarted/files/GUID-F0491540-0324-470A-B651-2238D0EFAC30.htm",
+      "checkedAt": "2026-10-13",
+      "scope": "Canvas selection/navigation"
+    },
+    {
+      "title": "Fusion preferences reference",
+      "url": "https://help.autodesk.com/view/fusion360/ENU/index.html?guid=GUID-878489CD-3A23-4303-8450-C2F4F8E410B1",
+      "checkedAt": "2026-10-13",
+      "scope": "Program-specific mouse shortcut presets"
+    }
+  ],
+  "bindings": [
+    {
+      "command": "view.pan",
+      "input": {
+        "type": "mouseDrag",
+        "button": "middle"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.zoom",
+      "input": {
+        "type": "wheel"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    }
+  ],
+  "unmappedTargetActions": [
+    {
+      "action": "Shift+MMB — Orbit",
+      "reason": "Circlith is a 2D schematic canvas."
+    }
+  ]
+}

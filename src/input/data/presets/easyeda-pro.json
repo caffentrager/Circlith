@@ -1,0 +1,125 @@
+{
+  "schemaVersion": "1.0",
+  "id": "easyeda-pro",
+  "name": "EasyEDA Pro",
+  "kind": "cad-compatibility",
+  "description": "EasyEDA Pro schematic 사용자를 위한 호환 프리셋.",
+  "basePreset": "circlith-modern",
+  "compatibility": {
+    "target": "EasyEDA Pro",
+    "level": "high",
+    "notes": [
+      "W, Space, K, RMB-hold pan 등 핵심 습관을 반영한다.",
+      "EasyEDA Pro의 M 동작은 Circlith Safe Move로 적응 매핑한다.",
+      "기능이 없는 PCB 전용 명령은 포함하지 않는다."
+    ]
+  },
+  "behavior": {
+    "rightClick": "cancel-on-click-or-pan-on-hold-drag"
+  },
+  "sources": [
+    {
+      "title": "EasyEDA Pro Shortcut Key",
+      "url": "https://prodocs.easyeda.com/en/introduction/hotkeys/",
+      "checkedAt": "2026-10-13",
+      "scope": "Common and schematic shortcuts"
+    },
+    {
+      "title": "EasyEDA Pro Schematic Settings",
+      "url": "https://prodocs.easyeda.com/en/schematic/settings-schematic/",
+      "checkedAt": "2026-10-13",
+      "scope": "Wire-follow movement behavior"
+    }
+  ],
+  "bindings": [
+    {
+      "command": "wire.start",
+      "input": {
+        "type": "key",
+        "key": "W"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "component.moveSafe",
+      "input": {
+        "type": "key",
+        "key": "M"
+      },
+      "provenance": "adapted",
+      "context": ["canvas"],
+      "notes": "Use Circlith connectivity-preserving move."
+    },
+    {
+      "command": "component.rotateCCW90",
+      "input": {
+        "type": "key",
+        "key": "Space"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.fitAll",
+      "input": {
+        "type": "key",
+        "key": "K"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.pan",
+      "input": {
+        "type": "mouseDrag",
+        "button": "right",
+        "thresholdPx": 4
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "app.cancel",
+      "input": {
+        "type": "key",
+        "key": "Escape"
+      },
+      "provenance": "target-native",
+      "context": ["canvas", "wire-draft"]
+    },
+    {
+      "command": "edit.delete",
+      "input": {
+        "type": "key",
+        "key": "Delete"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "history.undo",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "Z"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "history.redo",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "Y"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    }
+  ],
+  "unmappedTargetActions": [
+    {
+      "action": "Shift+X — Cross selection",
+      "reason": "Circlith uses direction-sensitive box selection rather than a separate approved cross-selection command."
+    }
+  ]
+}

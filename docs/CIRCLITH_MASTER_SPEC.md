@@ -128,7 +128,7 @@ Circlith에 가져올 핵심은 다음이다.
 | 위치 | 내용 | 목적 |
 |---|---|---|
 | 상단 | 프로젝트 이름, 저장 상태, 선택/배선 도구, Undo/Redo. 시간 기능 이후 Run/Pause/Step | 현재 작업·실행 상태 확인 |
-| 왼쪽 | 부품 검색, 최근 사용, 기본 논리 부품 | 검색→배치 진입 단축 |
+| 왼쪽 | 라이브러리/도면 트리 탭, 부품 검색·종류별 목록, 배치 객체·연결망 탐색 | 검색→배치 및 현재 객체 탐색 |
 | 중앙 | 도면, 그리드, 핀, 배선, 선택, 미리보기 | 주 작업 공간 |
 | 오른쪽 | 선택 대상 속성 또는 안내 | 편집 대상·설정 확인 |
 | 하단 | 현재 도구, 상황별 키 안내, 필요 시 진단·파형 | 다음 조작·문제 원인 확인 |
@@ -138,6 +138,14 @@ Circlith에 가져올 핵심은 다음이다.
 부품 패널을 접고 검색/목록을 필요할 때 열며, 속성은 선택 중에만 보인다. 도면 폭은 늘어나지만 패널을 다시 여는 조작이 추가된다.
 
 **상태: `EXPERIMENTAL`** — 같은 회로 작성 과제로 패널형과 비교한다.
+
+### 4.3 왼쪽 라이브러리·도면 트리 — 2026-10-16 사용자 요청
+
+- 왼쪽을 라이브러리와 도면 트리 두 탭으로 제공한다. 라이브러리는 논리 게이트(AND/OR/NOT, 조합논리 브랜치에서 XOR/NAND/NOR/XNOR 추가)·입출력(Input/Output)을 접고 펼치는 목록이며 클릭 배치·드래그 배치를 유지한다.
+- 도면 트리는 확정된 회로만 표시한다. 부품 목록과 연결망별 배선 목록을 제공하고, 같은 Editor selection을 사용해 도면과 강조를 동기화한다. 클릭은 선택, Shift+클릭은 추가/해제, 더블클릭은 해당 항목 화면 맞춤이다. 선택·탐색으로 회로나 편집 history를 변경하지 않는다.
+- 두 탭의 검색어와 폴더 접기 상태는 현재 세션에서 독립적으로 유지한다. 검색 중 관련 폴더를 펼쳐 일치 항목을 보여주며 검색 해제 후 원래 접기 상태로 돌아간다. 배선 검색은 연결망 표시 이름과 연결된 부품·핀 이름도 대상으로 한다.
+- 배치·배선·편집 초안 또는 진행 제스처가 있으면 도면 트리의 객체 선택·화면 맞춤을 비활성화한다. 삭제·Undo/Redo 결과는 현재 circuit에서 즉시 반영한다.
+- 이것은 탐색용 계층이다. 목록의 부모·자식 구조가 전기적 연결이나 부품 변환의 상속을 만들지 않는다. 그룹·서브회로, 계층 재배치, 이름 편집, Recent/Favorites 및 브라우저 간 상태 보관은 각 후속 계획으로 둔다.
 
 ---
 
@@ -160,6 +168,22 @@ Circlith에 가져올 핵심은 다음이다.
 - AI 회로 생성
 - 원본 MyLogic 전체 라이브러리/파일 호환
 
+### 5.1 `feat/editor-prototype` 브랜치 우선순위 — 2026-10-15 사용자 지시
+
+이 브랜치는 조작과 제어, UI/UX 성숙을 우선한다. 기존 선택·드래그·배선·회전·뷰 조작의 일관성, 입력 소유권, 상태 피드백, 취소·Undo/Redo와 브라우저 충돌을 먼저 다듬는다. Delete·클립보드·저장·추가 부품·시뮬레이션 등 미구현 목록은 즉시 구현할 작업 순서가 아니다. 추가 기능은 조작 흐름이 충분히 성숙한 뒤 진행한다. 위 단계별 표는 장기 제품 범위이며 이 브랜치의 현재 구현 우선순위를 덮어쓰지 않는다.
+
+### 5.2 `codex/logic-simulation` — 2026-10-18 사용자 요청
+
+새 브랜치에서 조합논리 시뮬레이션(로드맵 3~4단계)을 구현한다. 최초 3~6단계 요청은 후속 지시로 순차회로 이전까지로 축소했다. 기본 7종 게이트, 입력 토글·0/1/X/Z 지정, 출력·배선 값 표시, 미연결·다중 구동·충돌·조합 피드백 진단을 범위로 한다. 회로 저장·클립보드, Clock·래치·플립플롭, 시간 실행·파형·사용자 테스트벤치는 이번 범위에 포함하지 않는다. 입력 변경은 편집 history를 만들지 않으며 회로 편집·Undo/Redo와 계산 결과는 분리한다.
+
+2026-10-18 분리 배포 요청: 기존 편집기는 `/Circlith/`, 시뮬레이션은 `/Circlith/simulation/`에 제공한다. 세 배포 진입 브랜치는 하나의 공통 워크플로로 두 버전을 함께 조립한다. 시뮬레이션의 입력 프로필과 배선 설정은 `circlith.simulation.input-profile.v1`, `circlith.simulation.routing.v1`에 저장하며 기존 편집기 키를 읽거나 수정하지 않는다. 이전 공용 키의 자동 복사는 하지 않는다. 회로 저장 기능과는 별개다.
+
+### 5.3 main 통합과 공통 편집기 — 2026-10-18 후속 사용자 요청
+
+이 항목은 §5.2의 초기 브랜치별 배포 구성을 대체한다. 기능은 개발 브랜치에서 구현·검증한 뒤 main으로 병합하고 서비스는 main에서만 배포한다. 동일 소스·동일 커밋을 Vite editor/simulation 모드로 빌드한다. 두 모드는 7종 게이트와 동일한 편집·배선·교차 점프 기능을 공유한다. 편집 모드는 시뮬레이션 활성화 버튼·입력 토글·계산 결과·진단 패널을 제공하지 않는다. 계산 엔진은 별도 모듈로 유지한다.
+
+편집 모드 설정은 기존 `circlith.*`, 시뮬레이션 모드는 `circlith.simulation.*` 키를 쓴다. 입력 프로필·경로 생성·배선 표시 설정을 각각 저장하며 두 모드 사이에 자동 복사하지 않는다. `src/config/app-mode.ts`가 모드와 설정 namespace를 정하고 도면 모델에는 모드 필드를 추가하지 않는다. 과거 Phase 브랜치는 보존하되 서비스 배포 진입점으로 사용하지 않는다. 빌드 산출물에는 두 모드의 동일 source commit을 기록하고 실제 브라우저에서 모드 차이·공통 기능·설정 분리를 확인한다.
+
 ---
 
 # Part II. 결정 레지스트리
@@ -175,14 +199,20 @@ Circlith에 가져올 핵심은 다음이다.
 | DEC-005 | 상태 모델 | `PROVISIONAL` | Tool / Operation / Transient / Focus를 분리한 직교 상태 모델 |
 | DEC-006 | Preview 중 Undo | `PROVISIONAL` | 안전 우선안: 첫 `Ctrl+Z`는 활성 초안만 취소, 다음 `Ctrl+Z`가 history Undo. Codex 단일입력안은 부록에 보존 |
 | DEC-007 | Safe Move geometry | `PROVISIONAL` | 전체 autoroute 금지. 선택 내부는 강체 이동, 외부 연결만 최소 orthogonal stretch |
-| DEC-008 | 우클릭 | `CURRENT` | 기본 = Context menu. Pan은 Space+drag / middle drag. 우클릭 drag pan은 옵션 후보 |
+| DEC-008 | 우클릭 | `CURRENT` | Master Spec 기본 구현 정정: Modern은 짧은 RMB 메뉴, MMB/Space+LMB Pan. RMB drag Pan은 호환 프리셋 또는 사용자 바인딩 |
 | DEC-009 | 다중 Properties | `PROVISIONAL` | 의미적으로 호환되는 공통 속성만 일괄 편집. 혼합값 표시, 원자적 변경, 1 Undo |
-| DEC-010 | 0/1/X/Z resolution | `PROVISIONAL` | 4상태 논리와 진단을 분리. Simulator 단계 전 확정 |
+| DEC-010 | 0/1/X/Z resolution | `CURRENT` | 조합논리 브랜치는 §24의 4상태 논리·해석적 계산·보수적 피드백 진단을 사용. 물리적 전압·지연 모델 아님 |
 | DEC-011 | 미연결 배선 종료 | `PROVISIONAL` | v1에서 빈 공간 더블클릭 종료 제외. 필요 시 명시적 Finish Unconnected 명령 |
 | DEC-012 | 그룹/서브회로 | `DEFERRED` | 그룹=비전기적 편집 묶음, 서브회로=포트·내부 회로·저장 경계가 있는 전기적 단위 |
 | DEC-013 | 시간 Step | `DEFERRED` | 이벤트 Step과 clock edge/period를 분리. 동시 이벤트 semantics 이후 키 확정 |
 | DEC-014 | 성능 기준 | `PROVISIONAL` | 수치보다 측정 지표를 먼저 정의. 60Hz 16.7ms는 목표 후보, 기존 33ms는 과거 잠정안으로 보존 |
 | DEC-015 | 브라우저 억제 | `PROVISIONAL` | key/pointer × state/focus 매트릭스로 `preventDefault`/전파 종료를 관리 |
+| DEC-016 | 입력 프로필 | `CURRENT` | Command Registry → Binding → Preset 분리. Modern 기본, 버전 있는 외부 JSON, built-in + 사용자 override. 입력 재배정은 연결 유지 등 명령 불변식을 바꾸지 않음. 미지원 명령은 표시하며 실행하지 않음 |
+| DEC-017 | 현재 브랜치 우선순위 | `CURRENT` | `feat/editor-prototype`은 조작·제어·UI/UX 성숙을 우선한다. 미구현 기능 확장은 그 이후다. §5.1 |
+
+### 6.1 입력 프리셋 구현 결정
+
+2026-10-13 후속 사용자 지시로 `IMPLEMENTATION_PROMPT.md`를 우선 반영한다. 기본 우클릭은 메뉴이며 Altium/EasyEDA 등의 RMB click/drag는 threshold로 구분한다. 좌클릭 box와 부품 패널/접점 직접 조작은 유지한다. 순차 accelerator는 설정 가능한 timeout과 대기 표시를 제공하며 Esc/focus/modal/IME에서 취소한다(Quick Place Q의 timeout과는 별도 기능). Settings → Input & Controls에서 선택·혼합·바인딩 수정·개별/전체 reset·충돌 검사·JSON import/export를 지원한다. 프로필만 독립 localStorage 버전 1.0으로 저장하며 회로 저장과 혼동하지 않는다. 형식/명령 오류는 현재 프로필을 유지하며 안내한다. compatibility/source metadata는 seed 자료의 정보이며 1:1 호환 검증 완료를 뜻하지 않는다.
 
 ---
 
@@ -265,6 +295,7 @@ PAN 종료 시 원래 Tool과 Operation을 그대로 복원한다.
 
 ### 8.1 선택
 
+- 부품과 배선 경로 모두 클릭·Shift+클릭·영역 선택·전체 선택의 대상이다. 배선 선택은 연결 변경이나 경로 이동을 자동 실행하지 않는다.
 - 클릭은 기존 선택을 교체한다.
 - `Shift+클릭`은 선택 추가/제거 토글.
 - 이미 선택된 부품을 드래그하면 다중 선택 전체를 이동.
@@ -274,7 +305,7 @@ PAN 종료 시 원래 Tool과 Operation을 그대로 복원한다.
 - `Shift+영역 선택`: 현재 선택에 추가.
 - `Ctrl+A`: 도면 전체 편집 대상 선택. 입력 필드에서는 텍스트 전체 선택.
 - 빈 공간 drag: box select.
-- pan은 Space/middle drag로 분리.
+- 기본 pan은 Space+LMB / MMB drag다. RMB drag Pan은 호환 프리셋/사용자 바인딩에서 선택한다.
 
 ### 8.2 대상 우선순위
 
@@ -300,6 +331,14 @@ PAN 종료 시 원래 Tool과 Operation을 그대로 복원한다.
 - `Esc`는 preview 폐기.
 - 연속 배치는 `Shift`를 누른 채 배치 확정하는 안을 현재 기본으로 둔다.
 - 연속 배치의 각 확정은 별도 Undo 단위.
+
+### 9.2 부품 패널 드래그 배치
+
+사용자 요청 반영(2026-10-13): 부품 패널에서 도면으로 드래그하면 PLACE 미리보기를 제공하고, 도면에서 놓을 때 하나의 배치 Command로 확정한다. 도면 밖에서 놓거나 Esc·포인터 취소·캡처 상실로 중단하면 확정하지 않는다. 기존 클릭/검색 배치 경로도 유지한다.
+
+### 9.3 기본 게이트 심벌 — 2026-10-16 사용자 요청
+
+AND는 D자, OR는 곡선형, NOT은 삼각형과 출력 반전 원으로 표시한다. AND/OR는 2입력·1출력, NOT은 1입력·1출력이다. 기존 ±40 핀 좌표와 회전·연결 보존 규칙을 유지한다. 라이브러리와 도면은 같은 SVG 심벌을 사용한다. 부품 추가는 편집 모델 범위이며 시뮬레이터 구현을 뜻하지 않는다.
 
 ## 10. 검색 정렬
 
@@ -385,9 +424,9 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 4. 경로는 orthogonal segment만 사용.
 5. 기존 첫 출발 방향과 waypoint를 가능한 한 보존.
 6. 후보가 동점이면 결정적(deterministic) 순서를 사용.
-7. 길이 0 segment와 중복 waypoint 제거.
-8. 전체 net autorouting, obstacle avoidance, shortest-path reroute는 v1에서 하지 않는다.
-9. 겹침은 경고하되 자동 접속·삭제하지 않는다.
+7. 길이 0 segment, 중복 waypoint와 공선 되접힘을 공통 정규화 함수로 제거. 실제 junction은 분할된 wire의 endpoint로 보존하고 논리 연결은 변경하지 않는다.
+8. 전체 net을 재배치하지 않는다. 배선 설정의 자동 우회에서는 부품 몸체와 충돌하는 경로만 직각 탐색으로 복구한다. 명시적 경유점과 공유 junction은 고정한다. 경고 모드에서는 겹침을 표시하고 허용한다.
+9. 우회 실패 시 이유와 충돌 위치를 표시하고 확정을 막는다. 겹침은 자동 접속·삭제하지 않는다.
 
 ### 12.3 회전
 
@@ -395,6 +434,7 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 - 회전 후 pin 방향도 함께 변환.
 - 첫 wire segment는 새 pin 법선 방향에서 시작하도록 조정하는 안을 `PROVISIONAL`로 둔다.
 - 다중 회전은 표시된 selection bounds의 중심을 기준으로 한다.
+- 선택 부품을 드래그하거나 M 이동 중에도 R/Shift+R로 회전한다. 원본에서 누적 회전·이동을 계산하며 release/확정 시 한 Undo, Esc/Tab/포커스 상실/도면 밖 release 시 전체 초안을 취소한다.
 
 ### 12.4 테스트 불변식
 
@@ -403,6 +443,17 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 - 길이 0 segment 없음.
 - 동일 상태·동일 이동이면 동일 geometry 생성.
 - Undo 후 원래 좌표와 연결 복구.
+- 일회성 회전이 실패하면 원본과 history/Redo를 유지하고 임시 MOVE를 폐기한다. 실제 MOVE/선분 drag가 release에서 실패해도 원본으로 복구하고 초안을 종료한다. 오류 이유를 표시하며 마우스 버튼 없이 초안이 따라다니지 않는다. M 이동·배선 다시 그리기 등 명시적으로 시작한 안정 초안은 수정/취소 가능 상태를 유지한다.
+
+### 12.5 배선 경로 편집 — 2026-10-15
+
+- 선택한 배선의 선분을 직접 끌면 수평선은 위/아래, 수직선은 좌/우로 이동한다. 연결된 양 끝 핀·공유 junction은 고정하고 필요 시 직각 연결 구간을 추가한다.
+- 모서리의 사각 핸들은 꼭짓점 이동, 선분 중앙의 원형 핸들은 선분 이동, 마름모 핸들은 국소 우회 구간 추가다. 핸들은 화면 기준 크기를 유지한다.
+- 4 screen px 이상 drag부터 초안을 갱신하고 release로 한 번 확정한다. Esc/Ctrl+Z/Tab/창 비활성/캡처 상실/도면 밖 release는 drag 초안만 취소한다.
+- 경로 다시 그리기는 기존 두 endpoint를 고정한다. 빈 공간 클릭으로 경유점, Backspace로 마지막 경유점 취소, Shift+Space로 꺾임 방향, Enter/완료 버튼으로 경로 전체를 한 번 확정한다. 다른 핀과 교차해도 새 접속을 만들지 않는다.
+- 가로/세로 우선 정리는 선택 배선의 경유점을 의도적으로 제거하고 두 endpoint 사이의 최소 직각 경로로 대체한다. 여러 배선도 한 Undo다.
+- 모든 경로 수정은 wire ID, from/to, net, 부품·핀·junction을 보존한다. 중복점과 불필요 공선점을 정리하며 결과는 유한 좌표·직각·고정 endpoint 검증 후 commit한다.
+- 분기 생성은 §13.5의 명시적 접속 transaction으로 분리한다. endpoint 재연결·전기적 삭제는 후속 기능이다.
 
 ---
 
@@ -413,6 +464,7 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 - `W`로 WIRE 도구 활성.
 - 핀/접속점/기존 선분 위에서 시작 가능.
 - 빈 공간에서 W를 누르면 WIRE 대기만 시작.
+- 사용자 요청 반영(2026-10-13): SELECT 도구에서도 부품 접점을 클릭하거나 클릭 드래그하면 WIRE_DRAFT를 시작한다. 접점은 부품 본체 이동보다 우선한다. 클릭 시작 후 다른 접점 클릭으로 연결하거나, 다른 접점까지 드래그해 놓으면 연결을 확정한다. 빈 공간에서 드래그를 놓으면 미확정 배선 초안을 유지한다. 도면 밖 release와 gesture 취소는 드래그 초안을 폐기한다.
 - 기존 선분에서 branch를 시작할 경우 접속점은 wire commit 전까지 초안.
 
 ### 13.2 배선 진행
@@ -434,12 +486,14 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 
 ### 13.4 Snap 초기 가설
 
-- pin radius: 9 screen px
-- wire hit distance: 6 screen px
+- pin/junction radius: 13 screen px (2026-10-16 클릭 여유 확대)
+- wire hit distance: 12 screen px (2026-10-16 클릭 여유 확대)
 - drag start: 4 screen px
 - grid: 10 drawing units
 
 모두 검증 전 가설이다.
+
+직각 선분 투영은 가변 축의 좌표를 선분 범위로 clamp하고 고정 축은 원래 값을 그대로 사용한다. grid 좌표를 비율로 재계산해 미세 소수를 만들지 않는다. 화면 hit 허용 거리와 저장 좌표의 일치를 구분하며, 좌표가 가까운 별개 endpoint를 전기적으로 합치지 않는다.
 
 판정 거리는 zoom과 무관한 screen px로 관리하고 drawing coordinate와 분리한다.
 
@@ -449,7 +503,46 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 
 `Alt`는 grid snap만 잠시 해제하는 후보. 좌표가 우연히 겹쳤다고 전기적 연결을 새로 만들지 않는다.
 
+### 13.5 분기·배선 합치기와 피드백 — 2026-10-15
+
+2026-10-16 QA 수정: SELECT에서 배선의 투명 hit stroke들이 겹치면 DOM 그리기 순서 대신 실제 선분까지의 화면 거리를 비교한다. 기존 선택 허용 폭(중심선에서 6px)을 유지하고, 최근접에서 0.5px 이내인 후보가 여러 개면 선택 창에서 명시적으로 고른다. 선택은 교차점 자석 판정과 분리하며 전기적 연결을 변경하지 않는다. 핀·접속점 배선 시작 및 연결 후보 선택은 기존 규칙을 유지한다.
+
+2026-10-16 후속 사용자 승인: 초안 없는 SELECT에서 실제 몸체(심벌·반전 원·이름)를 직접 누르면 넓은 핀 포획보다 부품 선택을 우선한다. 핀 원 직접 클릭과 몸체 밖의 기존 포획 반경은 유지한다. pin lead는 몸체 보호 영역으로 보지 않는다. WIRE 도구·배선 초안 연결 의도에는 기존 후보 판정을 유지한다. 이 정책은 DOM surface를 전달받는 입력 판정 계층에서 적용하며 저수준 거리 계산의 반경을 축소하지 않는다.
+
+- WIRE 대기에서 핀·기존 junction·선분을 클릭하거나, SELECT에서 선분 위 W / 선택 배선의 분기 버튼으로 시작한다. SELECT의 단순 선 클릭·드래그는 선택·경로 편집을 유지한다.
+- 초안 시작·종료 대상은 pin/junction 또는 명시적으로 선택한 wire 위의 투영 좌표다. 선분 내부는 10 단위 grid에 투영하되 가까운 endpoint를 재사용한다. pin/junction 13 screen px → wire 12 screen px 우선이며 최근접 후보를 강조한다. 12px 안의 직각 교차점은 같은 좌표로 자석 스냅하여 후보를 선택하기 쉽게 하되, 실제 접속은 명시적 확정으로만 생성한다.
+- 시작선 분할·끝선 분할·junction 생성·net 병합·새 경로는 전체 검증 후 하나의 Command로 commit한다. 취소·실패 중에는 기존 회로와 Redo를 보존한다. 같은 선의 서로 다른 두 지점 연결과 기존 junction 재사용을 지원한다.
+- 분기점에 wire를 분할하며 기존 wire ID는 첫 구간에 유지한다. 공유 junction은 이동·회전·경로 정리로 삭제하거나 옮기지 않는다.
+- 단순 교차는 미접속이다. 동거리 대상이 여러 개면 후보 선택 창으로 구분한다. 정확히 같은 내부 교차점의 후보에는 별도 접속 버튼을 제공하며, 명시적으로 누른 경우에만 한 junction으로 합친다.
+- 유효 접속 후보·분기 예정점·연결된 pin·실제 junction·현재 배선 모드를 색과 형태/문자로 함께 구분한다. 선에서 시작한 초안의 junction은 commit 전에 미리보기만 표시한다.
+- 연결망 선택은 동일 net의 wire를 모두 선택한다. 부품 이동과 경로 편집은 연결망을 자동 병합하지 않는다.
+- wire/net/endpoint 참조·net 구성원·실제 연결성·유한 좌표·직각·endpoint 일치를 검증한다. 파일 저장·시뮬레이션은 별도 범위다.
+
+### 13.6 배선 설정 — 2026-10-15 사용자 요청
+
+- 설정에서 경로 생성: 스마트 자동(기본)/가로 우선/세로 우선, 부품 겹침: 자동 우회(기본)/경고하며 허용을 독립 선택한다. 브라우저에 별도 버전 키로 저장하며 입력 프로필 JSON과 분리한다. 설정 변경만으로 확정 회로를 바꾸지 않는다.
+- 스마트는 핀 방향·거리·꺾임 비용을 반영한 결정적 직각 경로를 생성한다. 자동 우회는 회전된 부품 몸체에 10 도면 단위 여유를 둔다. 고정 방향도 장애물 때문에 필요한 경우 우회한다. 다른 배선은 장애물이 아니며 교차는 미접속이다.
+- 수동 클릭 경유점은 자동 탐색·부품 이동 중 보존한다. 경유점이 부품 안에 들어가거나 경로를 찾지 못하면 실패를 표시한다. 명시적 경로 다시 그리기/가로·세로·설정대로 정리는 기존 경유점을 재설정한다.
+- Shift+Space는 현재 초안 구간의 우선 축만 임시 전환하며 저장 설정을 바꾸지 않는다. 상태 표시에서 현재 모드와 겹침/실패를 확인한다. 충돌은 몸체 위 점선으로 겹쳐 표시해 가려진 선을 찾을 수 있게 한다.
+- 구현 탐색은 좌표 압축 직각 그래프와 방향 상태를 사용한다. 탐색 크기를 제한하고 한도 초과 시 조용히 겹침을 허용하지 않는다.
+
+### 13.7 중복 우회 경로 정리 — 2026-10-15 사용자 사례
+
+- 직선과 ㄷ자 우회가 같은 두 접속점 사이에 중복으로 남는 사례를 기존 배선 조작 개선으로 다룬다. 일반 Delete 구현으로 확대하지 않는다.
+- 배선을 선택한 뒤 **연결망 중복 정리**를 실행한다. 선택 배선이 속한 연결망만 검사하며, 같은 net과 동일한 두 endpoint ID를 가진 병렬 wire를 중복 후보로 본다. 좌표만 같은 별개 endpoint나 다른 net의 교차는 합치지 않는다.
+- 부품 몸체를 통과하지 않는 경로를 우선하고, 그중 길이가 짧고 꺾임이 적은 경로 하나를 남긴다. 동점은 기존 순서로 결정한다. 중간에 실제 분기가 있어 나뉜 경로와 여러 wire를 잇는 일반 cycle은 정리 대상에서 제외한다.
+- 제거 예정 wire는 빨간 점선, 남길 wire는 초록 강조로 표시한다. 범위·개수·수동 경유점 제거 여부를 안내하며 Enter/완료 버튼으로 한 번 확정, Esc/초안 Undo로 취소한다. 미리보기만으로 circuit/history/Redo는 바뀌지 않는다.
+- 부품·핀·net 구성원·junction ID/좌표와 남는 wire ID/경로는 보존한다. 제거 wire ID 때문에 물리 wire 목록 fingerprint는 바뀌지만, 모든 기존 pin/junction의 연결성은 유지되어야 한다. 전체 검증 후 하나의 Undo로 정확히 복구한다.
+- 같은 net이라는 이유만으로 임의 배선·cycle을 지우거나, 분기된 우회를 자동 삭제하거나, 이동 중 사용자 경유점을 조용히 제거하지 않는다.
+
 ---
+
+### 13.8 미접속 교차 점프 — 2026-10-18 사용자 요청
+
+- 배선 표시 설정에서 미접속 교차 점프 On/Off 및 점프할 배선(가로선/세로선)을 고른다. 기본은 켜짐·가로선이다. 가로선은 위쪽, 세로선은 오른쪽 반원으로 표시한다.
+- 서로 다른 배선의 수직/수평 선분 내부 교차만 대상으로 한다. 같은 net이어도 해당 위치에 접속점이 없으면 표시한다. 같은 축의 겹침, 자기 교차, 끝점·모서리 교차, 접속점 근처는 제외한다. 반원은 최대 화면 반경 5px이며 여유가 부족한 교차는 줄이거나 생략한다.
+- 표시 geometry를 파생할 뿐 circuit·net·junction·배선 points·Undo/Redo·시뮬레이션 결과를 바꾸지 않는다. 브리지 원호를 클릭하면 그 배선을 선택하며 드래그는 원래 선분의 경로 편집으로 처리한다. 교차점 접속은 기존 명시적 접속 명령으로 수행한다.
+- 표시 설정은 경로 생성 설정과 분리해 브라우저에 저장한다. 저장 오류는 세션 적용과 오류 안내로 처리하며 잘못된 설정은 기본값으로 복구한다.
 
 # Part VI. 삭제·클립보드·Undo/Redo
 
@@ -467,6 +560,14 @@ Input/Output은 우선 A 검색 또는 명시적 메뉴에서 제공한다. 방�
 - 선택한 경로만 제거.
 - 다른 branch 유지.
 - 불필요 junction 정리는 같은 transaction에 포함.
+
+### 14.3 삭제와 꺾임점 조작 — 2026-10-16 사용자 요청
+
+- `edit.delete`를 활성화한다. 선택 부품/배선은 Delete·선택 삭제 버튼·메뉴로 삭제하며 다중 삭제는 하나의 Command다. text/modal/IME 입력 소유권은 유지하고 진행 초안/드래그 중 확정 회로 삭제를 막는다. hover만으로 삭제하지 않는다.
+- 삭제된 pin에 남는 wire가 있으면 해당 위치에 하나의 junction endpoint를 만들고 공유된 wire 끝들을 그 endpoint로 치환한다. 단일 말단은 빈 원으로 표시한다. 선택한 wire는 그 경로만 제거하며 실제 endpoint 그래프로 net을 다시 분할한다. 미사용 junction/net은 정리하고, 남는 경로/부품의 좌표와 wire ID는 유지한다. 전체 검증 후 commit하며 Undo/Redo는 정확한 snapshot을 복원한다.
+- WIRE_DRAFT/WIRE_ROUTE의 클릭 고정 경유점은 번호 있는 사각 마커로 표시한다. 실제 전기 junction(원)과 구분하고 Backspace/Esc로 함께 제거한다.
+- SELECT에서 완성된 wire의 사각 꺾임 핸들을 클릭하면 해당 점을 선택한다. Delete는 wire 전체가 아니라 그 꺾임점만 제거한다. 인접한 고정 좌표 사이를 반대 직각 경로로 재연결하며 endpoint/net/junction을 바꾸지 않는다. 다른 고정 anchor를 잃거나 자동 우회 정책에서 부품과 충돌하면 안내하고 기존 회로/history를 보존한다. 직각을 유지하려면 대체 꺾임점이 생길 수 있다. 실제 junction·양 끝 endpoint는 이 작업으로 삭제하지 않는다.
+- 2026-10-16 후속 사용자 승인: 꺾임점 삭제에서 양 끝점·전기적 연결·나머지 고정 경유점은 보존한다. 직각 유지에 필요한 국소 경로 정규화로 이웃한 비고정 꺾임점이 없어지거나 대체 꺾임점이 생길 수 있으며, 핀 출입 방향의 변경도 허용한다. 전체 회로를 임의 재배선하지 않는다. 위 보존 조건·현재 충돌 정책을 만족하지 못하면 명확한 이유와 경로 다시 그리기 안내를 제공하고 삭제를 거부한다. 한 번의 Undo로 원래 경로 전체를 복원한다.
 
 ## 15. Clipboard
 
@@ -638,12 +739,19 @@ Codex는 “preview는 history가 아니므로 한 번의 Ctrl+Z에서 preview�
 - Text edit의 Esc는 그 편집만 닫거나 미확정 값을 취소.
 - 같은 Esc를 canvas까지 전달하지 않는다.
 - UI에서 canvas로 focus가 돌아오면 기존 안정된 preview는 유지하고 다음 pointer update에서 위치 갱신.
+- 일반 도구·Undo/Redo·편집 버튼은 모달로 분류하지 않는다. 앱의 일반 명령 버튼 실행 후 도면에 키보드 포커스를 돌린다. 검색·설정·후보/메뉴 overlay와 텍스트 입력은 자체 입력 소유권을 유지한다.
 
 ### 19.3 Tab
 
 - Tab/Shift+Tab은 기본 UI keyboard navigation.
 - draft는 안정된 상태라면 잠시 유지.
 - pointer drag 중 Tab은 drag rollback 후 focus 이동하는 안을 우선 검토.
+
+### 19.4 줌 조작 — 2026-10-15 감사 수정
+
+- 휠·키보드·Home/선택 맞춤은 같은 10–200% 범위를 사용한다. 화면 맞춤이 50% 아래일 때도 줌 아웃이 역으로 확대되지 않는다.
+- 휠의 세로 delta 크기에 비례한 지수 배율을 사용한다. deltaY=0/비유한 값은 줌하지 않는다. line은 16px, page는 도면 높이로 정규화하고 이벤트당 최대 240px으로 제한한다. 기준 100px은 약 10% 변화이며 감도는 초기 조작 파라미터다. 실제 트랙패드 사용성 측정 완료를 뜻하지 않는다.
+- 확대 중심의 도면 좌표를 유지하고 휠 반전 설정을 적용한다. 텍스트/모달 입력 소유 중에는 도면 줌을 실행하지 않는다. 반복 배율 계산의 잔여 오차가 경계 선택을 흔들지 않도록 뷰 좌표/배율은 소수 12자리로 안정화한다. 회로 좌표를 반올림하는 정책과는 구분한다.
 
 ## 20. Browser default suppression matrix
 
@@ -656,7 +764,7 @@ Codex는 “preview는 history가 아니므로 한 번의 Ctrl+Z에서 preview�
 | Delete | CANVAS + 명시적 selection + 안전 상태 | selection 삭제 | text UI 문자 삭제. 위험 preview 중에는 삭제 금지/안내 |
 | Ctrl+Z | CANVAS history 처리 가능 | §16 정책 | text UI에서는 text undo |
 | Ctrl+S/O/F | app-owned focus에서 수신 가능 | 앱 명령 + 필요 시 default 억제 | 이벤트 수신 불가 환경은 버튼 fallback |
-| Right-click/contextmenu | canvas | 앱 context menu | canvas 밖 browser menu |
+| Right-click/contextmenu | 앱의 비텍스트 UI, 도면·메뉴·오버레이 | 앱 루트 capture에서 default와 전파 억제. 짧은 RMB 메뉴와 호환 프리셋 drag Pan을 유지하며 메뉴가 열린 뒤 도착하는 contextmenu도 차단 | input/textarea/contenteditable의 텍스트 편집 메뉴와 앱 밖 browser menu 유지 |
 | Alt hold | canvas + snap 후보 기능 | grid snap 임시 해제 | Windows browser menu focus 실측 필요 |
 
 실제 구현 문서에는 `handled`, `preventDefault`, `stopPropagation`, `user feedback`, `browser support`를 별도 열로 기록한다.
@@ -690,13 +798,13 @@ keyup / focus loss에서 이동 transaction을 마감한다.
 
 ## 21. 우클릭
 
-기본값은 **Context menu**.
+기본은 **짧은 우클릭 Context menu**다. Pan은 MMB/Space+LMB drag이며 호환 프로필에서는 RMB drag에도 배정할 수 있다. 기존 코드가 다른 경우 Master Spec 기본값에 맞게 정정한다.
 
 - 선택 대상 위: 기존 selection group용 메뉴.
 - 비선택 대상 위: 그 대상을 선택한 뒤 object menu를 여는 안을 현재 권장.
 - 빈 공간: canvas menu. 기존 selection 유지 가능.
 - active preview 중: preview용 context menu. 기존 회로 selection을 자동 변경하지 않음.
-- right-drag pan: 기본 비활성. 고급 설정 후보.
+- click/drag가 공유된 버튼은 pointer-down에 메뉴를 열지 않는다. threshold 미만 release는 click, 이상 움직이면 drag를 실행한다. 실제 drag 후 메뉴를 추가로 열지 않는다.
 
 ## 22. 다중 선택 Properties
 
@@ -736,9 +844,9 @@ keyup / focus loss에서 이동 transaction을 마감한다.
 - 0/1/X/Z를 값과 line style로 표시.
 - diagnosis에서 원인 object 선택/fit-to-view로 연결.
 
-## 24. 4상태 Net Resolution — 후보 규칙
+## 24. 조합논리의 4상태 Net Resolution
 
-**상태: `PROVISIONAL`. Simulator 구현 전에 확정.**
+**상태: `CURRENT` — 2026-10-18 조합논리 구현 기준.**
 
 첫 모델은 drive strength·pull-up/down 없는 4상태 논리로 제한한다.
 
@@ -749,24 +857,26 @@ keyup / focus loss에서 이동 transaction을 마감한다.
 | **X** | X | X | X | X |
 | **Z** | 0 | 1 | X | Z |
 
-규칙 후보:
+규칙:
 
 - Z는 active drive를 하지 않음.
 - driver가 없거나 모두 Z면 net = Z.
-- 일반 gate input에서 Z를 읽으면 X로 해석하는 안을 우선 검토.
+- 일반 gate input에서 Z를 읽으면 X로 해석한다. AND의 0, OR의 1은 다른 입력의 X/Z보다 우선한다. NOT의 X/Z는 X이며 XOR/XNOR는 모든 입력이 0/1일 때만 확정값을 낸다. NAND/NOR/XNOR는 각각 AND/OR/XOR 결과를 반전한다.
 - 0과 1 active drive 충돌 → X + conflict diagnostic.
 - 같은 값의 다중 active driver는 값 유지 가능하되 `MULTIPLE_DRIVERS` 진단.
 - X propagation과 physical driver conflict 진단은 구분.
 
-진단 코드 후보:
+진단 코드:
 
 - `FLOATING_INPUT`
 - `MULTIPLE_DRIVERS`
 - `DRIVE_CONFLICT`
-- `UNSUPPORTED_COMPONENT`
-- `UNSTABLE_COMBINATIONAL_FEEDBACK`
+- `COMBINATIONAL_FEEDBACK`
+- `INVALID_CIRCUIT`
 
-각 gate의 X/Z truth table과 combinational feedback 안정성 규칙은 별도 simulator spec에서 확정한다.
+엔진은 순환에 속한 게이트를 강결합 성분으로 찾고 그 출력은 X로 둔다. 안정·진동 여부나 기억 상태를 추정하지 않는다. 순환 밖 게이트는 이 X를 입력으로 정상 계산하므로 AND 0 등의 지배값은 전파된다. 이는 0 지연 조합논리의 보수적 규칙이며 실제 발진·지연 재현이 아니다. 순환 자체와 물리적 불안정을 혼동하지 않도록 진단 코드도 분리한다.
+
+입력 소자는 기본값 0, 사용자 지정값은 0/1/X/Z다. 시뮬레이션은 명시적인 표시 켜기/끄기로 제어하며 시간 Run/Step을 제공하지 않는다. 입력값은 별도 세션 상태이고 편집 history를 만들지 않는다. 표시를 껐다 켜도 존재하는 입력값은 유지된다. 삭제된 입력의 상태는 제거하며 Undo로 복원된 입력은 기본값 0으로 시작한다. 회로 변경·Undo/Redo는 확정된 회로를 재계산하며 편집 초안은 계산하지 않는다. 신호는 색과 함께 0/1/X/Z 문자 및 X/Z의 선 패턴으로 구분한다. 진단은 관련 부품/연결망의 선택·화면 맞춤으로 이동한다. 회로 데이터의 참조·연결 무결성 검증이 실패하면 계산을 중단하고 INVALID_CIRCUIT를 표시한다.
 
 ## 25. 시간 시뮬레이션
 
@@ -898,7 +1008,7 @@ keyup / focus loss에서 이동 transaction을 마감한다.
 ## 31. 단축키·검색 비교
 
 - gate 20개 이상 과제: A 검색 / alias 보강 / 필요 시 Q Quick Place 비교.
-- 필수 sequence timeout 없음.
+- Quick Place 후보에는 필수 sequence timeout 없음. 호환 accelerator timeout은 DEC-016의 설정을 따른다.
 - 완료 시간, 오입력, 학습 시간 기록.
 - KiCad 경험자의 M/G 이해도 기록.
 - `Shift+Space`가 WIRE_DRAFT에서 page scroll/pan을 일으키지 않는지.
@@ -985,12 +1095,12 @@ pointermove마다 전체 circuit을 재계산하지 않고, 필요하면 최신 
 | Input/Output 빠른 키 | A 검색/명시 메뉴 우선 |
 | `/` palette | 긴 꼬리 command discoverability 필요성 |
 | repeat duplicate | 변위 재사용 UX/Undo 검사 |
-| right-drag pan | advanced option only |
+| right-drag pan | 호환 프리셋/사용자 바인딩 |
 
 ## 37. 해당 기능 착수 전에 결정할 항목
 
-- 0/1/X/Z truth/resolution 상세
-- combinational feedback stabilization
+- 0/1/X/Z truth/resolution 상세 — 조합논리 브랜치 기준은 §24에서 확정
+- combinational feedback stabilization — 조합논리는 §24의 보수적 X 처리, 시간 기반 안정화는 후속
 - group/subcircuit model
 - hierarchy navigation
 - event queue/time Step semantics
@@ -1015,7 +1125,7 @@ pointermove마다 전체 circuit을 재계산하지 않고, 필요하면 최신 
 | Esc/Tab/input 우선순위 | **정리**: input ownership hierarchy 정의 |
 | 우클릭 기본 미정 | **정정**: 기존 문서에 context menu가 있었음. 남은 것은 대상 정책 |
 | 다중 E 규칙 없음 | **정정**: 공통 속성 원칙은 있었음. semantic compatibility를 추가 |
-| 0/1/X/Z table | **후속 명세**: 후보 table 포함, simulator 전에 확정 |
+| 0/1/X/Z table | **조합논리 기준 확정**: §24와 DEC-010 참고 |
 | Group/Subcircuit | **DEFERRED** |
 | Step 의미 | **DEFERRED** |
 | dangling double-click | **v1 제외 권장** |
@@ -1083,9 +1193,9 @@ Enter는 confirm 의미로 유지. Repeat는 별도 palette/shortcut 후보.
 
 필요 시 명시적 Finish Unconnected로 재검토.
 
-### 40.9 right-drag pan — `REJECTED` as default
+### 40.9 right-drag pan — 과거 `REJECTED` 기본안
 
-Context menu를 우선. advanced option 후보.
+기본은 Context menu 우선이다. 중간 프로토타입에서는 사용자 요청으로 빈 공간 RMB drag Pan을 지원했으며, 후속 입력 지침에서 Master Spec 기본값으로 정정했다. 현재 RMB drag Pan은 호환 프리셋/사용자 바인딩에만 적용한다.
 
 ---
 

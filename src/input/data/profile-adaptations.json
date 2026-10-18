@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "easyeda-pro": [
+    {
+      "command": "app.cancel",
+      "context": ["canvas", "wire-draft"],
+      "input": { "type": "mouseClick", "button": "right" },
+      "provenance": "adapted",
+      "notes": "Explicit binding for seed behavior rightClick=cancel-on-click-or-pan-on-hold-drag."
+    }
+  ]
+}

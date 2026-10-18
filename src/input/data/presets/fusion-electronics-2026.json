@@ -1,0 +1,117 @@
+{
+  "schemaVersion": "1.0",
+  "id": "fusion-electronics-2026",
+  "name": "Autodesk Fusion Electronics 2026",
+  "kind": "cad-compatibility",
+  "description": "Fusion Electronics / EAGLE 계열 습관을 참고한 schematic 호환 프리셋.",
+  "basePreset": "circlith-modern",
+  "compatibility": {
+    "target": "Autodesk Fusion Electronics",
+    "level": "partial",
+    "notes": [
+      "Electronics workspace의 context-sensitive shortcuts 중 Circlith에 직접 대응되는 것만 포함한다.",
+      "PCB-only routing/layer commands are intentionally omitted."
+    ]
+  },
+  "behavior": {},
+  "sources": [
+    {
+      "title": "Fusion keyboard shortcuts reference",
+      "url": "https://help.autodesk.com/cloudhelp/ENU/Fusion-GetStarted/files/GUID-F0491540-0324-470A-B651-2238D0EFAC30.htm",
+      "checkedAt": "2026-10-13",
+      "scope": "Electronics workspace shortcuts and canvas navigation"
+    }
+  ],
+  "bindings": [
+    {
+      "command": "component.addSearch",
+      "input": {
+        "type": "key",
+        "key": "A"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "component.moveSafe",
+      "input": {
+        "type": "key",
+        "key": "M"
+      },
+      "provenance": "adapted",
+      "context": ["canvas"]
+    },
+    {
+      "command": "grid.toggleVisible",
+      "input": {
+        "type": "key",
+        "key": "G"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "wire.start",
+      "input": {
+        "type": "key",
+        "key": "R"
+      },
+      "provenance": "adapted",
+      "context": ["canvas"],
+      "notes": "Fusion Electronics schematic uses R for Net; Circlith maps it to its wire/net drawing command."
+    },
+    {
+      "command": "app.cancel",
+      "input": {
+        "type": "key",
+        "key": "Escape"
+      },
+      "provenance": "target-native",
+      "context": ["canvas", "wire-draft"]
+    },
+    {
+      "command": "view.fitAll",
+      "input": {
+        "type": "key",
+        "key": "F6"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.pan",
+      "input": {
+        "type": "mouseDrag",
+        "button": "middle"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.zoom",
+      "input": {
+        "type": "wheel"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "history.undo",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "Z"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "history.redo",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "Y"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    }
+  ]
+}

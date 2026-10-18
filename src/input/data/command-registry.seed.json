@@ -1,0 +1,144 @@
+{
+  "schemaVersion": "1.0",
+  "commands": [
+    {
+      "id": "app.cancel",
+      "label": "Cancel / Escape",
+      "category": "app",
+      "semantics": "Cancel current draft/operation first; then exit tool; then clear selection according to the Master Spec."
+    },
+    {
+      "id": "app.confirm",
+      "label": "Confirm",
+      "category": "app",
+      "semantics": "Confirm a valid preview/operation."
+    },
+    {
+      "id": "history.undo",
+      "label": "Undo",
+      "category": "history"
+    },
+    {
+      "id": "history.redo",
+      "label": "Redo",
+      "category": "history"
+    },
+    {
+      "id": "clipboard.copy",
+      "label": "Copy",
+      "category": "edit"
+    },
+    {
+      "id": "clipboard.cut",
+      "label": "Cut",
+      "category": "edit"
+    },
+    {
+      "id": "clipboard.paste",
+      "label": "Paste",
+      "category": "edit"
+    },
+    {
+      "id": "edit.delete",
+      "label": "Delete",
+      "category": "edit"
+    },
+    {
+      "id": "edit.properties",
+      "label": "Properties",
+      "category": "edit"
+    },
+    {
+      "id": "tool.select",
+      "label": "Select Tool",
+      "category": "tools"
+    },
+    {
+      "id": "component.addSearch",
+      "label": "Add / Search Component",
+      "category": "schematic"
+    },
+    {
+      "id": "component.moveSafe",
+      "label": "Move (Preserve Connectivity)",
+      "category": "schematic",
+      "semantics": "Circlith safe move. Preserve logical connectivity; do not silently substitute a disconnecting move."
+    },
+    {
+      "id": "component.rotateCCW90",
+      "label": "Rotate 90° CCW",
+      "category": "schematic"
+    },
+    {
+      "id": "wire.start",
+      "label": "Wire",
+      "category": "schematic"
+    },
+    {
+      "id": "wire.removeLastPoint",
+      "label": "Remove Last Wire Point",
+      "category": "schematic"
+    },
+    {
+      "id": "grid.toggleVisible",
+      "label": "Toggle Grid Visibility",
+      "category": "view"
+    },
+    {
+      "id": "view.pan",
+      "label": "Pan",
+      "category": "view"
+    },
+    {
+      "id": "view.zoom",
+      "label": "Zoom",
+      "category": "view"
+    },
+    {
+      "id": "view.zoomIn",
+      "label": "Zoom In",
+      "category": "view"
+    },
+    {
+      "id": "view.zoomOut",
+      "label": "Zoom Out",
+      "category": "view"
+    },
+    {
+      "id": "view.fitAll",
+      "label": "Fit All",
+      "category": "view"
+    },
+    {
+      "id": "view.fitSelection",
+      "label": "Fit Selection",
+      "category": "view"
+    },
+    {
+      "id": "view.contextMenu",
+      "label": "Context Menu",
+      "category": "view"
+    },
+    {
+      "id": "selection.box",
+      "label": "Box Select",
+      "category": "selection"
+    },
+    {
+      "id": "selection.toggleItem",
+      "label": "Toggle Item Selection",
+      "category": "selection"
+    },
+    {
+      "id": "selection.addItem",
+      "label": "Add Item to Selection",
+      "category": "selection"
+    },
+    {
+      "id": "commandPalette.open",
+      "label": "Command Palette",
+      "category": "app",
+      "status": "candidate"
+    }
+  ]
+}

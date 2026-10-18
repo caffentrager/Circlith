@@ -1,0 +1,154 @@
+{
+  "schemaVersion": "1.0",
+  "id": "altium-designer-2026",
+  "name": "Altium Designer 2026",
+  "kind": "cad-compatibility",
+  "description": "Altium Designer schematic 사용자를 위한 키 시퀀스·마우스 조작 호환 프리셋.",
+  "basePreset": "circlith-modern",
+  "compatibility": {
+    "target": "Altium Designer Schematic Editor",
+    "level": "high",
+    "notes": [
+      "Altium의 accelerator key sequence(P,W / M,M / V,F 등)를 지원하려면 순차 키 입력 엔진이 필요하다.",
+      "짧은 RMB click은 context menu, RMB drag는 pan으로 분리해야 한다.",
+      "Circlith의 이동은 연결 보존 의미를 유지하므로 Altium의 설정 의존적 Move/Drag와 완전 동일하지 않을 수 있다."
+    ]
+  },
+  "behavior": {
+    "zoomFocus": "cursor",
+    "rightClick": "context-on-click-pan-on-drag",
+    "sequenceTimeoutMs": 900
+  },
+  "sources": [
+    {
+      "title": "Altium Schematic Editor shortcuts",
+      "url": "https://www.altium.com/documentation/altium-designer/shortcut-keys/schematic-editors",
+      "checkedAt": "2026-10-13",
+      "scope": "Schematic shortcuts and interactive shortcuts"
+    },
+    {
+      "title": "Altium shortcuts",
+      "url": "https://www.altium.com/documentation/altium-designer/shortcut-keys",
+      "checkedAt": "2026-10-13",
+      "scope": "Accelerator key sequences"
+    },
+    {
+      "title": "Altium document navigation",
+      "url": "https://www.altium.com/documentation/altium-designer/navigating-document",
+      "checkedAt": "2026-10-13",
+      "scope": "Pan and zoom"
+    }
+  ],
+  "bindings": [
+    {
+      "command": "wire.start",
+      "input": {
+        "type": "keySequence",
+        "sequence": ["P", "W"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "component.moveSafe",
+      "input": {
+        "type": "keySequence",
+        "sequence": ["M", "M"]
+      },
+      "provenance": "adapted",
+      "context": ["canvas"],
+      "notes": "Mapped to Circlith Safe Move; connectivity semantics remain Circlith-native."
+    },
+    {
+      "command": "view.fitAll",
+      "input": {
+        "type": "keySequence",
+        "sequence": ["V", "F"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "component.rotateCCW90",
+      "input": {
+        "type": "key",
+        "key": "Space"
+      },
+      "provenance": "target-native",
+      "context": ["placement", "move"]
+    },
+    {
+      "command": "edit.properties",
+      "input": {
+        "type": "mouseDoubleClick",
+        "button": "left"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.zoom",
+      "input": {
+        "type": "wheelChord",
+        "modifiers": ["Ctrl"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.pan",
+      "input": {
+        "type": "mouseDrag",
+        "button": "right",
+        "thresholdPx": 4
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.contextMenu",
+      "input": {
+        "type": "mouseClick",
+        "button": "right"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "app.cancel",
+      "input": {
+        "type": "key",
+        "key": "Escape"
+      },
+      "provenance": "target-native",
+      "context": ["canvas", "placement", "move", "wire-draft"]
+    },
+    {
+      "command": "edit.delete",
+      "input": {
+        "type": "key",
+        "key": "Delete"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "history.undo",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "Z"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "history.redo",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "Y"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    }
+  ]
+}

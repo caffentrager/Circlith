@@ -1,0 +1,253 @@
+{
+  "schemaVersion": "1.0",
+  "id": "circlith-modern",
+  "name": "Circlith Modern",
+  "kind": "native",
+  "description": "Circlith 공식 기본 조작. Master Spec CURRENT 결정을 우선하며 외부 CAD 관습 때문에 의미를 바꾸지 않는다.",
+  "basePreset": null,
+  "compatibility": {
+    "target": "Circlith",
+    "level": "native",
+    "notes": [
+      "M은 연결을 유지하는 Safe Move다.",
+      "G는 Grid 표시 토글이다. KiCad식 Drag 명령으로 사용하지 않는다.",
+      "짧은 RMB는 Context Menu이며 Pan은 MMB drag 또는 Space+LMB drag다."
+    ]
+  },
+  "behavior": {
+    "zoomFocus": "cursor",
+    "boxSelection": "direction-sensitive",
+    "leftToRightSelection": "fully-contained",
+    "rightToLeftSelection": "intersecting",
+    "rightClick": "context-menu",
+    "moveSemantics": "preserve-connectivity",
+    "suppressSingleLetterHotkeysWhenTextEditing": true,
+    "suppressHotkeysDuringIMEComposition": true
+  },
+  "sources": [
+    {
+      "title": "Circlith repository README",
+      "url": "https://github.com/caffentrager/Circlith/blob/main/README.md",
+      "checkedAt": "2026-10-13",
+      "scope": "Master Spec authority and repository status"
+    },
+    {
+      "title": "CIRCLITH_MASTER_SPEC.md",
+      "url": "https://github.com/caffentrager/Circlith/blob/main/docs/CIRCLITH_MASTER_SPEC.md",
+      "checkedAt": "2026-10-13",
+      "scope": "CURRENT decisions and interaction baseline"
+    }
+  ],
+  "bindings": [
+    {
+      "command": "tool.select",
+      "input": {
+        "type": "key",
+        "key": "V"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "component.addSearch",
+      "input": {
+        "type": "key",
+        "key": "A"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "wire.start",
+      "input": {
+        "type": "key",
+        "key": "W"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "component.moveSafe",
+      "input": {
+        "type": "key",
+        "key": "M"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "component.rotateCCW90",
+      "input": {
+        "type": "key",
+        "key": "R"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "grid.toggleVisible",
+      "input": {
+        "type": "key",
+        "key": "G"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.fitAll",
+      "input": {
+        "type": "key",
+        "key": "Home"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.fitSelection",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Shift", "Home"]
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "wire.removeLastPoint",
+      "input": {
+        "type": "key",
+        "key": "Backspace"
+      },
+      "provenance": "circlith-master",
+      "context": ["wire-draft"]
+    },
+    {
+      "command": "app.confirm",
+      "input": {
+        "type": "key",
+        "key": "Enter"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "app.cancel",
+      "input": {
+        "type": "key",
+        "key": "Escape"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas", "modal", "wire-draft"]
+    },
+    {
+      "command": "edit.delete",
+      "input": {
+        "type": "key",
+        "key": "Delete"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "history.undo",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "Z"]
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "history.redo",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "Y"]
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "clipboard.copy",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "C"]
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "clipboard.cut",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "X"]
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "clipboard.paste",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "V"]
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.pan",
+      "input": {
+        "type": "mouseDrag",
+        "button": "middle"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.pan",
+      "input": {
+        "type": "mouseDrag",
+        "button": "left",
+        "modifiers": ["Space"]
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.zoom",
+      "input": {
+        "type": "wheel"
+      },
+      "provenance": "recommended",
+      "context": ["canvas"],
+      "notes": "Cursor-centered zoom; keep direction configurable."
+    },
+    {
+      "command": "view.contextMenu",
+      "input": {
+        "type": "mouseClick",
+        "button": "right"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    },
+    {
+      "command": "selection.box",
+      "input": {
+        "type": "mouseDrag",
+        "button": "left"
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"],
+      "notes": "Only when drag begins on empty canvas and no placement/drawing operation owns the pointer."
+    },
+    {
+      "command": "selection.toggleItem",
+      "input": {
+        "type": "mouseClick",
+        "button": "left",
+        "modifiers": ["Shift"]
+      },
+      "provenance": "circlith-master",
+      "context": ["canvas"]
+    }
+  ]
+}

@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "1.0",
+  "id": "kicad-9",
+  "name": "KiCad 9",
+  "kind": "cad-compatibility",
+  "description": "KiCad 9 Schematic Editor 사용자를 위한 호환 프리셋. Circlith의 연결 보존 불변식은 유지한다.",
+  "basePreset": "circlith-modern",
+  "compatibility": {
+    "target": "KiCad 9 Schematic Editor",
+    "level": "high",
+    "notes": [
+      "KiCad G(Drag)는 연결을 유지하므로 Circlith component.moveSafe에 매핑한다.",
+      "KiCad M(Move)은 연결을 유지하지 않는 의미가 있어 Circlith 기본 불변식과 충돌하므로 기본 매핑하지 않는다.",
+      "좌→우 완전 포함 / 우→좌 교차 선택을 유지한다."
+    ]
+  },
+  "behavior": {
+    "zoomFocus": "cursor",
+    "boxSelection": "direction-sensitive",
+    "leftToRightSelection": "fully-contained",
+    "rightToLeftSelection": "intersecting"
+  },
+  "sources": [
+    {
+      "title": "KiCad 9 Schematic Editor",
+      "url": "https://docs.kicad.org/9.0/en/eeschema/eeschema.html",
+      "checkedAt": "2026-10-13",
+      "scope": "Hotkeys, selection, Move/Drag semantics"
+    }
+  ],
+  "bindings": [
+    {
+      "command": "component.moveSafe",
+      "input": {
+        "type": "key",
+        "key": "G"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "component.rotateCCW90",
+      "input": {
+        "type": "key",
+        "key": "R"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "wire.start",
+      "input": {
+        "type": "key",
+        "key": "W"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "edit.properties",
+      "input": {
+        "type": "key",
+        "key": "E"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "edit.delete",
+      "input": {
+        "type": "key",
+        "key": "Delete"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "view.contextMenu",
+      "input": {
+        "type": "mouseClick",
+        "button": "right"
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "selection.toggleItem",
+      "input": {
+        "type": "mouseClick",
+        "button": "left",
+        "modifiers": ["Ctrl"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "selection.addItem",
+      "input": {
+        "type": "mouseClick",
+        "button": "left",
+        "modifiers": ["Shift"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "app.cancel",
+      "input": {
+        "type": "key",
+        "key": "Escape"
+      },
+      "provenance": "target-native",
+      "context": ["canvas", "wire-draft"]
+    },
+    {
+      "command": "history.undo",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "Z"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    },
+    {
+      "command": "history.redo",
+      "input": {
+        "type": "keyChord",
+        "keys": ["Ctrl", "Y"]
+      },
+      "provenance": "target-native",
+      "context": ["canvas"]
+    }
+  ],
+  "unmappedTargetActions": [
+    {
+      "action": "M — KiCad Move without maintaining existing wire connections",
+      "reason": "Circlith Master Spec intentionally defines its main move as connectivity-preserving. Do not add a disconnecting move solely for preset fidelity without a new approved decision."
+    },
+    {
+      "action": "Alt+4 — Select Connection",
+      "reason": "No approved Circlith command equivalent in the current Master Spec."
+    },
+    {
+      "action": "Shift+Space — cycle wire line mode",
+      "reason": "Only map after Circlith exposes an approved wire posture/line-mode command."
+    }
+  ]
+}
