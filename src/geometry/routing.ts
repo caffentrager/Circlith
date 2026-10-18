@@ -1,6 +1,7 @@
 import type { Circuit, ConnectionTarget, Point } from "../model/circuit";
 import { rotatePoint, route } from "./geometry";
 import { anchorOffsets, clean, pointOnSegment, same, simplifyPath } from "./path";
+import { settingsKey } from '../config/app-mode';
 
 export type RoutingSettings = {
   version: 1;
@@ -8,7 +9,7 @@ export type RoutingSettings = {
   overlapMode: "avoid" | "warn";
 };
 export const defaultRouting: RoutingSettings = { version: 1, pathMode: "smart", overlapMode: "avoid" };
-export const routingStorageKey = "circlith.simulation.routing.v1";
+export const routingStorageKey = settingsKey('routing.v1');
 export const routingLabel = (s: RoutingSettings) =>
   `${s.pathMode === "smart" ? "스마트 자동" : s.pathMode === "horizontal" ? "가로 우선" : "세로 우선"} · ${s.overlapMode === "avoid" ? "자동 우회" : "겹침 경고"}`;
 export function validateRouting(value: unknown): RoutingSettings {

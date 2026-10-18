@@ -14,9 +14,13 @@ for (const [directory, base] of [[editor, '/Circlith/'], [simulation, '/Circlith
     throw new Error(`Incorrect asset base in ${directory}: expected ${base}`);
 }
 const revision = directory => execFileSync('git', ['-C', dirname(directory), 'rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+const sourceCommit = revision(editor);
+if (sourceCommit !== revision(simulation)) throw new Error('Both modes must be built from the same source commit.');
 const manifest = {
-  editor: { commit: revision(editor), path: '/Circlith/' },
-  simulation: { commit: revision(simulation), path: '/Circlith/simulation/' },
+  version: 2,
+  source: { commit: sourceCommit },
+  editor: { commit: sourceCommit, mode: 'editor', path: '/Circlith/' },
+  simulation: { commit: sourceCommit, mode: 'simulation', path: '/Circlith/simulation/' },
 };
 mkdirSync(site, { recursive: true });
 cpSync(editor, site, { recursive: true });

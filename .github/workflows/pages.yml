@@ -2,7 +2,7 @@ name: Publish Circlith Pages
 
 on:
   push:
-    branches: [main, feat/editor-prototype, codex/logic-simulation]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -15,5 +15,19 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  publish:
-    uses: caffentrager/Circlith/.github/workflows/deploy-pages.yml@codex/logic-simulation
+  build:
+    uses: ./.github/workflows/build-pages.yml
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy both modes from main
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

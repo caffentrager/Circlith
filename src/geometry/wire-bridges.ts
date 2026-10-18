@@ -1,9 +1,10 @@
 import type { Circuit, Point } from '../model/circuit';
 import { simplifyPath } from './path';
+import { settingsKey } from '../config/app-mode';
 
 export type WireDisplaySettings = { version: 1; enabled: boolean; axis: 'horizontal' | 'vertical' };
 export const defaultWireDisplay: WireDisplaySettings = { version: 1, enabled: true, axis: 'horizontal' };
-export const wireDisplayStorageKey = 'circlith.simulation.wire-display.v1';
+export const wireDisplayStorageKey = settingsKey('wire-display.v1');
 export function validateWireDisplay(value: unknown): WireDisplaySettings {
   const settings = value as WireDisplaySettings | null;
   if (!settings || settings.version !== 1 || typeof settings.enabled !== 'boolean' ||

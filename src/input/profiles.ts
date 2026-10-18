@@ -1,4 +1,5 @@
 import Ajv2020 from "ajv/dist/2020";
+import { settingsKey } from '../config/app-mode';
 import schema from "./data/schema/input-profile.schema.json";
 import catalog from "./data/preset-catalog.json";
 import extensions from "./data/native-extensions.json";
@@ -189,7 +190,7 @@ export function effective(user: UserProfile): Profile {
     bindings,
   };
 }
-export const storageKey = "circlith.simulation.input-profile.v1";
+export const storageKey = settingsKey('input-profile.v1');
 export function validateUser(value: unknown): UserProfile {
   const u = value as UserProfile;
   if (!u || u.schemaVersion !== "1.0")

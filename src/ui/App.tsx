@@ -42,6 +42,7 @@ import type { LogicValue } from '../simulation/logic';
 import { fitView, wheelZoomFactor, zoomView, ZOOM_STEP } from "../geometry/view";
 import { collidingSegments, defaultRouting, routingLabel, routingStorageKey, validateRouting, type RoutingSettings } from "../geometry/routing";
 import { defaultWireDisplay, validateWireDisplay, wireDisplayStorageKey, type WireDisplaySettings } from '../geometry/wire-bridges';
+import { simulationAvailable } from '../config/app-mode';
 import "./style.css";
 const kinds = componentKinds;
 export function App() {
@@ -61,7 +62,7 @@ export function App() {
   const [editor] = useState(() => { const e = new Editor(); e.routing = initialRouting.value; return e; });
   const [simulationEnabled, setSimulationEnabled] = useState(false);
   const [inputValues, setInputValues] = useState<Record<string, LogicValue>>({});
-  const plan = useMemo(() => simulationEnabled ? compileCircuit(editor.circuit) : null, [simulationEnabled, editor.circuit]);
+  const plan = useMemo(() => simulationAvailable && simulationEnabled ? compileCircuit(editor.circuit) : null, [simulationEnabled, editor.circuit]);
   const simulation = useMemo(() => plan ? simulate(plan, inputValues) : undefined, [plan, inputValues]);
   useEffect(() => {
     setInputValues(previous => {
@@ -684,7 +685,7 @@ export function App() {
     >
       <header>
         <strong>
-          Circlith <small>조합논리 프로토타입</small>
+          Circlith <small>{simulationAvailable ? '조합논리 시뮬레이션' : '회로 편집기'}</small>
         </strong>
         <input aria-label="프로젝트 이름" defaultValue="Untitled circuit" />
         <button
@@ -707,7 +708,7 @@ export function App() {
         </button>
         <button onClick={() => dispatch("history.undo")}>Undo</button>
         <button onClick={() => dispatch("history.redo")}>Redo</button>
-        <button aria-pressed={simulationEnabled} onClick={() => setSimulationEnabled(value => !value)}>시뮬레이션</button>
+        {simulationAvailable && <button aria-pressed={simulationEnabled} onClick={() => setSimulationEnabled(value => !value)}>시뮬레이션</button>}
         <button
           onClick={() => {
             rollback();
@@ -757,7 +758,7 @@ export function App() {
         </label>
         <p className="note">
           Safe Move 경로는 잠정 규칙입니다. 회로 저장은 후속 단계입니다.
-          시뮬레이션을 켜면 확정된 조합회로를 계산합니다.
+          {simulationAvailable && '시뮬레이션을 켜면 확정된 조합회로를 계산합니다.'}
         </p>
       </EditorSidebar>
       <main>

@@ -4,15 +4,15 @@
 
 **설계와 구현의 유일한 기준은 [CIRCLITH_MASTER_SPEC.md](docs/CIRCLITH_MASTER_SPEC.md)입니다.** 다른 문서와 충돌하면 Master Spec을 우선합니다.
 
-현재 `codex/logic-simulation`은 **조합논리 시뮬레이션 프로토타입**입니다. AND/OR/NOT/XOR/NAND/NOR/XNOR/Input/Output을 옆 부품 패널에서 도면으로 드래그해 배치하고, 접점을 클릭하거나 접점 간 드래그로 배선할 수 있습니다. 선택, 연결 유지 이동·회전, 직각 배선, Delete, Esc, Undo/Redo도 제공합니다. `CURRENT`는 현재 구현 기준이며, `PROVISIONAL`, `EXPERIMENTAL`, `DEFERRED`는 확정되거나 사용성이 검증된 기능을 뜻하지 않습니다.
+현재 서비스는 **`main`의 공통 편집기 코드**를 편집 모드와 조합논리 시뮬레이션 모드로 빌드합니다. AND/OR/NOT/XOR/NAND/NOR/XNOR/Input/Output을 옆 부품 패널에서 도면으로 드래그해 배치하고, 접점을 클릭하거나 접점 간 드래그로 배선할 수 있습니다. 선택, 연결 유지 이동·회전, 직각 배선, Delete, Esc, Undo/Redo도 제공합니다. `CURRENT`는 현재 구현 기준이며, `PROVISIONAL`, `EXPERIMENTAL`, `DEFERRED`는 확정되거나 사용성이 검증된 기능을 뜻하지 않습니다.
 
 **`feat/editor-prototype` 브랜치는 조작·제어와 UI/UX 성숙이 우선입니다.** 기존 선택·드래그·배선·회전·화면 이동의 일관성, 피드백, 취소·Undo와 브라우저 충돌을 먼저 다듬습니다. 사용자 요청으로 Delete와 OR/NOT을 추가했으며, 저장·클립보드·추가 부품·시뮬레이션은 별도 단계입니다. 미구현 목록은 즉시 개발할 우선순위가 아닙니다.
 
 **2026-10-18 사용자 요청으로 새 브랜치에서 로드맵 3~4단계를 진행합니다.** 상단 **시뮬레이션**을 켜고 도면의 Input 중앙을 클릭하거나 오른쪽 패널에서 입력을 바꾸면 확정된 회로를 재계산합니다. 출력·배선에 0/1/X/Z를 표시하며 미연결·다중 구동·출력 충돌·조합 피드백을 진단합니다. 입력 변경은 편집 Undo 기록에 포함하지 않습니다. 순차회로·Clock·시간 파형·사용자 테스트벤치는 후속 단계입니다. [시뮬레이션 사용법과 검증](docs/SIMULATION.md)을 참고하세요.
 
-Node.js 22.23.3 이상에서 `npm ci` 후 `npm run dev`로 실행합니다. `npm run build`, `npm test`, `npx playwright install chromium`, `npm run test:browser`로 검증합니다. 현재 회로와 시뮬레이션 입력은 메모리에만 유지되며 파일 저장은 후속 단계입니다.
+Node.js 22.23.3 이상에서 `npm ci` 후 `npm run dev`로 실행합니다(기본 시뮬레이션 모드). 편집 모드는 `npm run dev -- --mode editor`로 실행합니다. `npm test`, `npx playwright install chromium`, `npm run test:browser`로 검증합니다. 배포용 두 모드 빌드·실행 검증은 [Pages 배포](docs/PAGES_DEPLOYMENT.md)의 명령을 사용합니다. 현재 회로와 시뮬레이션 입력은 메모리에만 유지되며 파일 저장은 후속 단계입니다.
 
-공개 프로토타입: [기존 편집기](https://caffentrager.github.io/Circlith/) · [조합논리 시뮬레이션](https://caffentrager.github.io/Circlith/simulation/). `main`, `feat/editor-prototype`, `codex/logic-simulation`의 Pages 진입 워크플로는 시뮬레이션 브랜치의 공통 `deploy-pages.yml`을 호출합니다. 기존 편집기와 시뮬레이션을 각각 테스트·빌드해 한 산출물로 배포합니다. 기존 편집기 소스는 `feat/editor-prototype`, 시뮬레이션 소스는 `codex/logic-simulation`입니다. 로컬 개발은 `/`, 배포 시 자산 경로는 각각 `/Circlith/`, `/Circlith/simulation/`입니다. 자세한 운영 방법은 [Pages 배포](docs/PAGES_DEPLOYMENT.md)를 참고하세요.
+공개 프로토타입: [편집 모드](https://caffentrager.github.io/Circlith/) · [조합논리 시뮬레이션 모드](https://caffentrager.github.io/Circlith/simulation/). 기능은 브랜치에서 개발·검증한 뒤 `main`에 병합합니다. 서비스 배포는 `main`에서만 실행하며, 동일 커밋으로 두 모드를 빌드합니다. 편집기 수정은 두 모드에 함께 반영되고 계산 엔진·계산 UI만 시뮬레이션 모드에서 활성화됩니다. 과거 Phase 브랜치는 기준 버전으로 보존합니다. 배포 시 자산 경로는 각각 `/Circlith/`, `/Circlith/simulation/`입니다.
 
 2026-10-16 QA 후속: 평행 배선 선택, Redo 선택 정리, 고정 경유점 안내와 작은 창 포커스 스크롤을 수정했습니다. 후속 사용자 승인으로 초안 없는 SELECT에서 몸체 직접 클릭은 부품 선택을 우선하고, 핀 직접 클릭·몸체 밖 포획은 유지하도록 수정했습니다. 단위 179개(별도 soak 1개 기본 skip)·브라우저 123개와 빌드가 통과했습니다. [QA 수정·정책 기록](review/QA_FIXES_20261016.md)과 [통합 확장 계획](docs/EDITOR_EXPANSION_SCOPE.md)을 참고하세요.
 
