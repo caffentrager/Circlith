@@ -9,7 +9,7 @@
     "numPendingTests": 1
   },
   "browser": {
-    "passed": 146,
+    "passed": 147,
     "failed": 0
   },
   "independentSelected": {
@@ -234,5 +234,20 @@
     "Local validation before final commit; GitHub Actions rebuilds and validates the committed main.",
     "The fuzzer ignores one-point wires when choosing a segment midpoint; zero-length electrical connections remain valid.",
     "Historical audit evidence is unchanged."
-  ]
+  ],
+  "sidebarFollowup": {
+    "baselineRepeatPassed": 120,
+    "newRegressionFailedBeforeFix": true,
+    "fixedRepeatPassed": 50,
+    "initialMainAction": "39144559691",
+    "initialMainActionConclusion": "failure",
+    "exactCIFailureEventOrderConfirmed": false
+  },
+  "inputPruneFollowup": {
+    "initialFullRunPassed": 146,
+    "initialFullRunFailed": 1,
+    "failure": "Deleted Input restored by Undo retained its old value",
+    "fixedRepeatPassed": 20,
+    "strategy": "Capture committed circuit snapshot and prune in layout effect before paint"
+  }
 }

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Editor } from "../editor/editor";
 import {
   emptyCircuit,
@@ -63,14 +63,17 @@ export function App() {
   const [editor] = useState(() => { const e = new Editor(); e.routing = initialRouting.value; return e; });
   const [simulationEnabled, setSimulationEnabled] = useState(false);
   const [inputValues, setInputValues] = useState<Record<string, LogicValue>>({});
+  const inputCircuit = editor.circuit;
   const plan = useMemo(() => simulationAvailable && simulationEnabled ? compileCircuit(editor.circuit) : null, [simulationEnabled, editor.circuit]);
   const simulation = useMemo(() => plan ? simulate(plan, inputValues) : undefined, [plan, inputValues]);
-  useEffect(() => {
+  // Prune against this render's snapshot before a deleted Input can be restored by Undo.
+  // editor is mutable; reading editor.circuit in a deferred updater can observe a later edit.
+  useLayoutEffect(() => {
     setInputValues(previous => {
-      const entries = Object.entries(previous).filter(([id]) => editor.circuit.components[id]?.kind === 'Input');
+      const entries = Object.entries(previous).filter(([id]) => inputCircuit.components[id]?.kind === 'Input');
       return entries.length === Object.keys(previous).length ? previous : Object.fromEntries(entries);
     });
-  }, [editor.circuit]);
+  }, [inputCircuit]);
   const changeInput = (id: string, value: LogicValue) => {
     if (!editor.draft && !editor.selectionBox && editor.circuit.components[id]?.kind === 'Input')
       setInputValues(previous => ({ ...previous, [id]: value }));
