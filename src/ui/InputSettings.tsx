@@ -16,6 +16,7 @@ import {
 } from "../input/types";
 import { commands } from "../input/registry";
 import { defaultRouting, type RoutingSettings } from "../geometry/routing";
+import type { WireDisplaySettings } from '../geometry/wire-bridges';
 
 export function InputSettings({
   user,
@@ -23,12 +24,16 @@ export function InputSettings({
   onClose,
   routing,
   onRoutingChange,
+  wireDisplay,
+  onWireDisplayChange,
 }: {
   user: UserProfile;
   onChange: (u: UserProfile) => void;
   onClose: () => void;
   routing: RoutingSettings;
   onRoutingChange: (settings: RoutingSettings) => void;
+  wireDisplay: WireDisplaySettings;
+  onWireDisplayChange: (settings: WireDisplaySettings) => void;
 }) {
   const [error, setError] = useState(""),
     [editing, setEditing] = useState<{ key: string; json: string } | null>(
@@ -138,6 +143,20 @@ export function InputSettings({
           <p>설정은 바로 저장되며 새 배선·경로 정리·이동에 적용됩니다. 기존 회로는 유지됩니다. 고정 경유점이 우회를 막으면 확정 전에 표시합니다.</p>
           <p>배선 중 Shift+Space: 이번 구간 꺾임 전환 · 부품 드래그 중 R / Shift+R: 반시계 / 시계 회전</p>
           <button onClick={() => onRoutingChange({ ...defaultRouting })}>배선 설정 초기화</button>
+        </fieldset>
+        <fieldset className="routing-settings wire-display-settings">
+          <legend>배선 표시</legend>
+          <label><input type="checkbox" checked={wireDisplay.enabled}
+            onChange={e => onWireDisplayChange({ ...wireDisplay, enabled: e.target.checked })}/>
+            미접속 교차 점프
+          </label>
+          <label>점프할 배선
+            <select aria-label="점프할 배선" value={wireDisplay.axis} disabled={!wireDisplay.enabled}
+              onChange={e => onWireDisplayChange({ ...wireDisplay, axis: e.target.value as WireDisplaySettings['axis'] })}>
+              <option value="horizontal">가로선</option><option value="vertical">세로선</option>
+            </select>
+          </label>
+          <p>가로선은 위로, 세로선은 오른쪽으로 넘습니다. 접속점·끝점·모서리 근처와 촘촘한 교차는 생략합니다. 연결 관계와 Undo 기록은 바뀌지 않습니다.</p>
         </fieldset>
         <label>
           Control Preset{" "}

@@ -155,6 +155,14 @@ svg:focus {
 .wire.selected {
   vector-effect: non-scaling-stroke;
 }
+.wire-bridge { fill: none; stroke: #346a7a; stroke-width: 2; }
+.wire-bridge-halo { fill: none; stroke: white; stroke-linecap: round; }
+.wire-bridge.signal-X { stroke-dasharray: 3 3; }
+.wire-bridge.signal-Z { stroke-dasharray: 9 4; }
+.wire-bridge[data-selected="true"] { stroke: #008cab; stroke-width: 4; stroke-dasharray: 5 2; vector-effect: non-scaling-stroke; }
+.wire-bridge[data-selected="true"].signal-X { stroke-dasharray: 3 3; }
+.wire-bridge[data-selected="true"].signal-Z { stroke-dasharray: 9 4; }
+.wire-display-settings input { width: auto; margin-right: 8px; }
 .wire-handle {
   fill: #fff;
   stroke: #008cab;

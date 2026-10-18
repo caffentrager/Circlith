@@ -41,9 +41,17 @@ import { compileCircuit, simulate } from '../simulation/simulator';
 import type { LogicValue } from '../simulation/logic';
 import { fitView, wheelZoomFactor, zoomView, ZOOM_STEP } from "../geometry/view";
 import { collidingSegments, defaultRouting, routingLabel, routingStorageKey, validateRouting, type RoutingSettings } from "../geometry/routing";
+import { defaultWireDisplay, validateWireDisplay, wireDisplayStorageKey, type WireDisplaySettings } from '../geometry/wire-bridges';
 import "./style.css";
 const kinds = componentKinds;
 export function App() {
+  const [initialWireDisplay] = useState(() => {
+    try {
+      const data = localStorage.getItem(wireDisplayStorageKey);
+      return { value: data ? validateWireDisplay(JSON.parse(data)) : { ...defaultWireDisplay }, error: '' };
+    } catch { return { value: { ...defaultWireDisplay }, error: '배선 표시 설정을 복구하지 못해 기본값을 사용합니다.' }; }
+  });
+  const [wireDisplay, setWireDisplay] = useState(initialWireDisplay.value);
   const [initialRouting] = useState(() => {
     try {
       const data = localStorage.getItem(routingStorageKey);
@@ -154,6 +162,14 @@ export function App() {
     } catch { setMessage("배선 설정은 이번 세션에 적용되었습니다. 브라우저 저장에 실패했습니다."); }
     refresh();
   };
+  const applyWireDisplay = (next: WireDisplaySettings) => {
+    const validated = validateWireDisplay(next);
+    setWireDisplay(validated);
+    try {
+      localStorage.setItem(wireDisplayStorageKey, JSON.stringify(validated));
+      setMessage(`미접속 교차 점프 ${validated.enabled ? `켜짐 · ${validated.axis === 'horizontal' ? '가로선' : '세로선'}` : '꺼짐'}`);
+    } catch { setMessage('배선 표시는 이번 세션에 적용되었습니다. 브라우저 저장에 실패했습니다.'); }
+  };
   const screen = (e: { clientX: number; clientY: number }) => {
     const r = svg.current!.getBoundingClientRect();
     return { x: e.clientX - r.left, y: e.clientY - r.top };
@@ -236,7 +252,7 @@ export function App() {
     return () => el.removeEventListener("wheel", wheel);
   }, []);
   useEffect(() => {
-    if (initial.error || initialRouting.error) setMessage([initial.error, initialRouting.error].filter(Boolean).join(" · "));
+    if (initial.error || initialRouting.error || initialWireDisplay.error) setMessage([initial.error, initialRouting.error, initialWireDisplay.error].filter(Boolean).join(" · "));
     return () => resolver.cancel();
   }, []);
   const place = (kind: Kind) => {
@@ -784,7 +800,7 @@ export function App() {
           }}
           onPointerDown={(e) => {
             const object = (e.target as Element).closest(
-              '[data-component],[data-pin],[data-wire],[data-wire-hit],[data-wire-handle],[data-layer="junctions"]',
+              '[data-component],[data-pin],[data-wire],[data-wire-hit],[data-bridge-hit],[data-wire-handle],[data-layer="junctions"]',
             );
             svg.current?.focus({ preventScroll: true });
             pointer.current = { clientX: e.clientX, clientY: e.clientY };
@@ -807,8 +823,10 @@ export function App() {
               object?.getAttribute("data-component") ??
               object?.getAttribute("data-wire") ??
               object?.getAttribute("data-wire-hit") ??
+              object?.getAttribute("data-bridge-hit") ??
               object?.getAttribute("data-wire-handle") ?? undefined;
-            const wireCandidates = object?.hasAttribute('data-wire-hit') || object?.hasAttribute('data-wire')
+            const bridgeHit = object?.getAttribute('data-bridge-hit');
+            const wireCandidates = bridgeHit ? [bridgeHit] : object?.hasAttribute('data-wire-hit') || object?.hasAttribute('data-wire')
               ? nearestWires(editor.circuit, drawingPoint(e), editor.viewport.zoom) : [];
             if (wireCandidates.length === 1) objectKey = wireCandidates[0];
             if (
@@ -832,7 +850,7 @@ export function App() {
             }
             if (button !== "left") return;
             const editHandle=(e.target as Element).closest('[data-wire-handle]');
-            const pin = editor.tool==='SELECT'&&editHandle?undefined:target(e.target) ?? hitConnection(e);
+            const pin = editor.tool==='SELECT'&&(editHandle || (bridgeHit && !editor.draft))?undefined:target(e.target) ?? hitConnection(e);
             hover.current = pin;
             if (editor.draft) {
               editor.update(cursor.current);
@@ -1050,6 +1068,7 @@ export function App() {
               />
             )}
             <Symbols circuit={preview} selection={editor.selection} zoom={editor.viewport.zoom}
+              wireDisplay={wireDisplay}
               simulation={simulation} inputs={inputValues}
               onToggleInput={!draft && !editor.selectionBox && !gesture.current && !paletteDrag.current
                 ? id => changeInput(id, inputValues[id] === '1' ? '0' : '1') : undefined}/>
@@ -1346,6 +1365,8 @@ export function App() {
           user={user}
           routing={editor.routing}
           onRoutingChange={applyRouting}
+          wireDisplay={wireDisplay}
+          onWireDisplayChange={applyWireDisplay}
           onChange={applyProfile}
           onClose={() => {
             setSettings(false);

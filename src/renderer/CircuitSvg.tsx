@@ -3,6 +3,8 @@ import { pinPosition } from "../geometry/geometry";
 import {GateBody} from './GateBody';
 import type { SimulationResult } from '../simulation/simulator';
 import type { LogicValue } from '../simulation/logic';
+import { useId, useMemo } from 'react';
+import { defaultWireDisplay, wireBridges, type WireDisplaySettings } from '../geometry/wire-bridges';
 export const path = (points: Point[]) =>
   points.map((p) => `${p.x},${p.y}`).join(" ");
 export function Symbols({
@@ -12,6 +14,7 @@ export function Symbols({
   simulation,
   inputs = {},
   onToggleInput,
+  wireDisplay = defaultWireDisplay,
 }: {
   circuit: Circuit;
   selection: string[];
@@ -19,9 +22,28 @@ export function Symbols({
   simulation?: SimulationResult;
   inputs?: Readonly<Record<string, LogicValue>>;
   onToggleInput?: (id: string) => void;
+  wireDisplay?: WireDisplaySettings;
 }) {
+  const maskPrefix = useId().replace(/:/g, '');
+  const bridges = useMemo(() => wireBridges(circuit, wireDisplay, zoom), [circuit, wireDisplay, zoom]);
+  const byWire = new Map<string, typeof bridges>();
+  for (const bridge of bridges) {
+    const group = byWire.get(bridge.wire) ?? [];
+    group.push(bridge); byWire.set(bridge.wire, group);
+  }
   return (
     <>
+      <defs>
+        {[...byWire].map(([id, group]) => {
+          const points = circuit.geometry.wires[id].points, padding = 10 / zoom + 4;
+          const x = Math.min(...points.map(p => p.x)) - padding, y = Math.min(...points.map(p => p.y)) - padding;
+          const width = Math.max(...points.map(p => p.x)) - x + padding, height = Math.max(...points.map(p => p.y)) - y + padding;
+          return <mask key={id} id={`${maskPrefix}-wire-${id}`} maskUnits="userSpaceOnUse" x={x} y={y} width={width} height={height}>
+            <rect x={x} y={y} width={width} height={height} fill="white"/>
+            {group.map((bridge, i) => <path key={i} d={bridge.gap} stroke="black" strokeWidth={selection.includes(id) ? 6 / zoom : 4} fill="none"/>)}
+          </mask>;
+        })}
+      </defs>
       <g data-layer="wires">
         {Object.values(circuit.geometry.wires).map((w) => (
           <g key={w.id}>
@@ -33,6 +55,7 @@ export function Symbols({
             <polyline
               data-wire={w.id}
               data-value={simulation?.nets[w.net]}
+              mask={byWire.has(w.id) ? `url(#${maskPrefix}-wire-${w.id})` : undefined}
               points={path(w.points)}
               className={`wire${selection.includes(w.id) ? ' selected' : ''}${simulation ? ` signal-${simulation.nets[w.net] ?? 'X'}` : ''}`}
               pointerEvents="none"
@@ -42,6 +65,20 @@ export function Symbols({
               style={{ fontSize: 12 / zoom }} className="signal-label">{simulation.nets[w.net] ?? 'X'}</text>}
           </g>
         ))}
+      </g>
+      <g data-layer="wire-bridges" pointerEvents="none" aria-hidden="true">
+        {bridges.map((bridge, index) => {
+          const wire = circuit.geometry.wires[bridge.wire], selected = selection.includes(wire.id);
+          return <g key={`${bridge.wire}-${index}`}>
+            <path d={bridge.arc} className="wire-bridge-halo" strokeWidth={(selected ? 4 / zoom : 2) + 3 / zoom}/>
+            <path d={bridge.arc} data-wire-bridge={bridge.wire} data-bridge-axis={bridge.axis}
+              data-bridge-x={bridge.point.x} data-bridge-y={bridge.point.y} data-bridge-radius={bridge.radius}
+              data-selected={selected || undefined} data-value={simulation?.nets[wire.net]}
+              className={`wire-bridge${simulation ? ` signal-${simulation.nets[wire.net] ?? 'X'}` : ''}`}/>
+            <path d={bridge.arc} data-bridge-hit={bridge.wire} fill="none" stroke="transparent"
+              strokeWidth={Math.max(4 / zoom, 2)} pointerEvents="stroke"/>
+          </g>;
+        })}
       </g>
       <g data-layer="junctions">
         {Object.entries(circuit.geometry.junctions).map(([id, p]) => {
