@@ -1,12 +1,20 @@
 import { clone, gateInputCount, id, isBinaryGate, MAX_GATE_INPUTS, type Circuit } from './circuit';
 import { endpointPosition, pinPosition, route } from '../geometry/geometry';
-import { same, simplifyPath } from '../geometry/path';
+import { anchorOffsets, clean, same, simplifyPath } from '../geometry/path';
+import { collidingSegmentsWith, componentObstacles, defaultRouting, planRoute, type RoutingSettings } from '../geometry/routing';
 import { assertCircuit } from './connections';
+
+const retraces = (points: Circuit['geometry']['wires'][string]['points']) => points.some((b, i) => {
+  if (!i || i === points.length - 1) return false;
+  const a = points[i - 1], c = points[i + 1];
+  return (a.x === b.x && b.x === c.x && (b.y - a.y) * (c.y - b.y) < 0) ||
+    (a.y === b.y && b.y === c.y && (b.x - a.x) * (c.x - b.x) < 0);
+});
 
 export type ComponentProperties = { name: string; inputCount: number; invertedInputs: boolean[] };
 
 /** Preserve retained pin IDs (including the output), nets and manually fixed wire anchors. */
-export function updateComponentProperties(circuit: Circuit, key: string, properties: ComponentProperties): Circuit {
+export function updateComponentProperties(circuit: Circuit, key: string, properties: ComponentProperties, routing: RoutingSettings = defaultRouting): Circuit {
   const original = circuit.components[key];
   if (!original) throw new Error('부품을 찾을 수 없습니다.');
   const name = properties.name.trim(), variable = isBinaryGate(original.kind);
@@ -46,9 +54,27 @@ export function updateComponentProperties(circuit: Circuit, key: string, propert
         // Keep the original first point as a route stop when it is a pinned waypoint.
         const keep = wire.anchors?.some(anchor => same(anchor, points[0]));
         const stop = keep ? points[0] : fixed;
-        const stretched = simplifyPath([...route(start, stop, points[0].y === fixed.y), ...points.slice(keep ? 1 : 2)]);
+        const joined = [...route(start, stop, points[0].y === fixed.y), ...points.slice(keep ? 1 : 2)];
+        // Collapsing collinear points can erase a pinned waypoint that sits on a retraced spur; keep the unsimplified path then.
+        const simple = simplifyPath(joined), stretched = wire.anchors?.length && anchorOffsets(side === 'from' ? simple : [...simple].reverse(), wire.anchors) === null ? clean(joined) : simple;
         wire.points = side === 'from' ? stretched : stretched.reverse();
       }
+    }
+  }
+  if (variable && count !== gateInputCount(original)) {
+    // Re-plan a pinned route that doubled back after stretching, as well as newly blocked routes.
+    const before = componentObstacles(circuit, 0), after = componentObstacles(next, 0);
+    for (const wire of Object.values(next.geometry.wires)) {
+      const old = circuit.geometry.wires[wire.id];
+      const anchorRetrace = !!wire.anchors?.length && retraces(wire.points);
+      const newlyBlocked = routing.overlapMode === 'avoid' && collidingSegmentsWith(after, wire.points).length > 0 &&
+        (!old || !collidingSegmentsWith(before, old.points).length);
+      if (!anchorRetrace && !newlyBlocked) continue;
+      const plan = planRoute(next, endpointPosition(next, wire.from), endpointPosition(next, wire.to), routing,
+        { from: wire.from, to: wire.to, anchors: wire.anchors, avoidRetrace: true });
+      if (plan.blocked) throw new Error('입력 수를 바꾸면 몸체가 배선과 겹치고 우회할 수 없습니다. 해당 배선의 경로를 먼저 정리하세요.');
+      if (retraces(plan.points)) throw new Error('고정 경유점을 유지하면 배선이 같은 구간을 되짚습니다. 경유점을 조정한 뒤 입력 수를 바꾸세요.');
+      wire.points = plan.points;
     }
   }
   assertCircuit(next);

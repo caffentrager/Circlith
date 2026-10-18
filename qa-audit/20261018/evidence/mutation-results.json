@@ -1,0 +1,250 @@
+{
+  "baseline": {
+    "existingUnitFailed": 0,
+    "qaBaselineFailed": 35
+  },
+  "results": [
+    {
+      "id": "M01-invert-Z-keeps-Z",
+      "existingSuiteDetects": true,
+      "existingFailed": 1,
+      "qaDetects": true,
+      "qaNewFailures": 11,
+      "sample": [
+        "simulation.test.ts > independent four-state truth tables NOT Z = X",
+        "fuzz.test.ts > 17 stateful adversarial model fuzz (fixed seeds) seed 1: 1000 operations",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) NOT inverted=false"
+      ]
+    },
+    {
+      "id": "M02-xor-parity-reversed",
+      "existingSuiteDetects": true,
+      "existingFailed": 11,
+      "qaDetects": true,
+      "qaNewFailures": 14,
+      "sample": [
+        "component-properties.test.ts > multi-input simulation and input bubbles XOR handles 1,1,1",
+        "component-properties.test.ts > multi-input simulation and input bubbles XNOR handles 1,1,1",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) XOR n=2",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) XOR n=3"
+      ]
+    },
+    {
+      "id": "M03-and-controlling-zero-ignored",
+      "existingSuiteDetects": true,
+      "existingFailed": 17,
+      "qaDetects": true,
+      "qaNewFailures": 13,
+      "sample": [
+        "component-properties.test.ts > multi-input simulation and input bubbles AND handles 1,Z,0",
+        "component-properties.test.ts > multi-input simulation and input bubbles inverts individual pins at the gate without changing the net value",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) AND n=2",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) AND n=3"
+      ]
+    },
+    {
+      "id": "M04-conflict-severity-warning",
+      "existingSuiteDetects": false,
+      "existingFailed": 0,
+      "qaDetects": true,
+      "qaNewFailures": 2,
+      "sample": [
+        "prior.test.ts > P3-7/P3-8 - driver diagnostics 0-vs-1: error severity DRIVE_CONFLICT (and record duplicate-cause diagnostics)",
+        "prior.test.ts > P3-7/P3-8 - driver diagnostics severity map for a 0/1 conflict"
+      ]
+    },
+    {
+      "id": "M05-scc-objects-truncated",
+      "existingSuiteDetects": false,
+      "existingFailed": 0,
+      "qaDetects": true,
+      "qaNewFailures": 1,
+      "sample": [
+        "prior.test.ts > P3-7/P3-8 - driver diagnostics 3+-member SCC lists every member"
+      ]
+    },
+    {
+      "id": "M06-input-count-off-by-one",
+      "existingSuiteDetects": true,
+      "existingFailed": 8,
+      "qaDetects": true,
+      "qaNewFailures": 47,
+      "sample": [
+        "component-properties.test.ts > component property transactions retains existing pins, nets, wire IDs and endpoint attachment at 0 degrees",
+        "component-properties.test.ts > component property transactions retains existing pins, nets, wire IDs and endpoint attachment at 90 degrees",
+        "fuzz.test.ts > 17 stateful adversarial model fuzz (fixed seeds) seed 1: 1000 operations",
+        "geometry.test.ts > 8.1 pin / symbol / selection / obstacle / fit consistency over kind x count x rotation pins lie exactly on the rotated symbol lead start and bounds contain every pin and bubble"
+      ]
+    },
+    {
+      "id": "M07-pin-ids-regenerated-on-resize",
+      "existingSuiteDetects": true,
+      "existingFailed": 9,
+      "qaDetects": true,
+      "qaNewFailures": 114,
+      "sample": [
+        "component-properties.test.ts > component property transactions retains existing pins, nets, wire IDs and endpoint attachment at 0 degrees",
+        "component-properties.test.ts > component property transactions retains existing pins, nets, wire IDs and endpoint attachment at 90 degrees",
+        "geometry.test.ts > 8.1 pin / symbol / selection / obstacle / fit consistency over kind x count x rotation pins lie exactly on the rotated symbol lead start and bounds contain every pin and bubble",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) AND n=2"
+      ]
+    },
+    {
+      "id": "M08-history-recorded-twice",
+      "existingSuiteDetects": true,
+      "existingFailed": 38,
+      "qaDetects": true,
+      "qaNewFailures": 1,
+      "sample": [
+        "adversarial-latest.test.ts > topology torture (spec §16) every step changes only the expected connectivity; full Undo/Redo is exact",
+        "adversarial-latest.test.ts > wire corner deletion a deletion whose opposite-L would cross a component is refused: circuit, history and Redo untouched",
+        "properties.test.ts > 6.4 atomic transaction via Editor name + count + inversion + wire geometry change = exactly 1 history entry; Undo/Redo exact; invalid/noop apply leaves history untouched"
+      ]
+    },
+    {
+      "id": "M09-bridge-mutates-connectivity",
+      "existingSuiteDetects": true,
+      "existingFailed": 3,
+      "qaDetects": true,
+      "qaNewFailures": 3,
+      "sample": [
+        "wire-bridges.test.ts > derived wire bridge geometry draws the chosen axis without changing topology, paths or simulation",
+        "wire-bridges.test.ts > derived wire bridge geometry is deterministic under route reversal and duplicate collinear waypoints",
+        "bridges.test.ts > 10.1/10.2 basic crossings H x V of different nets -> exactly one bridge on the chosen axis, none when disabled",
+        "bridges.test.ts > 10.1/10.2 basic crossings is a pure derivation: circuit, electrical graph and simulation are unchanged"
+      ]
+    },
+    {
+      "id": "M10-input-inversion-not-applied",
+      "existingSuiteDetects": true,
+      "existingFailed": 1,
+      "qaDetects": true,
+      "qaNewFailures": 39,
+      "sample": [
+        "component-properties.test.ts > multi-input simulation and input bubbles inverts individual pins at the gate without changing the net value",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) AND n=2",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) AND n=3"
+      ]
+    },
+    {
+      "id": "M11-xnor-not-inverted",
+      "existingSuiteDetects": true,
+      "existingFailed": 5,
+      "qaDetects": true,
+      "qaNewFailures": 8,
+      "sample": [
+        "component-properties.test.ts > multi-input simulation and input bubbles XNOR handles 1,1,1",
+        "simulation.test.ts > independent four-state truth tables XNOR(0,0) = 1",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) XNOR n=2",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) XNOR n=3"
+      ]
+    },
+    {
+      "id": "M12-resolve-X-with-0-gives-0",
+      "existingSuiteDetects": true,
+      "existingFailed": 3,
+      "qaDetects": true,
+      "qaNewFailures": 5,
+      "sample": [
+        "simulation.test.ts > independent four-state truth tables resolves drivers X,0",
+        "simulation.test.ts > independent four-state truth tables resolves drivers X,1",
+        "fuzz.test.ts > 17 stateful adversarial model fuzz (fixed seeds) seed 1: 1000 operations",
+        "oracle.test.ts > driver resolution oracle (0..3 drivers, every value tuple) 2 Input drivers on one Output"
+      ]
+    },
+    {
+      "id": "M13-floating-input-diag-removed",
+      "existingSuiteDetects": true,
+      "existingFailed": 2,
+      "qaDetects": true,
+      "qaNewFailures": 2,
+      "sample": [
+        "simulation.test.ts > committed circuit evaluation distinguishes driver Z/Z resolution from physical conflict",
+        "simulation.test.ts > committed circuit evaluation unconnected inputs are Z, ordinary gates interpret them as unknown, and controlling values prevail",
+        "fuzz.test.ts > 17 stateful adversarial model fuzz (fixed seeds) seed 1: 1000 operations",
+        "oracle.test.ts > random graphs: simulator == independent reference (multi-input, inverted bubbles, cycles, fanout, floating) 400 seeded graphs x 4 input vectors"
+      ]
+    },
+    {
+      "id": "M14-removed-pin-records-kept",
+      "existingSuiteDetects": true,
+      "existingFailed": 1,
+      "qaDetects": true,
+      "qaNewFailures": 9,
+      "sample": [
+        "component-properties.test.ts > component property transactions allows unconnected trailing inputs to be removed and rejects connected removal atomically",
+        "properties.test.ts > 6.2/6.3 input count transitions keep pin identity and reject connected removal AND: all count transitions (unconnected)",
+        "properties.test.ts > 6.2/6.3 input count transitions keep pin identity and reject connected removal OR: all count transitions (unconnected)"
+      ]
+    },
+    {
+      "id": "M15-output-pin-index-not-updated",
+      "existingSuiteDetects": true,
+      "existingFailed": 5,
+      "qaDetects": true,
+      "qaNewFailures": 40,
+      "sample": [
+        "component-properties.test.ts > component property transactions retains existing pins, nets, wire IDs and endpoint attachment at 0 degrees",
+        "component-properties.test.ts > component property transactions retains existing pins, nets, wire IDs and endpoint attachment at 90 degrees",
+        "fuzz.test.ts > 17 stateful adversarial model fuzz (fixed seeds) seed 1: 1000 operations",
+        "oracle.test.ts > simulator vs oracle: exhaustive 4-state tables through real circuits (n=2,3,4, every inversion mask) AND n=3"
+      ]
+    },
+    {
+      "id": "M16-connected-removal-allowed",
+      "existingSuiteDetects": true,
+      "existingFailed": 1,
+      "qaDetects": true,
+      "qaNewFailures": 1,
+      "sample": [
+        "component-properties.test.ts > component property transactions allows unconnected trailing inputs to be removed and rejects connected removal atomically",
+        "fuzz.test.ts > 17 stateful adversarial model fuzz (fixed seeds) seed 1: 1000 operations"
+      ]
+    },
+    {
+      "id": "M17-validator-skips-pin-ownership",
+      "existingSuiteDetects": false,
+      "existingFailed": 0,
+      "qaDetects": false,
+      "qaNewFailures": 0,
+      "sample": []
+    },
+    {
+      "id": "M18-feedback-gates-computed-anyway",
+      "existingSuiteDetects": true,
+      "existingFailed": 1,
+      "qaDetects": true,
+      "qaNewFailures": 1,
+      "sample": [
+        "simulation.test.ts > committed circuit evaluation reports only cycle members, propagates X downstream, and still resolves independent controlling inputs",
+        "oracle.test.ts > random graphs: simulator == independent reference (multi-input, inverted bubbles, cycles, fanout, floating) 400 seeded graphs x 4 input vectors"
+      ]
+    },
+    {
+      "id": "M19-undo-forgets-future",
+      "existingSuiteDetects": true,
+      "existingFailed": 23,
+      "qaDetects": true,
+      "qaNewFailures": 2,
+      "sample": [
+        "adversarial-latest.test.ts > Delete: topology repartition A: deleting the Input keeps the wire, creates one dangling junction at the pin, exact Undo/Redo",
+        "adversarial-latest.test.ts > Delete: topology repartition G: Delete → Undo → new edit → Redo must NOT re-apply the old delete",
+        "fuzz.test.ts > 17 stateful adversarial model fuzz (fixed seeds) seed 1: 1000 operations",
+        "properties.test.ts > 6.4 atomic transaction via Editor name + count + inversion + wire geometry change = exactly 1 history entry; Undo/Redo exact; invalid/noop apply leaves history untouched"
+      ]
+    },
+    {
+      "id": "M20-wire-bridge-radius-unbounded",
+      "existingSuiteDetects": true,
+      "existingFailed": 2,
+      "qaDetects": true,
+      "qaNewFailures": 3,
+      "sample": [
+        "wire-bridges.test.ts > derived wire bridge geometry omits end touches, parallel overlaps, self crossings and short corner clearances",
+        "wire-bridges.test.ts > derived wire bridge geometry shrinks adjacent jumps, deduplicates overlapping underpasses and suppresses dense crossings",
+        "bridges.test.ts > 10.3 complex crossings very close crossings (spacing 6) shrink the radius instead of overlapping; below the minimum they are dropped",
+        "bridges.test.ts > 10.3 complex crossings crossing near an endpoint / corner is omitted when there is no room; T-contact and collinear overlap never bridge"
+      ]
+    }
+  ]
+}

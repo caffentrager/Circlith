@@ -1,0 +1,297 @@
+{
+  "bubble geometry": [
+    {
+      "kind": "AND",
+      "n": 2,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 2
+    },
+    {
+      "kind": "AND",
+      "n": 3,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 3,
+      "leadShort": 3
+    },
+    {
+      "kind": "AND",
+      "n": 4,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 4,
+      "leadShort": 4
+    },
+    {
+      "kind": "AND",
+      "n": 8,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 8,
+      "leadShort": 8
+    },
+    {
+      "kind": "AND",
+      "n": 15,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 15,
+      "leadShort": 15
+    },
+    {
+      "kind": "AND",
+      "n": 16,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 16,
+      "leadShort": 16
+    },
+    {
+      "kind": "NAND",
+      "n": 2,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 2
+    },
+    {
+      "kind": "NAND",
+      "n": 3,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 3,
+      "leadShort": 3
+    },
+    {
+      "kind": "NAND",
+      "n": 4,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 4,
+      "leadShort": 4
+    },
+    {
+      "kind": "NAND",
+      "n": 8,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 8,
+      "leadShort": 8
+    },
+    {
+      "kind": "NAND",
+      "n": 15,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 15,
+      "leadShort": 15
+    },
+    {
+      "kind": "NAND",
+      "n": 16,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 16,
+      "leadShort": 16
+    },
+    {
+      "kind": "OR",
+      "n": 2,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 0,
+      "leadShort": 2
+    },
+    {
+      "kind": "OR",
+      "n": 3,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 0,
+      "leadShort": 3
+    },
+    {
+      "kind": "OR",
+      "n": 4,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 0,
+      "leadShort": 4
+    },
+    {
+      "kind": "OR",
+      "n": 8,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 8
+    },
+    {
+      "kind": "OR",
+      "n": 15,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 15
+    },
+    {
+      "kind": "OR",
+      "n": 16,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 16
+    },
+    {
+      "kind": "NOR",
+      "n": 2,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 0,
+      "leadShort": 2
+    },
+    {
+      "kind": "NOR",
+      "n": 3,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 0,
+      "leadShort": 3
+    },
+    {
+      "kind": "NOR",
+      "n": 4,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 0,
+      "leadShort": 4
+    },
+    {
+      "kind": "NOR",
+      "n": 8,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 8
+    },
+    {
+      "kind": "NOR",
+      "n": 15,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 15
+    },
+    {
+      "kind": "NOR",
+      "n": 16,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 16
+    },
+    {
+      "kind": "XOR",
+      "n": 2,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 0,
+      "leadShort": 2
+    },
+    {
+      "kind": "XOR",
+      "n": 3,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 3
+    },
+    {
+      "kind": "XOR",
+      "n": 4,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 4
+    },
+    {
+      "kind": "XOR",
+      "n": 8,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 4,
+      "leadShort": 8
+    },
+    {
+      "kind": "XOR",
+      "n": 15,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 6,
+      "leadShort": 15
+    },
+    {
+      "kind": "XOR",
+      "n": 16,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 6,
+      "leadShort": 16
+    },
+    {
+      "kind": "XNOR",
+      "n": 2,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 0,
+      "leadShort": 2
+    },
+    {
+      "kind": "XNOR",
+      "n": 3,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 3
+    },
+    {
+      "kind": "XNOR",
+      "n": 4,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 2,
+      "leadShort": 4
+    },
+    {
+      "kind": "XNOR",
+      "n": 8,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 4,
+      "leadShort": 8
+    },
+    {
+      "kind": "XNOR",
+      "n": 15,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 6,
+      "leadShort": 15
+    },
+    {
+      "kind": "XNOR",
+      "n": 16,
+      "reversed": 0,
+      "pinInsideBubble": 0,
+      "pinCircleOverlap": 6,
+      "leadShort": 16
+    }
+  ],
+  "pin/bounds consistency": {
+    "checked": 912,
+    "bad": 0,
+    "first": []
+  }
+}

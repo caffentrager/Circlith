@@ -1,0 +1,218 @@
+{
+  "100 gates": {
+    "toggleToFrame": {
+      "n": 20,
+      "median": 31.8,
+      "p95": 32.8,
+      "max": 32.8
+    },
+    "zoomStepToFrame": {
+      "n": 20,
+      "median": 31.6,
+      "p95": 32.9,
+      "max": 32.9
+    },
+    "top15toggles": [
+      {
+        "fn": "(idle) :-1",
+        "selfMs": 268
+      },
+      {
+        "fn": "(program) :-1",
+        "selfMs": 164
+      },
+      {
+        "fn": "(anonymous) assets/index-Ciuzo4UL.js:48",
+        "selfMs": 55
+      },
+      {
+        "fn": "(anonymous) assets/index-Ciuzo4UL.js:57",
+        "selfMs": 28
+      },
+      {
+        "fn": "e1 assets/index-Ciuzo4UL.js:48",
+        "selfMs": 12
+      },
+      {
+        "fn": "(garbage collector) :-1",
+        "selfMs": 7
+      },
+      {
+        "fn": "setAttribute :-1",
+        "selfMs": 5
+      },
+      {
+        "fn": "Nr assets/index-Ciuzo4UL.js:48",
+        "selfMs": 5
+      },
+      {
+        "fn": "elementFromPoint :-1",
+        "selfMs": 5
+      },
+      {
+        "fn": "yp assets/index-Ciuzo4UL.js:47",
+        "selfMs": 4
+      },
+      {
+        "fn": "Qm assets/index-Ciuzo4UL.js:47",
+        "selfMs": 4
+      },
+      {
+        "fn": "ki assets/index-Ciuzo4UL.js:47",
+        "selfMs": 3
+      },
+      {
+        "fn": "Mr assets/index-Ciuzo4UL.js:48",
+        "selfMs": 3
+      },
+      {
+        "fn": "Qu assets/index-Ciuzo4UL.js:47",
+        "selfMs": 3
+      }
+    ]
+  },
+  "500 gates": {
+    "toggleToFrame": {
+      "n": 20,
+      "median": 136.3,
+      "p95": 212.2,
+      "max": 212.2
+    },
+    "zoomStepToFrame": {
+      "n": 20,
+      "median": 132,
+      "p95": 174.6,
+      "max": 174.6
+    },
+    "top15toggles": [
+      {
+        "fn": "(anonymous) assets/index-Ciuzo4UL.js:48",
+        "selfMs": 778
+      },
+      {
+        "fn": "(anonymous) assets/index-Ciuzo4UL.js:57",
+        "selfMs": 660
+      },
+      {
+        "fn": "(program) :-1",
+        "selfMs": 351
+      },
+      {
+        "fn": "(garbage collector) :-1",
+        "selfMs": 47
+      },
+      {
+        "fn": "e1 assets/index-Ciuzo4UL.js:48",
+        "selfMs": 34
+      },
+      {
+        "fn": "l$ assets/index-Ciuzo4UL.js:55",
+        "selfMs": 24
+      },
+      {
+        "fn": "yp assets/index-Ciuzo4UL.js:47",
+        "selfMs": 24
+      },
+      {
+        "fn": "setAttribute :-1",
+        "selfMs": 20
+      },
+      {
+        "fn": "(idle) :-1",
+        "selfMs": 17
+      },
+      {
+        "fn": "Qu assets/index-Ciuzo4UL.js:47",
+        "selfMs": 17
+      },
+      {
+        "fn": "lv assets/index-Ciuzo4UL.js:48",
+        "selfMs": 16
+      },
+      {
+        "fn": "ki assets/index-Ciuzo4UL.js:47",
+        "selfMs": 15
+      },
+      {
+        "fn": "g$ assets/index-Ciuzo4UL.js:57",
+        "selfMs": 12
+      },
+      {
+        "fn": "ye assets/index-Ciuzo4UL.js:47",
+        "selfMs": 12
+      }
+    ]
+  },
+  "1000 gates": {
+    "toggleToFrame": {
+      "n": 20,
+      "median": 493.6,
+      "p95": 609,
+      "max": 609
+    },
+    "zoomStepToFrame": {
+      "n": 20,
+      "median": 468.7,
+      "p95": 578.5,
+      "max": 578.5
+    },
+    "top15toggles": [
+      {
+        "fn": "(anonymous) assets/index-Ciuzo4UL.js:48",
+        "selfMs": 3209
+      },
+      {
+        "fn": "(anonymous) assets/index-Ciuzo4UL.js:57",
+        "selfMs": 2803
+      },
+      {
+        "fn": "(program) :-1",
+        "selfMs": 548
+      },
+      {
+        "fn": "l$ assets/index-Ciuzo4UL.js:55",
+        "selfMs": 57
+      },
+      {
+        "fn": "g$ assets/index-Ciuzo4UL.js:57",
+        "selfMs": 57
+      },
+      {
+        "fn": "(garbage collector) :-1",
+        "selfMs": 54
+      },
+      {
+        "fn": "e1 assets/index-Ciuzo4UL.js:48",
+        "selfMs": 49
+      },
+      {
+        "fn": "setAttribute :-1",
+        "selfMs": 49
+      },
+      {
+        "fn": "lv assets/index-Ciuzo4UL.js:48",
+        "selfMs": 38
+      },
+      {
+        "fn": "yp assets/index-Ciuzo4UL.js:47",
+        "selfMs": 33
+      },
+      {
+        "fn": "Qu assets/index-Ciuzo4UL.js:47",
+        "selfMs": 23
+      },
+      {
+        "fn": "ki assets/index-Ciuzo4UL.js:47",
+        "selfMs": 22
+      },
+      {
+        "fn": "yc assets/index-Ciuzo4UL.js:48",
+        "selfMs": 19
+      },
+      {
+        "fn": "(idle) :-1",
+        "selfMs": 18
+      }
+    ]
+  }
+}

@@ -32,9 +32,12 @@ function intersects(a: Point, b: Point, r: Rect) {
     ? a.y > r.top && a.y < r.bottom && Math.max(a.x, b.x) > r.left && Math.min(a.x, b.x) < r.right
     : a.x > r.left && a.x < r.right && Math.max(a.y, b.y) > r.top && Math.min(a.y, b.y) < r.bottom;
 }
-export function collidingSegments(c: Circuit, points: Point[], margin = 0): [Point, Point][] {
-  const rects = componentObstacles(c, margin);
+/** Same test against pre-computed obstacle rectangles, so callers checking many wires build the rectangles once. */
+export function collidingSegmentsWith(rects: Rect[], points: Point[]): [Point, Point][] {
   return points.slice(1).flatMap((b, i) => rects.some((r) => intersects(points[i], b, r)) ? [[points[i], b] as [Point, Point]] : []);
+}
+export function collidingSegments(c: Circuit, points: Point[], margin = 0): [Point, Point][] {
+  return collidingSegmentsWith(componentObstacles(c, margin), points);
 }
 function escape(c: Circuit, p: Point, toward: Point, target?: ConnectionTarget): Point {
   if (target?.type === "wire") {
@@ -114,7 +117,7 @@ function search(a: Point, b: Point, rects: Rect[], horizontal?: boolean): Point[
 }
 
 export function planRoute(c: Circuit, a: Point, b: Point, settings: RoutingSettings,
-  options: { from?: ConnectionTarget; to?: ConnectionTarget; anchors?: Point[]; horizontal?: boolean } = {}) {
+  options: { from?: ConnectionTarget; to?: ConnectionTarget; anchors?: Point[]; horizontal?: boolean; avoidRetrace?: boolean } = {}) {
   const preferred = options.horizontal ?? (settings.pathMode === "smart" ? undefined : settings.pathMode === "horizontal");
   const smart = settings.pathMode === "smart" && options.horizontal === undefined;
   const first = smart ? escape(c, a, options.anchors?.[0] ?? b, options.from) : a;
@@ -124,10 +127,17 @@ export function planRoute(c: Circuit, a: Point, b: Point, settings: RoutingSetti
   let blocked = false, points: Point[] = [a];
   if (rects.some((r) => intersects(a, first, r) || intersects(last, b, r))) blocked = true;
   for (let i = 1; i < stops.length; i++) {
-    const result = search(stops[i - 1], stops[i], rects, preferred);
+    const a = stops[i - 1], b = stops[i], previous = points.at(-2);
+    let intervalPreferred = preferred;
+    // A resized pin can lie behind the last waypoint. Leave that waypoint sideways instead of retracing the incoming span.
+    if (options.avoidRetrace && previous && !same(previous, a)) {
+      if (previous.x === a.x && (a.y - previous.y) * (b.y - a.y) < 0) intervalPreferred = true;
+      if (previous.y === a.y && (a.x - previous.x) * (b.x - a.x) < 0) intervalPreferred = false;
+    }
+    const result = search(a, b, rects, intervalPreferred);
     if (!result) blocked = true;
     // Keep every manually fixed interval; global simplification could erase a U-turn anchor.
-    points.push(...(result ?? route(stops[i - 1], stops[i], preferred ?? true)));
+    points.push(...(result ?? route(a, b, intervalPreferred ?? true)));
   }
   points.push(last, b);
   points = clean(points);

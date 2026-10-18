@@ -1,0 +1,107 @@
+{
+  "basic": {
+    "bridgeCount": 1,
+    "bridge": {
+      "wire": "31cce6ea-3204-4618-b6a2-047ff663102c",
+      "x": 330,
+      "y": 200,
+      "r": 5,
+      "axis": "horizontal"
+    },
+    "afterArcClick": {
+      "selected": [
+        "31cce6ea-3204-4618-b6a2-047ff663102c"
+      ],
+      "choiceDialog": 0
+    },
+    "afterVerticalClick": [
+      "751754cc-ac65-433e-be70-60b550c5dce1"
+    ],
+    "afterShoulderClick": [
+      "31cce6ea-3204-4618-b6a2-047ff663102c"
+    ],
+    "afterCentreClick": {
+      "selected": [],
+      "dialogs": [
+        "선택할 배선을 고르세요\n\n같은 거리에 있는 배선입니다. 선택만 하며 연결은 변경하지 않습니다.\n\n1. Input 1 → Output 1 · 연결망 1\n2. Input 1 → Output 1 · 연결망 2\n취소"
+      ]
+    },
+    "historyUnchangedByClicks": true,
+    "junctionsAfterClicks": 0,
+    "selectedForEdit": 1
+  },
+  "settings": {
+    "bridgesDisabled": 0,
+    "verticalAxis": {
+      "count": 1,
+      "axis": "vertical"
+    },
+    "storage": {
+      "circlith.simulation.wire-display.v1": "{\"version\":1,\"enabled\":true,\"axis\":\"vertical\"}"
+    },
+    "historyUnchanged": true,
+    "netsUnchanged": true,
+    "afterReload": {
+      "storage": [
+        "circlith.simulation.wire-display.v1"
+      ],
+      "circuitSurvives": 0
+    },
+    "corruptedRecovery": {
+      "message": "배선 표시 설정을 복구하지 못해 기본값을 사용합니다. · Ctrl+Z Undo · Ctrl+Shift+Z Redo · Circlith Modern · 입력 대기"
+    }
+  },
+  "zoom": {
+    "zoomSeries": [
+      {
+        "requested": 2,
+        "actual": 1.999999999278,
+        "count": 1,
+        "radiusUser": 2.5000000009025,
+        "radiusPx": 5
+      },
+      {
+        "requested": 1.5,
+        "actual": 1.500000004598,
+        "count": 1,
+        "radiusUser": 3.3333333231155557,
+        "radiusPx": 5
+      },
+      {
+        "requested": 1,
+        "actual": 1,
+        "count": 1,
+        "radiusUser": 5,
+        "radiusPx": 5
+      },
+      {
+        "requested": 0.5,
+        "actual": 0.500000000181,
+        "count": 1,
+        "radiusUser": 9.99999999638,
+        "radiusPx": 5
+      },
+      {
+        "requested": 0.25,
+        "actual": 0.250000000181,
+        "count": 1,
+        "radiusUser": 19.999999985520002,
+        "radiusPx": 5
+      },
+      {
+        "requested": 0.1,
+        "actual": 0.100000000462,
+        "count": 1,
+        "radiusUser": 33.333333333333336,
+        "radiusPx": 3.33
+      }
+    ],
+    "selectedAtMinZoom": 0
+  },
+  "sim-on": [
+    {
+      "value": "0",
+      "cls": "wire-bridge signal-0"
+    }
+  ]
+}

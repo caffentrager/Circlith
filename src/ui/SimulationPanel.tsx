@@ -13,6 +13,7 @@ export function SimulationPanel({ circuit, result, inputs, busy, onInput, onRese
 }) {
   const sources = Object.values(circuit.components).filter(c => c.kind === 'Input');
   const sinks = Object.values(circuit.components).filter(c => c.kind === 'Output');
+  const circuitInvalid = result.diagnostics.some(d => d.code === 'INVALID_CIRCUIT');
   return <section className="simulation-panel" aria-label="조합논리 시뮬레이션">
     <h2>조합논리 시뮬레이션</h2>
     <p>확정된 회로를 입력 변화마다 계산합니다. 시간·클록은 사용하지 않습니다.</p>
@@ -38,8 +39,8 @@ export function SimulationPanel({ circuit, result, inputs, busy, onInput, onRese
     {!sinks.length && <p>확인할 위치에 Output을 연결하세요.</p>}
     {sinks.map((sink, index) => <div className="simulation-output" key={sink.id}>
       <span>{sink.name} {index + 1}</span>
-      <output data-output={sink.id} className={`signal-badge signal-${result.outputs[sink.id] ?? 'X'}`}
-        aria-label={`${sink.name} ${index + 1} 값`}>{result.outputs[sink.id] ?? 'X'}</output>
+      <output data-output={sink.id} className={`signal-badge signal-${circuitInvalid ? 'invalid' : result.outputs[sink.id] ?? 'X'}`}
+        aria-label={`${sink.name} ${index + 1} 값`}>{circuitInvalid ? '오류' : result.outputs[sink.id] ?? 'X'}</output>
     </div>)}
     <h3>진단 {result.diagnostics.length}개</h3>
     {!result.diagnostics.length && <p>감지된 연결 오류가 없습니다.</p>}

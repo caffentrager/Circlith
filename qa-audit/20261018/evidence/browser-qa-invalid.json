@@ -1,0 +1,155 @@
+{
+  "config": {
+    "argv": [
+      "C:\\Users\\choi\\AppData\\Local\\OpenAI\\Codex\\runtimes\\cua_node\\a5a02988362ca169\\bin\\node.exe",
+      "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\node_modules\\@playwright\\test\\cli.js",
+      "test",
+      "--config",
+      "qa-playwright.config.ts",
+      "qa-browser/invalid.spec.ts"
+    ],
+    "configFile": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-playwright.config.ts",
+    "rootDir": "D:/Circlith/build/qa-audit-20261018/work-browser/qa-browser",
+    "failOnFlakyTests": false,
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 1
+    },
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "D:/Circlith/build/qa-audit-20261018/work-browser/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "id": "",
+        "name": "",
+        "testDir": "D:/Circlith/build/qa-audit-20261018/work-browser/qa-browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "filteredProjects": [
+      {
+        "grep": {},
+        "grepInvert": null,
+        "outputDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 1
+        },
+        "name": "",
+        "testDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser",
+        "snapshotDir": "D:\\Circlith\\build\\qa-audit-20261018\\work-browser\\qa-browser",
+        "testIgnore": [],
+        "testMatch": "**/*.@(spec|test).?(c|m)[jt]s?(x)",
+        "timeout": 30000,
+        "use": {
+          "baseURL": "http://127.0.0.1:5291",
+          "viewport": {
+            "width": 1280,
+            "height": 800
+          }
+        },
+        "dependencies": [],
+        "ignoreSnapshots": false,
+        "__projectId": ""
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "D:\\Circlith\\build\\qa-audit-20261018\\evidence\\browser-qa-invalid.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "default",
+    "updateSourceMethod": "patch",
+    "version": "1.64.0",
+    "workers": 1,
+    "webServer": {
+      "command": "node node_modules/vite/bin/vite.js --host 127.0.0.1 --port 5291 --strictPort",
+      "url": "http://127.0.0.1:5291",
+      "reuseExistingServer": false,
+      "timeout": 60000
+    }
+  },
+  "suites": [
+    {
+      "title": "invalid.spec.ts",
+      "file": "invalid.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "P3-11 INVALID_CIRCUIT presentation: topology-valid circuit with a diagonal wire",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 928,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-10-18T15:05:41.710Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "509ced157e9a786bb7dd-50345312ee6687ebfc86",
+          "file": "invalid.spec.ts",
+          "line": 6,
+          "column": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-10-18T15:05:40.124Z",
+    "duration": 2871.987,
+    "expected": 1,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

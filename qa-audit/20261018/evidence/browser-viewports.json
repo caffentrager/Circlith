@@ -1,0 +1,288 @@
+{
+  "1024x420": {
+    "base": {
+      "docScroll": {
+        "w": 1024,
+        "h": 500
+      },
+      "inner": {
+        "w": 1024,
+        "h": 420
+      },
+      "horizontalOverflow": false,
+      "verticalPageScroll": true,
+      "mainSvg": {
+        "w": 692,
+        "h": 394
+      }
+    },
+    "propertiesDialog": {
+      "box": {
+        "x": 282,
+        "y": 32,
+        "w": 460,
+        "h": 357
+      },
+      "scrollable": true,
+      "scrollHeight": 1010,
+      "clientHeight": 357,
+      "fitsViewport": true,
+      "applyVisibleWithoutScroll": true
+    },
+    "afterApplyDialogs": 0,
+    "pageAfterModal": {
+      "docScroll": {
+        "w": 1024,
+        "h": 500
+      },
+      "inner": {
+        "w": 1024,
+        "h": 420
+      },
+      "horizontalOverflow": false,
+      "verticalPageScroll": true,
+      "mainSvg": {
+        "w": 692,
+        "h": 394
+      }
+    },
+    "settingsDialog": {
+      "fits": true,
+      "h": 378,
+      "scrollable": true
+    }
+  },
+  "1024x768": {
+    "base": {
+      "docScroll": {
+        "w": 1024,
+        "h": 768
+      },
+      "inner": {
+        "w": 1024,
+        "h": 768
+      },
+      "horizontalOverflow": false,
+      "verticalPageScroll": false,
+      "mainSvg": {
+        "w": 692,
+        "h": 662
+      }
+    },
+    "propertiesDialog": {
+      "box": {
+        "x": 282,
+        "y": 58,
+        "w": 460,
+        "h": 653
+      },
+      "scrollable": true,
+      "scrollHeight": 1010,
+      "clientHeight": 653,
+      "fitsViewport": true,
+      "applyVisibleWithoutScroll": true
+    },
+    "afterApplyDialogs": 0,
+    "pageAfterModal": {
+      "docScroll": {
+        "w": 1024,
+        "h": 768
+      },
+      "inner": {
+        "w": 1024,
+        "h": 768
+      },
+      "horizontalOverflow": false,
+      "verticalPageScroll": false,
+      "mainSvg": {
+        "w": 692,
+        "h": 662
+      }
+    },
+    "settingsDialog": {
+      "fits": true,
+      "h": 691,
+      "scrollable": true
+    }
+  },
+  "1440x900": {
+    "base": {
+      "docScroll": {
+        "w": 1440,
+        "h": 900
+      },
+      "inner": {
+        "w": 1440,
+        "h": 900
+      },
+      "horizontalOverflow": false,
+      "verticalPageScroll": false,
+      "mainSvg": {
+        "w": 1018,
+        "h": 794
+      }
+    },
+    "propertiesDialog": {
+      "box": {
+        "x": 490,
+        "y": 68,
+        "w": 460,
+        "h": 765
+      },
+      "scrollable": true,
+      "scrollHeight": 1010,
+      "clientHeight": 765,
+      "fitsViewport": true,
+      "applyVisibleWithoutScroll": true
+    },
+    "afterApplyDialogs": 0,
+    "pageAfterModal": {
+      "docScroll": {
+        "w": 1440,
+        "h": 900
+      },
+      "inner": {
+        "w": 1440,
+        "h": 900
+      },
+      "horizontalOverflow": false,
+      "verticalPageScroll": false,
+      "mainSvg": {
+        "w": 1018,
+        "h": 794
+      }
+    },
+    "settingsDialog": {
+      "fits": true,
+      "h": 810,
+      "scrollable": true
+    }
+  },
+  "1920x1080": {
+    "base": {
+      "docScroll": {
+        "w": 1920,
+        "h": 1080
+      },
+      "inner": {
+        "w": 1920,
+        "h": 1080
+      },
+      "horizontalOverflow": false,
+      "verticalPageScroll": false,
+      "mainSvg": {
+        "w": 1498,
+        "h": 974
+      }
+    },
+    "propertiesDialog": {
+      "box": {
+        "x": 730,
+        "y": 81,
+        "w": 460,
+        "h": 918
+      },
+      "scrollable": true,
+      "scrollHeight": 1010,
+      "clientHeight": 918,
+      "fitsViewport": true,
+      "applyVisibleWithoutScroll": true
+    },
+    "afterApplyDialogs": 0,
+    "pageAfterModal": {
+      "docScroll": {
+        "w": 1920,
+        "h": 1080
+      },
+      "inner": {
+        "w": 1920,
+        "h": 1080
+      },
+      "horizontalOverflow": false,
+      "verticalPageScroll": false,
+      "mainSvg": {
+        "w": 1498,
+        "h": 974
+      }
+    },
+    "settingsDialog": {
+      "fits": true,
+      "h": 972,
+      "scrollable": true
+    }
+  },
+  "zoom hit testing 16-input gate": [
+    {
+      "requested": 2,
+      "actual": 2,
+      "gateBoxPx": {
+        "w": 144,
+        "h": 664
+      },
+      "selectedByBodyClick": 1,
+      "firstInputPinPx": {
+        "w": 24
+      }
+    },
+    {
+      "requested": 1.5,
+      "actual": 1.5,
+      "gateBoxPx": {
+        "w": 108,
+        "h": 498
+      },
+      "selectedByBodyClick": 1,
+      "firstInputPinPx": {
+        "w": 18
+      }
+    },
+    {
+      "requested": 1,
+      "actual": 1,
+      "gateBoxPx": {
+        "w": 72,
+        "h": 332
+      },
+      "selectedByBodyClick": 1,
+      "firstInputPinPx": {
+        "w": 12
+      }
+    },
+    {
+      "requested": 0.5,
+      "actual": 0.5,
+      "gateBoxPx": {
+        "w": 36,
+        "h": 166
+      },
+      "selectedByBodyClick": 1,
+      "firstInputPinPx": {
+        "w": 6
+      }
+    },
+    {
+      "requested": 0.25,
+      "actual": 0.25,
+      "gateBoxPx": {
+        "w": 18,
+        "h": 83
+      },
+      "selectedByBodyClick": 1,
+      "firstInputPinPx": {
+        "w": 3
+      }
+    },
+    {
+      "requested": 0.1,
+      "actual": 0.1,
+      "gateBoxPx": {
+        "w": 7,
+        "h": 33
+      },
+      "selectedByBodyClick": 1,
+      "firstInputPinPx": {
+        "w": 1.2
+      }
+    }
+  ]
+}

@@ -134,7 +134,7 @@ export class Editor {
   }
   updateProperties(key: string, properties: ComponentProperties) {
     if (this.draft || this.selectionBox) throw new Error('진행 중인 작업을 완료하거나 취소하세요.');
-    this.commit('부품 속성 변경', updateComponentProperties(this.circuit, key, properties));
+    this.commit('부품 속성 변경', updateComponentProperties(this.circuit, key, properties, this.routing));
   }
   place(kind: Kind, position: Point) {
     this.cancel();

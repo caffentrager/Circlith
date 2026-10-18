@@ -212,6 +212,7 @@ svg:focus {
 .signal-1 { color: #08744c; stroke: #08744c; }
 .signal-X { color: #b13d24; stroke: #b13d24; }
 .signal-Z { color: #7152a5; stroke: #7152a5; }
+.signal-invalid { color: #9a3412; stroke: #9a3412; }
 .wire.signal-X { stroke-dasharray: 3 3; }
 .wire.signal-Z { stroke-dasharray: 9 4; }
 .wire.selected { stroke-width: 4; }

@@ -1,0 +1,218 @@
+{
+  "100 gates": {
+    "toggleToFrame": {
+      "n": 20,
+      "median": 31.9,
+      "p95": 42.2,
+      "max": 42.2
+    },
+    "zoomStepToFrame": {
+      "n": 20,
+      "median": 31.9,
+      "p95": 35.9,
+      "max": 35.9
+    },
+    "top15toggles": [
+      {
+        "fn": "(program) :-1",
+        "selfMs": 162
+      },
+      {
+        "fn": "exports.jsxDEV deps/react_jsx-dev-runtime.js?v=0026d340:240",
+        "selfMs": 108
+      },
+      {
+        "fn": "(idle) :-1",
+        "selfMs": 59
+      },
+      {
+        "fn": "(anonymous) renderer/CircuitSvg.tsx:289",
+        "selfMs": 37
+      },
+      {
+        "fn": "jsxDEVImpl deps/react_jsx-dev-runtime.js?v=0026d340:169",
+        "selfMs": 31
+      },
+      {
+        "fn": "collidingSegments geometry/routing.ts:24",
+        "selfMs": 25
+      },
+      {
+        "fn": "updateProperties deps/react-dom_client.js?v=0026d340:16172",
+        "selfMs": 23
+      },
+      {
+        "fn": "runWithFiberInDEV deps/react-dom_client.js?v=0026d340:1393",
+        "selfMs": 15
+      },
+      {
+        "fn": "validatePropertiesInDevelopment deps/react-dom_client.js?v=0026d340:15479",
+        "selfMs": 13
+      },
+      {
+        "fn": "run :-1",
+        "selfMs": 12
+      },
+      {
+        "fn": "validateProperty deps/react-dom_client.js?v=0026d340:2750",
+        "selfMs": 11
+      },
+      {
+        "fn": "now :-1",
+        "selfMs": 11
+      },
+      {
+        "fn": "shouldSetTextContent deps/react-dom_client.js?v=0026d340:17288",
+        "selfMs": 9
+      },
+      {
+        "fn": "pushHostContext deps/react-dom_client.js?v=0026d340:1054",
+        "selfMs": 9
+      }
+    ]
+  },
+  "500 gates": {
+    "toggleToFrame": {
+      "n": 20,
+      "median": 162.5,
+      "p95": 258.1,
+      "max": 258.1
+    },
+    "zoomStepToFrame": {
+      "n": 20,
+      "median": 171.4,
+      "p95": 243.8,
+      "max": 243.8
+    },
+    "top15toggles": [
+      {
+        "fn": "(anonymous) renderer/CircuitSvg.tsx:289",
+        "selfMs": 693
+      },
+      {
+        "fn": "(anonymous) ui/App.tsx:534",
+        "selfMs": 604
+      },
+      {
+        "fn": "(program) :-1",
+        "selfMs": 430
+      },
+      {
+        "fn": "exports.jsxDEV deps/react_jsx-dev-runtime.js?v=0026d340:240",
+        "selfMs": 275
+      },
+      {
+        "fn": "jsxDEVImpl deps/react_jsx-dev-runtime.js?v=0026d340:169",
+        "selfMs": 131
+      },
+      {
+        "fn": "updateProperties deps/react-dom_client.js?v=0026d340:16172",
+        "selfMs": 68
+      },
+      {
+        "fn": "validatePropertiesInDevelopment deps/react-dom_client.js?v=0026d340:15479",
+        "selfMs": 64
+      },
+      {
+        "fn": "(garbage collector) :-1",
+        "selfMs": 62
+      },
+      {
+        "fn": "runWithFiberInDEV deps/react-dom_client.js?v=0026d340:1393",
+        "selfMs": 53
+      },
+      {
+        "fn": "validateProperty deps/react-dom_client.js?v=0026d340:2750",
+        "selfMs": 52
+      },
+      {
+        "fn": "now :-1",
+        "selfMs": 44
+      },
+      {
+        "fn": "run :-1",
+        "selfMs": 35
+      },
+      {
+        "fn": "shouldSetTextContent deps/react-dom_client.js?v=0026d340:17288",
+        "selfMs": 32
+      },
+      {
+        "fn": "(anonymous) geometry/routing.ts:26",
+        "selfMs": 31
+      }
+    ]
+  },
+  "1000 gates": {
+    "toggleToFrame": {
+      "n": 20,
+      "median": 583.9,
+      "p95": 670.2,
+      "max": 670.2
+    },
+    "zoomStepToFrame": {
+      "n": 20,
+      "median": 597.2,
+      "p95": 656.2,
+      "max": 656.2
+    },
+    "top15toggles": [
+      {
+        "fn": "(anonymous) renderer/CircuitSvg.tsx:289",
+        "selfMs": 3214
+      },
+      {
+        "fn": "(anonymous) ui/App.tsx:534",
+        "selfMs": 2639
+      },
+      {
+        "fn": "(program) :-1",
+        "selfMs": 714
+      },
+      {
+        "fn": "exports.jsxDEV deps/react_jsx-dev-runtime.js?v=0026d340:240",
+        "selfMs": 653
+      },
+      {
+        "fn": "jsxDEVImpl deps/react_jsx-dev-runtime.js?v=0026d340:169",
+        "selfMs": 324
+      },
+      {
+        "fn": "validatePropertiesInDevelopment deps/react-dom_client.js?v=0026d340:15479",
+        "selfMs": 156
+      },
+      {
+        "fn": "updateProperties deps/react-dom_client.js?v=0026d340:16172",
+        "selfMs": 154
+      },
+      {
+        "fn": "(garbage collector) :-1",
+        "selfMs": 121
+      },
+      {
+        "fn": "run :-1",
+        "selfMs": 115
+      },
+      {
+        "fn": "(anonymous) geometry/routing.ts:26",
+        "selfMs": 107
+      },
+      {
+        "fn": "validateProperty deps/react-dom_client.js?v=0026d340:2750",
+        "selfMs": 105
+      },
+      {
+        "fn": "EditorSidebar ui/EditorSidebar.tsx:7",
+        "selfMs": 100
+      },
+      {
+        "fn": "now :-1",
+        "selfMs": 76
+      },
+      {
+        "fn": "runWithFiberInDEV deps/react-dom_client.js?v=0026d340:1393",
+        "selfMs": 69
+      }
+    ]
+  }
+}

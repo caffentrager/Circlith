@@ -1,0 +1,170 @@
+{
+  "oracle self-check tuples": 28032,
+  "exhaustive AND n=2": {
+    "sims": 64,
+    "mismatches": 0
+  },
+  "exhaustive AND n=3": {
+    "sims": 512,
+    "mismatches": 0
+  },
+  "exhaustive AND n=4": {
+    "sims": 4096,
+    "mismatches": 0
+  },
+  "exhaustive OR n=2": {
+    "sims": 64,
+    "mismatches": 0
+  },
+  "exhaustive OR n=3": {
+    "sims": 512,
+    "mismatches": 0
+  },
+  "exhaustive OR n=4": {
+    "sims": 4096,
+    "mismatches": 0
+  },
+  "exhaustive XOR n=2": {
+    "sims": 64,
+    "mismatches": 0
+  },
+  "exhaustive XOR n=3": {
+    "sims": 512,
+    "mismatches": 0
+  },
+  "exhaustive XOR n=4": {
+    "sims": 4096,
+    "mismatches": 0
+  },
+  "exhaustive NAND n=2": {
+    "sims": 64,
+    "mismatches": 0
+  },
+  "exhaustive NAND n=3": {
+    "sims": 512,
+    "mismatches": 0
+  },
+  "exhaustive NAND n=4": {
+    "sims": 4096,
+    "mismatches": 0
+  },
+  "exhaustive NOR n=2": {
+    "sims": 64,
+    "mismatches": 0
+  },
+  "exhaustive NOR n=3": {
+    "sims": 512,
+    "mismatches": 0
+  },
+  "exhaustive NOR n=4": {
+    "sims": 4096,
+    "mismatches": 0
+  },
+  "exhaustive XNOR n=2": {
+    "sims": 64,
+    "mismatches": 0
+  },
+  "exhaustive XNOR n=3": {
+    "sims": 512,
+    "mismatches": 0
+  },
+  "exhaustive XNOR n=4": {
+    "sims": 4096,
+    "mismatches": 0
+  },
+  "wide AND n=8": {
+    "cases": 541,
+    "bad": 0
+  },
+  "wide AND n=15": {
+    "cases": 544,
+    "bad": 0
+  },
+  "wide AND n=16": {
+    "cases": 547,
+    "bad": 0
+  },
+  "wide OR n=8": {
+    "cases": 541,
+    "bad": 0
+  },
+  "wide OR n=15": {
+    "cases": 544,
+    "bad": 0
+  },
+  "wide OR n=16": {
+    "cases": 547,
+    "bad": 0
+  },
+  "wide XOR n=8": {
+    "cases": 541,
+    "bad": 0
+  },
+  "wide XOR n=15": {
+    "cases": 544,
+    "bad": 0
+  },
+  "wide XOR n=16": {
+    "cases": 547,
+    "bad": 0
+  },
+  "wide NAND n=8": {
+    "cases": 541,
+    "bad": 0
+  },
+  "wide NAND n=15": {
+    "cases": 544,
+    "bad": 0
+  },
+  "wide NAND n=16": {
+    "cases": 547,
+    "bad": 0
+  },
+  "wide NOR n=8": {
+    "cases": 541,
+    "bad": 0
+  },
+  "wide NOR n=15": {
+    "cases": 544,
+    "bad": 0
+  },
+  "wide NOR n=16": {
+    "cases": 547,
+    "bad": 0
+  },
+  "wide XNOR n=8": {
+    "cases": 541,
+    "bad": 0
+  },
+  "wide XNOR n=15": {
+    "cases": 544,
+    "bad": 0
+  },
+  "wide XNOR n=16": {
+    "cases": 547,
+    "bad": 0
+  },
+  "drivers n=1": {
+    "tuples": 4,
+    "bad": 0
+  },
+  "drivers n=2": {
+    "tuples": 16,
+    "bad": 0
+  },
+  "drivers n=3": {
+    "tuples": 64,
+    "bad": 0
+  },
+  "random graphs": {
+    "graphs": 400,
+    "vectors": 1600,
+    "bad": 0,
+    "vectorsWithCycles": 1316,
+    "vectorsWithMultiDriver": 1323
+  },
+  "metamorphic": {
+    "variants": 600,
+    "bad": 0
+  }
+}

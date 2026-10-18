@@ -1,0 +1,235 @@
+{
+  "key-isolation": {
+    "w": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "W": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "m": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "r": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "g": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "a": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "Delete": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "Backspace": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "Control+z": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "Control+Shift+z": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "Control+a": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "Shift+r": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "Space": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "Tab": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    },
+    "Shift+Tab": {
+      "propsStillOpen": true,
+      "history": "2 committed edits",
+      "components": 2,
+      "operation": "NONE",
+      "transformsSame": true
+    }
+  },
+  "modal-focus": {
+    "initialFocus": "INPUT",
+    "tabOrder": [
+      "INPUT:입력 수",
+      "INPUT:입력 1 반전",
+      "INPUT:입력 2 반전",
+      "BUTTON:취소",
+      "BUTTON:적용",
+      "INPUT:이름",
+      "INPUT:입력 수",
+      "INPUT:입력 1 반전",
+      "INPUT:입력 2 반전",
+      "BUTTON:취소",
+      "BUTTON:적용",
+      "INPUT:이름"
+    ],
+    "focusEscapedModal": false,
+    "shiftTabInside": true,
+    "dialogAfterBackdropClick": 1,
+    "activeAfterClose": "BODY",
+    "componentsAfterDeleteShortcut": 1
+  },
+  "focus-chain": {
+    "dialogOpen": 1,
+    "afterEscape": {
+      "dialog": 0,
+      "active": "svg"
+    },
+    "afterW": "WIRE_DRAFT",
+    "afterEscDraft": "NONE",
+    "panned": true
+  },
+  "xor16-bubble-geometry": {
+    "rot0": [
+      {
+        "index": 0,
+        "distance": 2.51,
+        "bubbleRadius": 4,
+        "pinRadius": 5,
+        "pinInsideBubble": true
+      },
+      {
+        "index": 15,
+        "distance": 2.51,
+        "bubbleRadius": 4,
+        "pinRadius": 5,
+        "pinInsideBubble": true
+      }
+    ],
+    "rot90": [
+      {
+        "index": 0,
+        "distance": 2.51,
+        "bubbleRadius": 4,
+        "pinRadius": 5,
+        "pinInsideBubble": true
+      },
+      {
+        "index": 15,
+        "distance": 2.51,
+        "bubbleRadius": 4,
+        "pinRadius": 5,
+        "pinInsideBubble": true
+      }
+    ],
+    "counts": [
+      16,
+      16
+    ]
+  },
+  "name-edge-cases": {
+    "fillResultLength": 80,
+    "rawLength": 81,
+    "dialogOpenAfter81": 1,
+    "alert81": "이름은 1~80자로 입력하세요.",
+    "historyUnchangedAfter81": true,
+    "blankMessage": "이름은 1~80자로 입력하세요.",
+    "dialogOpenAfterBlank": 1,
+    "htmlLabel": "<img src=x onerror=\"window.__xss=1\"><b>bold</b>",
+    "xss": null,
+    "injectedElements": 0,
+    "hierarchyText": "AND\n<img src=x onerror=\"window.__xss=1\"><b>bold</b>",
+    "hierarchyInjected": 0,
+    "diagnosticsText": "주의\n\n<img src=x onerror=\"window.__xss=1\"><b>bold</b> 입력 1: 구동 신호가 없습니다(Z).\n\n관련 위치 보기 | 주의\n\n<img src=x onerror=\"window.__xss=1\"><b>bold</b> 입력 2: 구동 신호가 없습니다(Z).\n\n관련 위치 보기"
+  },
+  "backdrop-focus": {
+    "properties": {
+      "afterClick": {
+        "dialog": 1,
+        "active": "BODY"
+      },
+      "afterEscape": {
+        "dialog": 1,
+        "active": "BODY"
+      },
+      "afterTab": {
+        "insideDialog": true
+      }
+    },
+    "propertiesClosedByKeyboardAfterRefocus": true,
+    "settings": {
+      "afterClick": {
+        "dialog": 1,
+        "active": "BODY"
+      },
+      "afterEscape": {
+        "dialog": 1,
+        "active": "BODY"
+      },
+      "afterTab": {
+        "insideDialog": true
+      }
+    },
+    "settingsClosedByKeyboardAfterRefocus": true
+  },
+  "live-apply": {
+    "outputDialog": {
+      "open": 1,
+      "countField": 0,
+      "bubbleFieldset": 0
+    },
+    "outputLabel": "Y",
+    "outputValueAfterInvertNot": "0",
+    "outputValueAfterUndo": "1",
+    "outputValueAfterRedo": "0"
+  }
+}
