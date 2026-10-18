@@ -5,38 +5,43 @@ export function GateBody({
   value,
   inputCount = 2,
   invertedInputs = [],
+  showPinLabels = false,
 }: {
   kind: Kind;
   selected?: boolean;
   value?: string;
   inputCount?: number;
   invertedInputs?: boolean[];
+  showPinLabels?: boolean;
 }) {
   const className = selected ? "symbol selected" : "symbol";
   const inverted = kind === "NAND" || kind === "NOR" || kind === "XNOR";
-  const bubble = inverted ? <circle data-inversion-bubble="true" cx="34" cy="0" r="4" className="gate-bubble"/> : null;
+  const bubble = inverted ? <circle data-inversion-bubble="true" cx="32" cy="0" r="3" className="gate-bubble"/> : null;
   const height = gateHalfHeight(inputCount);
   const inputLeads = (curved: boolean) => Array.from({ length: inputCount }, (_, index) => {
     const y = inputY(index, inputCount);
-    const edge = curved ? -17.5 - 12.5 * (y / height) ** 2 - (kind === 'XOR' || kind === 'XNOR' ? 5 : 0) : -30;
+    // The auxiliary XOR curve stays far enough from x=-40 for an input bubble.
+    const edge = curved ? -14 - 10 * (y / height) ** 2 - (kind === 'XOR' || kind === 'XNOR' ? 5 : 0) : -26;
     return <g key={index}>
       <path d={`M -40 ${y} H ${invertedInputs[index] ? edge - 8 : edge}`} className="pin-lead"/>
       {invertedInputs[index] && <circle data-input-bubble={index} cx={edge - 4} cy={y} r="4" className="gate-bubble"/>}
+      {showPinLabels && <text data-pin-name={`I${index}`} x={curved ? edge + 9 : -21} y={y + 2.5} className="gate-pin-name">I{index}</text>}
     </g>;
   });
+  const outputName = showPinLabels && <text data-pin-name="O" x="21" y="2.5" textAnchor="end" className="gate-pin-name">O</text>;
   if (kind === "AND" || kind === "NAND")
     return (
       <>
         <path
           data-gate-shape={kind}
-          d={`M -30 ${-height} H 10 A 20 ${height} 0 0 1 10 ${height} H -30 Z`}
+          d={`M -26 ${-height} H 8 A 20 ${height} 0 0 1 8 ${height} H -26 Z`}
           className={className}
         />
         {bubble}
-        {kind === 'NAND' && <text textAnchor="middle" y="5" className="gate-caption">NAND</text>}
+        {outputName}
         {inputLeads(false)}
         <path
-          d={`M ${inverted ? 38 : 30} 0 H 40`}
+          d={`M ${inverted ? 35 : 28} 0 H 40`}
           className="pin-lead"
         />
       </>
@@ -46,15 +51,15 @@ export function GateBody({
       <>
         <path
           data-gate-shape={kind}
-          d={`M -30 ${-height} Q -5 0 -30 ${height} Q 7 ${height} 30 0 Q 7 ${-height} -30 ${-height} Z`}
+          d={`M -24 ${-height} Q -4 0 -24 ${height} Q 8 ${height} 28 0 Q 8 ${-height} -24 ${-height} Z`}
           className={className}
         />
-        {(kind === 'XOR' || kind === 'XNOR') && <path d={`M -35 ${-height} Q -10 0 -35 ${height}`} className="pin-lead"/>}
+        {(kind === 'XOR' || kind === 'XNOR') && <path data-xor-curve="true" d={`M -29 ${-height} Q -9 0 -29 ${height}`} className="gate-outline"/>}
         {bubble}
-        {kind !== 'OR' && <text textAnchor="middle" y="5" className="gate-caption">{kind}</text>}
+        {outputName}
         {inputLeads(true)}
         <path
-          d={`M ${inverted ? 38 : 30} 0 H 40`}
+          d={`M ${inverted ? 35 : 28} 0 H 40`}
           className="pin-lead"
         />
       </>
@@ -64,36 +69,33 @@ export function GateBody({
       <>
         <path
           data-gate-shape="NOT"
-          d="M -30 -20 L 20 0 L -30 20 Z"
+          d="M -26 -20 L 18 0 L -26 20 Z"
           className={className}
         />
         <circle
           data-inversion-bubble="true"
-          cx="25"
+          cx="23"
           cy="0"
-          r="5"
+          r="4"
           className="gate-bubble"
         />
-        <path d={`M -40 0 H ${invertedInputs[0] ? -38 : -30} M 30 0 H 40`} className="pin-lead" />
-        {invertedInputs[0] && <circle data-input-bubble="0" cx="-34" cy="0" r="4" className="gate-bubble"/>}
+        <path d={`M -40 0 H ${invertedInputs[0] ? -34 : -26} M 27 0 H 40`} className="pin-lead" />
+        {invertedInputs[0] && <circle data-input-bubble="0" cx="-30" cy="0" r="4" className="gate-bubble"/>}
       </>
     );
   return (
     <>
-      <rect
-        x="-30"
-        y="-20"
-        width="60"
-        height="40"
-        rx="4"
+      <path
+        data-port-shape={kind}
+        d="M -26 -11 H 12 L 26 0 L 12 11 H -26 Z"
         className={className}
       />
       <path
-        d={kind === "Input" ? "M 30 0 H 40" : "M -40 0 H -30"}
+        d={kind === "Input" ? "M 26 0 H 40" : "M -40 0 H -26"}
         className="pin-lead"
       />
-      <text textAnchor="middle" y="5">
-        {value ?? kind}
+      <text textAnchor="middle" x="-4" y="4" className={`port-value${value ? ` value-${value}` : ''}`}>
+        {value ?? (kind === 'Input' ? 'I' : 'O')}
       </text>
     </>
   );

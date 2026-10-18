@@ -52,7 +52,7 @@ test('double-click properties changes gate name, inputs and per-pin bubbles with
   await expect(gate.locator('[data-input-bubble]')).toHaveCount(2);
   await expect(page.locator('header span')).toHaveText('2 committed edits');
   await page.keyboard.press('Control+z');
-  await expect(gate.locator('.label')).toHaveText('AND');
+  await expect(gate.locator('.label')).toHaveText('AND2');
   await expect(page.locator('main [data-pin]')).toHaveCount(3);
   await expect(gate.locator('[data-input-bubble]')).toHaveCount(0);
   await page.keyboard.press('Control+Shift+z');

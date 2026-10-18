@@ -1,4 +1,4 @@
-import { gateHalfHeight, gateInputCount, type Circuit, type Point } from "../model/circuit";
+import { gateHalfHeight, gateInputCount, isBinaryGate, type Circuit, type Point } from "../model/circuit";
 import { pinPosition } from "../geometry/geometry";
 import {GateBody} from './GateBody';
 import type { SimulationResult } from '../simulation/simulator';
@@ -25,6 +25,7 @@ export function Symbols({
   wireDisplay?: WireDisplaySettings;
 }) {
   const maskPrefix = useId().replace(/:/g, '');
+  const connectedPins = useMemo(() => new Set(Object.values(circuit.nets).flatMap(net => net.pins)), [circuit]);
   const bridges = useMemo(() => wireBridges(circuit, wireDisplay, zoom), [circuit, wireDisplay, zoom]);
   const byWire = new Map<string, typeof bridges>();
   for (const bridge of bridges) {
@@ -97,8 +98,9 @@ export function Symbols({
               transform={`translate(${p.position.x} ${p.position.y}) rotate(${p.rotation})`}
             >
               <GateBody kind={c.kind} selected={selection.includes(c.id)} inputCount={gateInputCount(c)}
+                showPinLabels
                 invertedInputs={c.pins.filter(id => circuit.pins[id].direction === 'in').map(id => !!circuit.pins[id].inverted)}
-                value={simulation ? (c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? simulation.outputs[c.id] ?? 'X' : undefined) : undefined}/>
+                value={c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? simulation ? simulation.outputs[c.id] ?? 'X' : '—' : undefined}/>
               {simulation && c.kind === 'Input' && onToggleInput && <g role="button" tabIndex={0}
                 aria-label={`입력 토글 ${Object.values(circuit.components).filter(part => part.kind === 'Input').findIndex(part => part.id === c.id) + 1}: ${inputs[c.id] ?? '0'}`}
                 data-input-toggle={c.id} className="input-toggle"
@@ -107,11 +109,16 @@ export function Symbols({
                 onKeyDown={e => {
                   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); if (e.key === 'Enter' && !e.repeat) onToggleInput(c.id); }
                 }} onKeyUp={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); } }}>
-                <rect x="-25" y="-16" width="50" height="32" rx="3" fill="transparent"/>
+                <path d="M -24 -10 H 11 L 24 0 L 11 10 H -24 Z" fill="transparent"/>
                 <title>클릭 또는 Enter: 입력 0/1 전환 · 오른쪽 패널에서 X/Z 지정</title>
               </g>}
-              <text textAnchor="middle" y={-gateHalfHeight(gateInputCount(c)) - 9} className="label">
-                {c.name}
+              {selection.includes(c.id) && <rect data-symbol-selection={c.id} x="-45" y={-gateHalfHeight(gateInputCount(c)) - 5}
+                width="90" height={gateHalfHeight(gateInputCount(c)) * 2 + 10} className="symbol-selection" pointerEvents="none"/>}
+              <text textAnchor={c.kind === 'Input' ? 'end' : c.kind === 'Output' ? 'start' : 'middle'}
+                x={c.kind === 'Input' ? -34 : c.kind === 'Output' ? 34 : 0}
+                y={c.kind === 'Input' || c.kind === 'Output' ? 4 : -gateHalfHeight(gateInputCount(c)) - 11}
+                className={`label${c.kind === 'Input' || c.kind === 'Output' ? ' port-label' : ''}`}>
+                {c.name === c.kind && isBinaryGate(c.kind) ? `${c.kind}${gateInputCount(c)}` : c.name}
               </text>
             </g>
           );
@@ -120,21 +127,22 @@ export function Symbols({
       <g data-layer="pins">
         {Object.values(circuit.pins).map((pin) => {
           const p = pinPosition(circuit, pin.id);
-          return (
+          return <g key={pin.id}>
+            <circle data-pin-marker={pin.id} cx={p.x} cy={p.y} r="1.8"
+              className={connectedPins.has(pin.id) ? 'pin-marker connected' : 'pin-marker'} pointerEvents="none"/>
             <circle
-              key={pin.id}
               data-pin={pin.id}
               data-value={simulation?.pins[pin.id]}
               cx={p.x}
               cy={p.y}
               r="5"
-              className={Object.values(circuit.nets).some((n) => n.pins.includes(pin.id)) ? "pin connected" : "pin"}
+              className={connectedPins.has(pin.id) ? "pin connected" : "pin"}
             >
               <title>
                 {pin.direction} {pin.index + 1}{simulation ? ` · ${simulation.pins[pin.id] ?? 'X'}` : ''}
               </title>
             </circle>
-          );
+          </g>;
         })}
       </g>
     </>
