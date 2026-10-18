@@ -41,13 +41,13 @@ export function EditorSidebar({ circuit, selection, renderPart, searchCommand, o
     return `${name(wire.from)} → ${name(wire.to)}`;
   };
   const folder = (id: string, label: string, count: number, content: ReactNode) => <details
-    key={id} className="outline-folder" open={query !== '' || !closed[id]}
-    onToggle={e => {
-      if (query) return;
-      const isClosed = !e.currentTarget.open;
-      setClosed(prev => prev[id] === isClosed ? prev : { ...prev, [id]: isClosed });
-    }}>
-    <summary><span>{label}</span><span className="outline-count">{count}</span></summary>
+    key={id} className="outline-folder" open={query !== '' || !closed[id]}>
+    <summary onClick={e => {
+      // Keep native delayed toggle events from competing with search's forced-open state.
+      // Keyboard activation of summary also dispatches click, preserving Enter/Space support.
+      e.preventDefault();
+      if (!query) setClosed(prev => ({ ...prev, [id]: !prev[id] }));
+    }}><span>{label}</span><span className="outline-count">{count}</span></summary>
     <ul>{content}</ul>
   </details>;
   const row = (key: string, name: string, type: string) => <li key={key}>

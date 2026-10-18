@@ -27,6 +27,23 @@ test('library folders filter, reopen for search, preserve fold state, and still 
   await expect(page.locator('main svg')).toBeFocused();
 });
 
+test('search keeps matching folders open and restores keyboard-controlled fold state',async({page})=>{
+  const library=page.getByRole('region',{name:'부품 라이브러리',exact:true});
+  const folder=library.locator('details').filter({has:page.locator('summary').filter({hasText:'논리 게이트'})});
+  const summary=folder.locator('summary');
+  const search=page.getByRole('searchbox',{name:'라이브러리 검색',exact:true});
+  await summary.focus();await page.keyboard.press('Enter');
+  await expect(folder).not.toHaveAttribute('open');
+  await search.fill('OR');
+  await expect(folder).toHaveAttribute('open');
+  await summary.click();
+  await expect(library.getByRole('button',{name:'OR',exact:true})).toBeVisible();
+  await search.fill('');
+  await expect(folder).not.toHaveAttribute('open');
+  await summary.focus();await page.keyboard.press('Space');
+  await expect(folder).toHaveAttribute('open');
+});
+
 test('scene rows and canvas share selection, Shift-selection, Delete and Undo without adding history',async({page})=>{
   await place(page,'AND',200,200);await place(page,'OR',500,200);
   await tab(page,'도면 트리').click();

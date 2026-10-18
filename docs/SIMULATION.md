@@ -41,6 +41,6 @@
 
 브라우저 테스트는 도면·패널 입력, 출력·배선값·선 패턴, 입력 변경과 history 분리, 표시 전환, XOR 전체 진리표와 회전, 진단 위치 이동, 배선 Undo/Redo 후 재계산, 초안 중 입력 차단, Enter 조작, 삭제된 입력의 Undo 초기화, 피드백 진단을 확인한다. 진단 위치로 이동한 뒤 기존 배선 꺾임점 선택이 남아 Delete 대상이 바뀌는 회귀도 검사한다. 기존 라이브러리/도면 심벌 비교는 7종 게이트 모두를 종류별로 검사하도록 확장했다.
 
-2026-10-19 QA 통합 후속: 단위 409개 통과·별도 soak 1개 기본 skip, 브라우저 전체 146개 통과. 감사 회귀 테스트는 `tests/unit/audit-regressions.test.ts`, `tests/unit/qa-integration-followups.test.ts`, `tests/browser/audit-regressions.spec.ts`. 경유점 되짚음 5개 사례를 4회전으로 검증하고 Undo/Redo, 우회 실패의 원자성, 잘못된 입력값, 진단 구분, 핀 소유권·충돌 severity·피드백 전체 구성원도 검사한다. 독립 감사 원본 커밋 `9c47291`의 기록은 단위 367개·브라우저 145개다.
+2026-10-19 QA 통합 후속: 단위 409개 통과·별도 soak 1개 기본 skip, 브라우저 전체 147개 통과. 감사 회귀 테스트는 `tests/unit/audit-regressions.test.ts`, `tests/unit/qa-integration-followups.test.ts`, `tests/browser/audit-regressions.spec.ts`. 경유점 되짚음 5개 사례를 4회전으로 검증하고 Undo/Redo, 우회 실패의 원자성, 잘못된 입력값, 진단 구분, 핀 소유권·충돌 severity·피드백 전체 구성원도 검사한다. 독립 감사 원본 커밋 `9c47291`의 기록은 단위 367개·브라우저 145개다.
 
 사용성·대규모 회로 성능과 실제 Windows IME 실측을 완료했다는 의미는 아니다.
