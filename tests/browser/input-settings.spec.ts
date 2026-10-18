@@ -246,7 +246,7 @@ test("storage corruption recovers safely and storage write failure is visible", 
   page,
 }) => {
   await page.evaluate(() =>
-    localStorage.setItem("circlith.input-profile.v1", "bad JSON"),
+    localStorage.setItem("circlith.simulation.input-profile.v1", "bad JSON"),
   );
   await page.reload();
   await expect(page.locator("footer")).toContainText("프로필 복구 실패");

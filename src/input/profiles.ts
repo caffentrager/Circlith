@@ -189,7 +189,7 @@ export function effective(user: UserProfile): Profile {
     bindings,
   };
 }
-export const storageKey = "circlith.input-profile.v1";
+export const storageKey = "circlith.simulation.input-profile.v1";
 export function validateUser(value: unknown): UserProfile {
   const u = value as UserProfile;
   if (!u || u.schemaVersion !== "1.0")

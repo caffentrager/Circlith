@@ -12,7 +12,7 @@
 
 Node.js 22.23.3 이상에서 `npm ci` 후 `npm run dev`로 실행합니다. `npm run build`, `npm test`, `npx playwright install chromium`, `npm run test:browser`로 검증합니다. 현재 회로와 시뮬레이션 입력은 메모리에만 유지되며 파일 저장은 후속 단계입니다.
 
-공개 프로토타입: [GitHub Pages](https://caffentrager.github.io/Circlith/). `main` 또는 `feat/editor-prototype`에 push하면 단위·브라우저 테스트와 빌드 성공 후 GitHub Actions로 배포합니다. 로컬 개발은 `/`, Pages 빌드는 `/Circlith/` 경로를 사용합니다.
+공개 프로토타입: [기존 편집기](https://caffentrager.github.io/Circlith/) · [조합논리 시뮬레이션](https://caffentrager.github.io/Circlith/simulation/). `main`, `feat/editor-prototype`, `codex/logic-simulation`의 Pages 진입 워크플로는 시뮬레이션 브랜치의 공통 `deploy-pages.yml`을 호출합니다. 기존 편집기와 시뮬레이션을 각각 테스트·빌드해 한 산출물로 배포합니다. 기존 편집기 소스는 `feat/editor-prototype`, 시뮬레이션 소스는 `codex/logic-simulation`입니다. 로컬 개발은 `/`, 배포 시 자산 경로는 각각 `/Circlith/`, `/Circlith/simulation/`입니다. 자세한 운영 방법은 [Pages 배포](docs/PAGES_DEPLOYMENT.md)를 참고하세요.
 
 2026-10-16 QA 후속: 평행 배선 선택, Redo 선택 정리, 고정 경유점 안내와 작은 창 포커스 스크롤을 수정했습니다. 후속 사용자 승인으로 초안 없는 SELECT에서 몸체 직접 클릭은 부품 선택을 우선하고, 핀 직접 클릭·몸체 밖 포획은 유지하도록 수정했습니다. 단위 179개(별도 soak 1개 기본 skip)·브라우저 123개와 빌드가 통과했습니다. [QA 수정·정책 기록](review/QA_FIXES_20261016.md)과 [통합 확장 계획](docs/EDITOR_EXPANSION_SCOPE.md)을 참고하세요.
 

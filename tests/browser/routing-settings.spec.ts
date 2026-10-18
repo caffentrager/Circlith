@@ -73,7 +73,7 @@ test("group drag rotates the selected components together and reverses the entir
 });
 
 test("corrupt routing storage recovers visibly and unavailable storage still applies settings to the session", async ({ page }) => {
-  await page.evaluate(() => localStorage.setItem("circlith.routing.v1", '{"version":9}'));
+  await page.evaluate(() => localStorage.setItem("circlith.simulation.routing.v1", '{"version":9}'));
   await page.reload(); await expect(page.getByRole("status")).toContainText("배선 설정을 복구하지 못해 기본값");
   await expect(page.locator("main svg")).toHaveAttribute("data-routing-mode", "smart");
   await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error("disabled"); }; });
