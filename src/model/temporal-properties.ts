@@ -1,12 +1,17 @@
-import type { Component } from './circuit';
+import { isMemory, type Component } from './circuit';
 
 export const clockProperties = (part: Component) => part.clock ?? { period: 10, duty: 50, initial: '0' as const };
 export const dffProperties = (part: Component) => part.dff ?? { edge: 'rising' as const, initial: 'X' as const };
+export const memoryProperties = (part: Component) => part.kind === 'DFF'
+  ? { ...dffProperties(part), activeLevel: 'high' as const }
+  : part.memory ?? { edge: 'rising' as const, initial: 'X' as const, activeLevel: 'high' as const };
 
 export function temporalPropertyError(part: Component): string | undefined {
   if (part.clock !== undefined && (!part.clock || typeof part.clock !== 'object') ||
-      part.dff !== undefined && (!part.dff || typeof part.dff !== 'object')) return '시간 속성 형식이 손상되었습니다.';
+      part.dff !== undefined && (!part.dff || typeof part.dff !== 'object') ||
+      part.memory !== undefined && (!part.memory || typeof part.memory !== 'object')) return '시간 속성 형식이 손상되었습니다.';
   if (part.clock !== undefined && part.kind !== 'Clock' || part.dff !== undefined && part.kind !== 'DFF') return '종류에 맞지 않는 시간 속성입니다.';
+  if (part.memory !== undefined && (!isMemory(part.kind) || part.kind === 'DFF')) return '종류에 맞지 않는 기억소자 속성입니다.';
   if (part.kind === 'Clock') {
     const p = clockProperties(part);
     if (!p || !Number.isInteger(p.period) || p.period < 2 || p.period > 1_000_000 ||
@@ -17,5 +22,10 @@ export function temporalPropertyError(part: Component): string | undefined {
     const p = dffProperties(part);
     if (!p || !['rising', 'falling'].includes(p.edge) || !['0', '1', 'X'].includes(p.initial))
       return 'DFF 엣지는 상승/하강, 초기 Q는 0/1/X여야 합니다.';
+  }
+  if (isMemory(part.kind) && part.kind !== 'DFF') {
+    const p = memoryProperties(part);
+    if (!['rising', 'falling'].includes(p.edge) || !['0', '1', 'X'].includes(p.initial) || !['high', 'low'].includes(p.activeLevel))
+      return '기억소자의 엣지·초기 Q·활성 레벨 설정이 잘못되었습니다.';
   }
 }

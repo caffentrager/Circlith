@@ -1,4 +1,4 @@
-import { gateHalfHeight, inputY, type Kind } from "../model/circuit";
+import { gateHalfHeight, inputY, isMemory, memoryPorts, type Kind } from "../model/circuit";
 export function GateBody({
   kind,
   selected = false,
@@ -8,6 +8,7 @@ export function GateBody({
   showPinLabels = false,
   zoom = 1,
   clockEdge = 'rising',
+  activeLevel = 'high',
 }: {
   kind: Kind;
   selected?: boolean;
@@ -17,11 +18,12 @@ export function GateBody({
   showPinLabels?: boolean;
   zoom?: number;
   clockEdge?: 'rising' | 'falling';
+  activeLevel?: 'high' | 'low';
 }) {
   const className = selected ? "symbol selected" : "symbol";
   const inverted = kind === "NAND" || kind === "NOR" || kind === "XNOR";
   const bubble = inverted ? <circle data-inversion-bubble="true" cx="32" cy="0" r="3" className="gate-bubble"/> : null;
-  const height = gateHalfHeight(inputCount);
+  const height = gateHalfHeight(isMemory(kind) ? memoryPorts[kind].length - 1 : inputCount);
   const inputLeads = (curved: boolean) => Array.from({ length: inputCount }, (_, index) => {
     const y = inputY(index, inputCount);
     // The auxiliary XOR curve stays far enough from x=-40 for an input bubble.
@@ -42,14 +44,21 @@ export function GateBody({
     <path d="M 26 0 H 40" className="pin-lead"/>
     {value !== undefined && <text x="0" y={zoom < 1 ? 20 + 12 / zoom : 34} style={{ fontSize: Math.max(10, 9 / zoom) }} textAnchor="middle" className="gate-pin-name">{value}</text>}
   </>;
-  if (kind === 'DFF') return <>
-    <rect data-gate-shape="DFF" x="-26" y="-20" width="52" height="40" className={className}/>
-    <path d={`M -40 -10 H -26 M -40 10 H ${clockEdge === 'falling' ? -33 : -26} M 26 0 H 40`} className="pin-lead"/>
-    {clockEdge === 'falling' && <circle data-clock-edge="falling" cx="-30" cy="10" r="3" className="gate-bubble"/>}
-    <path d="M -26 5 L -19 10 L -26 15" className="gate-outline"/>
-    <text x="-20" y="-7" className="gate-pin-name">D</text>
+  if (isMemory(kind)) return <>
+    <rect data-gate-shape={kind} x="-26" y={-height} width="52" height={2 * height} className={className}/>
+    {memoryPorts[kind].slice(0, -1).map((name, i, ports) => {
+      const y = inputY(i, ports.length), clk = name === 'CLK';
+      const inverted = clk && clockEdge === 'falling' || kind === 'DLatch' && name === 'EN' && activeLevel === 'low';
+      return <g key={name}>
+        <path d={`M -40 ${y} H ${inverted ? -33 : -26}`} className="pin-lead"/>
+        {inverted && <circle data-clock-edge={clk ? 'falling' : undefined} data-enable-level={!clk ? 'low' : undefined} cx="-30" cy={y} r="3" className="gate-bubble"/>}
+        {clk ? <path d={`M -26 ${y - 5} L -19 ${y} L -26 ${y + 5}`} className="gate-outline"/>
+          : <text data-pin-name={name} x="-20" y={y + 3} className="gate-pin-name">{name}</text>}
+      </g>;
+    })}
+    <path d="M 26 0 H 40" className="pin-lead"/>
     <text x="20" y="3" textAnchor="end" className="gate-pin-name">Q</text>
-    {value !== undefined && <text x="0" y={zoom < 1 ? 20 + 12 / zoom : 34} style={{ fontSize: Math.max(10, 9 / zoom) }} textAnchor="middle" className="gate-pin-name">{value}</text>}
+    {value !== undefined && <text x="0" y={zoom < 1 ? height + 12 / zoom : height + 14} style={{ fontSize: Math.max(10, 9 / zoom) }} textAnchor="middle" className="gate-pin-name">{value}</text>}
   </>;
   if (kind === "AND" || kind === "NAND")
     return (

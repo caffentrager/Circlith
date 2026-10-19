@@ -1,12 +1,12 @@
 import { useState, type ReactNode } from 'react';
 import type { Circuit, Kind } from '../model/circuit';
-import { gateKinds } from '../model/circuit';
+import { gateKinds, memoryKinds } from '../model/circuit';
 import type { CircuitLabels } from './circuit-labels';
 
 const categories: { name: string; kinds: Kind[] }[] = [
   { name: '논리 게이트', kinds: [...gateKinds] },
   { name: '입출력', kinds: ['Input', 'Output'] },
-  { name: '순차소자', kinds: ['Clock', 'DFF'] },
+  { name: '순차소자', kinds: ['Clock', ...memoryKinds] },
 ];
 
 export function EditorSidebar({ circuit, labels, selection, renderPart, searchCommand, onSelect, onReveal, onClose, busy, children }: {

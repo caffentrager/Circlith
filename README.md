@@ -1,5 +1,7 @@
 # Circlith
 
+순차소자 확장 개발: JKFF·TFF·SRFF·DFFE·DFFSR·DLatch·SRLatch를 추가하고, NOR/NAND로 만든 래치의 Set/Reset·상태 유지를 지원합니다. 현재 기능 브랜치의 범위·초기 Q·핀 구성·한계는 [순차소자 확장](docs/SEQUENTIAL_COMPONENTS.md), 기준 규칙은 [Master Spec §25.2](docs/CIRCLITH_MASTER_SPEC.md#252-순차소자-확장과-게이트-피드백--2026-10-19)를 참고하세요.
+
 > 2026-10-19 저장소 감사: 현재 `main@f59efd2`는 Logic 편집·조합논리·Clock/DFF 시간 시뮬레이션·파형을 제공하는 단일 앱입니다. 아래 날짜·브랜치별 설명에는 과거 단계의 기록이 포함됩니다. 현재 상태와 문서 권위는 [저장소 인덱스](docs/REPOSITORY_INDEX.md), [감사 보고서](docs/platform/REPOSITORY_AUDIT.md)를 먼저 확인하세요.
 >
 > Logic/Electronics 플랫폼 구조는 [미래 설계 제안](docs/platform/PLATFORM_ARCHITECTURE.md)이며 이번 단계에서 구현하지 않았습니다. 기존 Master Spec이 기준이며, 저장·복구/클립보드는 별도 개발 브랜치의 미통합 작업입니다.

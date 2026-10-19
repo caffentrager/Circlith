@@ -1,4 +1,4 @@
-import { clone, connect, id, mergeNets, type Circuit, type ConnectionTarget, type Endpoint, type Point } from "./circuit";
+import { clone, connect, id, mergeNets, isGate, type Circuit, type ConnectionTarget, type Endpoint, type Point } from "./circuit";
 import { endpointPosition } from "../geometry/geometry";
 import { temporalPropertyError } from './temporal-properties';
 import { anchorOffsets, clean, pointOnSegment, same, simplifyPath } from "../geometry/path";
@@ -110,7 +110,7 @@ function validateRecords(c: Circuit): string[] {
   }
   for (const pin of Object.values(c.pins)) {
     if (!c.components[pin.component]?.pins.includes(pin.id)) errors.push("핀 소유권 오류");
-    if (pin.inverted !== undefined && (typeof pin.inverted !== 'boolean' || pin.direction !== 'in' || ['Input', 'Output', 'Clock', 'DFF'].includes(c.components[pin.component]?.kind)))
+    if (pin.inverted !== undefined && (typeof pin.inverted !== 'boolean' || pin.direction !== 'in' || !isGate(c.components[pin.component]?.kind)))
       errors.push('입력 반전 설정 오류');
   }
   for (const net of Object.values(c.nets)) {

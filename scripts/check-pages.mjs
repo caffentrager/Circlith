@@ -48,7 +48,7 @@ try {
   for (const path of ['simulation/', 'editor/']) assert.equal((await context.request.get(base + path)).status(), 404, `Retired path still served: ${path}`);
   assert.equal((await page.goto(base)).status(), 200);
   await page.locator('main > svg').waitFor();
-  for (const kind of ['XNOR', 'Clock', 'DFF'])
+  for (const kind of ['XNOR', 'Clock', 'DFF', 'JKFF', 'TFF', 'SRFF', 'DFFE', 'DFFSR', 'DLatch', 'SRLatch'])
     await expect(page.locator('.library').getByRole('button', { name: kind, exact: true })).toHaveCount(1);
   await expect(page.getByRole('button', { name: '시뮬레이션', exact: true })).toHaveCount(1);
 
@@ -101,10 +101,29 @@ try {
   await expect.poll(async () => Number(await time.getAttribute('data-time'))).toBeGreaterThan(0);
   await expect(page.locator('header').getByRole('button', { name: 'Undo', exact: true })).toBeDisabled();
   await page.getByRole('button', { name: '일시정지', exact: true }).click();
+  // A fresh test page checks a clock-free latch in the actual production artifact.
+  page.once('dialog', dialog => dialog.accept()); // Discard only this disposable smoke-test circuit on reload.
+  await page.reload(); await page.locator('main > svg').waitFor();
+  await place('Input', 140, 100); await place('Input', 140, 260);
+  await place('SRLatch', 420, 180); await place('Output', 680, 180);
+  await wire(0, 2); await wire(1, 3); await wire(4, 5);
+  await page.getByRole('button', { name: '시뮬레이션', exact: true }).click();
+  await page.getByRole('tab', { name: /^입출력 · 진단/ }).click();
+  const latchOutput = page.locator('main [data-component]').last();
+  await page.getByLabel('Input 1 값', { exact: true }).selectOption('1');
+  await expect(latchOutput).toHaveAttribute('data-value', '1');
+  await page.getByLabel('Input 1 값', { exact: true }).selectOption('0');
+  await expect(latchOutput).toHaveAttribute('data-value', '1');
+  await page.getByLabel('Input 2 값', { exact: true }).selectOption('1');
+  await expect(latchOutput).toHaveAttribute('data-value', '0');
+  await page.getByLabel('Input 2 값', { exact: true }).selectOption('0');
+  await expect(latchOutput).toHaveAttribute('data-value', '0');
+  await expect(page.getByRole('button', { name: '실행', exact: true })).toBeDisabled();
   if (process.env.CIRCLITH_SCREENSHOT) await page.screenshot({ path: process.env.CIRCLITH_SCREENSHOT, fullPage: true });
   assert.deepEqual(errors, []);
   console.log(JSON.stringify({ base, source: manifest.source, singleApplication: 'passed', retiredPaths: '404',
-    settingsPersistence: 'passed', clockDff: 'passed', runPauseStepReset: 'passed', waveform: 'passed', assetErrors: errors }));
+    settingsPersistence: 'passed', clockDff: 'passed', runPauseStepReset: 'passed', waveform: 'passed',
+    sequentialPalette: 'passed', srLatchSetHoldReset: 'passed', assetErrors: errors }));
 } finally {
   await browser?.close();
   if (server) await new Promise(accept => server.close(accept));

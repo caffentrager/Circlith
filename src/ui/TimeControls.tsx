@@ -35,7 +35,7 @@ export function TimeControls({ controller, labels, busy, onRun, onHeight }: {
       {[1, 2, 5, 10].map(rate => <option key={rate} value={rate}>{rate} 시각/초</option>)}
     </select></label>
     <output className="time-current" aria-label="시뮬레이션 시각" data-time={session.time}>t = {session.time.toLocaleString('en-US', { maximumFractionDigits: 2 })} µs · {session.error || session.invalid ? '오류로 정지' : running ? '실행 중' : '일시정지'}</output>
-    {!session.hasEvents && !session.error && !session.invalid && <span className="time-no-events">예약 이벤트 없음 · Input으로 CLK를 구동하거나 Clock을 배치하세요.</span>}
+    {!session.hasEvents && !session.error && !session.invalid && <span className="time-no-events">예약 이벤트 없음 · 입력 변경은 즉시 계산됩니다. 시간 진행은 Clock이 필요합니다.</span>}
     {session.error && <span role="alert" className="time-error">{session.error}</span>}
   </section>;
 }

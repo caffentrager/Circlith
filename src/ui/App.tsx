@@ -4,6 +4,9 @@ import {
   emptyCircuit,
   addComponent,
   componentKinds,
+  isSequential,
+  isMemory,
+  memoryPorts,
   type ConnectionTarget,
   type Kind,
   type Point,
@@ -87,12 +90,14 @@ export function App() {
   const [simulationEnabled, setSimulationEnabled] = useState(false);
   const [inputValues, setInputValues] = useState<Record<string, LogicValue>>({});
   const inputCircuit = editor.circuit;
-  const hasSequential = Object.values(inputCircuit.components).some(c => c.kind === 'Clock' || c.kind === 'DFF');
-  const time = useTimeSession(inputCircuit, inputValues, simulationAvailable && hasSequential, setInputValues);
-  const temporal = simulationEnabled ? time.session : null;
-  const plan = useMemo(() => simulationAvailable && simulationEnabled && !hasSequential ? compileCircuit(editor.circuit) : null, [simulationEnabled, editor.circuit, hasSequential]);
+  const compiled = useMemo(() => simulationAvailable ? compileCircuit(inputCircuit) : null, [inputCircuit]);
+  const hasSequential = Object.values(inputCircuit.components).some(c => isSequential(c.kind));
+  const hasFeedback = !!compiled?.cycles.length;
+  const time = useTimeSession(inputCircuit, inputValues, simulationAvailable && (hasSequential || hasFeedback), setInputValues);
+  const temporal = simulationEnabled && hasSequential ? time.session : null;
+  const plan = simulationEnabled && !hasSequential && !hasFeedback ? compiled : null;
   const combinational = useMemo(() => plan && !hasSequential ? simulate(plan, inputValues) : undefined, [plan, inputValues, hasSequential]);
-  const simulation = simulationEnabled ? temporal?.result ?? combinational : undefined;
+  const simulation = simulationEnabled ? time.session?.result ?? combinational : undefined;
   // Prune against this render's snapshot before a deleted Input can be restored by Undo.
   // editor is mutable; reading editor.circuit in a deferred updater can observe a later edit.
   useLayoutEffect(() => {
@@ -742,7 +747,7 @@ export function App() {
               place(k);
             }}
           >
-            <svg aria-hidden="true" className="library-symbol" viewBox="-45 -25 90 50"><GateBody kind={k}/></svg>{k}
+            <svg aria-hidden="true" className="library-symbol" viewBox={`-45 -${isMemory(k) ? Math.max(25, (memoryPorts[k].length - 1) * 10 + 5) : 25} 90 ${isMemory(k) ? Math.max(50, (memoryPorts[k].length - 1) * 20 + 10) : 50}`}><GateBody kind={k}/></svg>{k}
           </button>
   );
   return (
