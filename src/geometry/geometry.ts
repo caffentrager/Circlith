@@ -29,7 +29,7 @@ export function pinPosition(c: Circuit, key: string): Point {
     comp = c.components[pin.component],
     place = c.geometry.components[comp.id];
   const local =
-    isBinaryGate(comp.kind)
+    isBinaryGate(comp.kind) || comp.kind === 'DFF'
       ? pin.direction === "out"
         ? { x: 40, y: 0 }
         : { x: -40, y: inputY(pin.index, gateInputCount(comp)) }

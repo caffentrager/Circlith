@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Editor } from "../editor/editor";
 import {
   emptyCircuit,
@@ -50,8 +50,12 @@ import { InspectorPanel } from './InspectorPanel';
 import { CircuitLabelRegistry } from './circuit-labels';
 import { wireOverlaps } from '../geometry/wire-overlaps';
 import { DrawingWarnings } from './DrawingWarnings';
+import { useTimeSession } from './useTimeSession';
+import { TimeControls } from './TimeControls';
+import { WaveformPanel } from './WaveformPanel';
 import "./style.css";
 import "./workspace.css";
+import "./sequential.css";
 const kinds = componentKinds;
 export function App() {
   const [initialWireDisplay] = useState(() => {
@@ -83,8 +87,12 @@ export function App() {
   const [simulationEnabled, setSimulationEnabled] = useState(false);
   const [inputValues, setInputValues] = useState<Record<string, LogicValue>>({});
   const inputCircuit = editor.circuit;
-  const plan = useMemo(() => simulationAvailable && simulationEnabled ? compileCircuit(editor.circuit) : null, [simulationEnabled, editor.circuit]);
-  const simulation = useMemo(() => plan ? simulate(plan, inputValues) : undefined, [plan, inputValues]);
+  const hasSequential = Object.values(inputCircuit.components).some(c => c.kind === 'Clock' || c.kind === 'DFF');
+  const time = useTimeSession(inputCircuit, inputValues, simulationAvailable && hasSequential, setInputValues);
+  const temporal = simulationEnabled ? time.session : null;
+  const plan = useMemo(() => simulationAvailable && simulationEnabled && !hasSequential ? compileCircuit(editor.circuit) : null, [simulationEnabled, editor.circuit, hasSequential]);
+  const combinational = useMemo(() => plan && !hasSequential ? simulate(plan, inputValues) : undefined, [plan, inputValues, hasSequential]);
+  const simulation = simulationEnabled ? temporal?.result ?? combinational : undefined;
   // Prune against this render's snapshot before a deleted Input can be restored by Undo.
   // editor is mutable; reading editor.circuit in a deferred updater can observe a later edit.
   useLayoutEffect(() => {
@@ -94,13 +102,30 @@ export function App() {
     });
   }, [inputCircuit]);
   const changeInput = (id: string, value: LogicValue) => {
-    if (!editor.draft && !editor.selectionBox && editor.circuit.components[id]?.kind === 'Input')
+    if (!time.running && !editor.draft && !editor.selectionBox && editor.circuit.components[id]?.kind === 'Input')
       setInputValues(previous => ({ ...previous, [id]: value }));
   };
   const [, render] = useState(0);
   const refresh = () => render((v) => v + 1);
   const svg = useRef<SVGSVGElement>(null);
   const workspace = useRef<HTMLDivElement>(null);
+  const onExecutionHeight = useCallback((height: number) => workspace.current?.style.setProperty('--execution-height', height + 'px'), []);
+  useLayoutEffect(() => {
+    if (!temporal) return;
+    const frame = requestAnimationFrame(() => {
+      if (!svg.current || editor.circuit !== temporal.circuit) return;
+      const bounds = svg.current.getBoundingClientRect(), view = editor.viewport;
+      const outside = Object.values(editor.circuit.geometry.components).some(p => {
+        const x = p.position.x * view.zoom + view.x, y = p.position.y * view.zoom + view.y;
+        return x < 20 || x > bounds.width - 20 || y < 20 || y > bounds.height - 20;
+      });
+      if (outside) {
+        const fitted = fitView(editor.circuit, bounds.width, bounds.height, undefined, Math.min(20, bounds.height / 8));
+        if (fitted) { editor.viewport = fitted; refresh(); }
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [!!temporal]);
   const analysisDock = useRef<HTMLElement>(null);
   const properties = useRef<HTMLElement>(null);
   const cursor = useRef<Point>({ x: 200, y: 200 });
@@ -134,6 +159,7 @@ export function App() {
   const [libraryOpen, setLibraryOpen] = useState(() => window.innerWidth >= 1024);
   const [inspectorOpen, setInspectorOpen] = useState(() => window.innerWidth >= 1200);
   const [analysisOpen, setAnalysisOpen] = useState(false);
+  const [analysisTab, setAnalysisTab] = useState<'waveform' | 'signals'>('waveform');
   useLayoutEffect(() => {
     const dock = analysisDock.current;
     if (!dock) return;
@@ -300,6 +326,7 @@ export function App() {
     return () => resolver.cancel();
   }, []);
   const place = (kind: Kind) => {
+    if (time.running) { setMessage('일시정지 후 부품을 배치하세요.'); return; }
     dispatcher.dispatch("component.place", { kind, position: cursor.current });
     setSearch(null);
     setMenu(false);
@@ -532,6 +559,9 @@ export function App() {
     setMessage,
   );
   const dispatch = (command: string, payload?: any) => {
+    if (time.running && !/^(view\.|selection\.|grid\.|tool\.select$|app\.cancel$)/.test(command)) {
+      setMessage('일시정지 후 회로를 편집하세요.'); refresh(); return;
+    }
     try { dispatcher.dispatch(command, payload); }
     catch (error) { warnMessage(`실행하지 못했습니다: ${error instanceof Error ? error.message : String(error)}`); }
     refresh();
@@ -584,7 +614,8 @@ export function App() {
     : hover.current?.type === 'pin' ? pinNets.get(hover.current.id)
     : hover.current?.type === 'junction' ? editor.circuit.junctions[hover.current.id]?.net : undefined;
   if (hoverNet) highlightedNets.add(hoverNet);
-  const busy = !!draft || !!editor.selectionBox || !!gesture.current || !!paletteDrag.current;
+  const operationBusy = !!draft || !!editor.selectionBox || !!gesture.current || !!paletteDrag.current;
+  const busy = operationBusy || time.running;
   const locateDiagnostic = (diagnostic: import('../simulation/simulator').Diagnostic) => {
     if (busy) return;
     const keys = diagnostic.objects.filter(id => editor.circuit.components[id] || editor.circuit.geometry.wires[id]);
@@ -634,6 +665,7 @@ export function App() {
   const renderPaletteButton = (k: Kind) => (
           <button
             key={k}
+            disabled={time.running}
             onPointerDown={(e) => {
               if (e.button !== 0) return;
               e.currentTarget.focus();
@@ -716,7 +748,7 @@ export function App() {
   return (
     <div
       ref={workspace}
-      className={`app${libraryOpen ? ' library-open' : ''}${inspectorOpen ? ' inspector-open' : ''}`}
+      className={`app${libraryOpen ? ' library-open' : ''}${inspectorOpen ? ' inspector-open' : ''}${temporal ? ' time-active' : ''}`}
       onContextMenuCapture={(e) => {
         const el = e.target as HTMLElement;
         if (el.closest("input,textarea") || el.isContentEditable) return;
@@ -745,10 +777,10 @@ export function App() {
         if (button && !button.disabled && !button.closest('.overlay,[role="dialog"],.sidebar-tabs,.simulation-panel')) svg.current?.focus({ preventScroll: true });
       }}
     >
-      <WorkspaceHeader tool={editor.tool} simulationEnabled={simulationEnabled}
+      <WorkspaceHeader tool={editor.tool} simulationEnabled={simulationEnabled} sequential={hasSequential}
         projectName={projectName} onProjectName={setProjectName}
-        canUndo={!!editor.draft || !!editor.selectionBox || editor.history.length > 0}
-        canRedo={!editor.draft && !editor.selectionBox && editor.future.length > 0}
+        canUndo={!time.running && (!!editor.draft || !!editor.selectionBox || editor.history.length > 0)}
+        canRedo={!time.running && !editor.draft && !editor.selectionBox && editor.future.length > 0}
         edits={editor.history.length} hint={hint} onCommand={dispatch}
         onSimulation={() => {
           if (!simulationEnabled) {
@@ -759,7 +791,7 @@ export function App() {
             setConnectionChoice(null);
             setSelectionChoice(null);
           }
-          setSimulationEnabled(value => !value);
+          time.pause(); setSimulationEnabled(value => !value);
         }} onSettings={() => {
             rollback();
             resolver.cancel();
@@ -782,6 +814,9 @@ export function App() {
           setInspectorOpen(v => !v);
         }}>Inspector</button>
       </div>
+      {temporal && <TimeControls controller={time} labels={labels} busy={operationBusy} onHeight={onExecutionHeight} onRun={() => {
+        rollback(); resolver.cancel(); editor.setTool('SELECT'); setMenu(false); setSearch(null); time.start();
+      }}/>}
       <EditorSidebar circuit={editor.circuit} labels={labels} selection={editor.selection}
         onClose={() => setLibraryOpen(false)}
         renderPart={renderPaletteButton} searchCommand={(<button
@@ -861,6 +896,7 @@ export function App() {
             editor.focus = "CANVAS";
           }}
           onDoubleClick={(e) => {
+            if (time.running) return;
             // Pointer capture can retarget the click to the SVG canvas after mouseup.
             const hit = document.elementFromPoint(e.clientX, e.clientY);
             const component = ((e.target as Element).closest('[data-component]') ?? hit?.closest('[data-component]'))?.getAttribute('data-component');
@@ -937,6 +973,12 @@ export function App() {
               return;
             }
             if (button !== "left") return;
+            if (time.running) {
+              if (objectKey && (editor.circuit.components[objectKey] || editor.circuit.geometry.wires[objectKey])) {
+                editor.selection = e.shiftKey ? editor.selection.includes(objectKey) ? editor.selection.filter(id => id !== objectKey) : [...editor.selection, objectKey] : [objectKey];
+              } else editor.selection = [];
+              editor.selectedCorner = null; refresh(); return;
+            }
             const editHandle=(e.target as Element).closest('[data-wire-handle]');
             const bridgeWire = bridgeHit ? editor.preview().geometry.wires[bridgeHit] : undefined;
             const bridgeSegment = bridgeWire ? nearestSegment(bridgeWire.points, drawingPoint(e)) : 0;
@@ -1176,7 +1218,7 @@ export function App() {
               wireDisplay={wireDisplay}
               simulation={simulation} inputs={inputValues}
               onToggleInput={id => changeInput(id, inputValues[id] === '1' ? '0' : '1')}
-              toggleDisabled={!!draft || !!editor.selectionBox || !!gesture.current || !!paletteDrag.current}/>
+              toggleDisabled={busy}/>
             <g data-layer="wire-overlaps" pointerEvents="none">{!draft && overlaps.map((overlap, i) =>
               <polyline key={i} data-overlap-segment={i} points={path([overlap.from, overlap.to])} className="wire-overlap"/>)}</g>
             {cleanup && <g data-layer="wire-cleanup-preview" pointerEvents="none">
@@ -1303,15 +1345,23 @@ export function App() {
       </aside>
       {simulationAvailable && <section ref={analysisDock} className="analysis-dock" aria-label="회로 분석">
         <button className="analysis-toggle" aria-expanded={analysisOpen} aria-controls="analysis-content" onClick={() => setAnalysisOpen(v => !v)}>
-          <i aria-hidden="true">{analysisOpen ? '⌄' : '⌃'}</i> 입출력과 회로 진단
+          <i aria-hidden="true">{analysisOpen ? '⌄' : '⌃'}</i> {temporal ? '파형 · 입출력과 회로 진단' : '입출력과 회로 진단'}
         </button>
         <div id="analysis-content" hidden={!analysisOpen}>
-          {simulation ? <SimulationPanel circuit={editor.circuit} labels={labels} result={simulation} inputs={inputValues}
-            busy={busy} onInput={changeInput} onReset={() => setInputValues({})} onLocate={locateDiagnostic}/>
+          {temporal && <div role="tablist" aria-label="시뮬레이션 분석" className="time-analysis-tabs">
+            <button role="tab" id="time-wave-tab" aria-controls="time-wave-panel" aria-selected={analysisTab === 'waveform'} onClick={() => setAnalysisTab('waveform')}>파형</button>
+            <button role="tab" id="time-signals-tab" aria-controls="time-signals-panel" aria-selected={analysisTab === 'signals'} onClick={() => setAnalysisTab('signals')}>입출력 · 진단 {simulation?.diagnostics.length ?? 0}</button>
+          </div>}
+          {temporal && <div role="tabpanel" id="time-wave-panel" aria-labelledby="time-wave-tab" hidden={analysisTab !== 'waveform'}>
+            <WaveformPanel session={temporal} labels={labels} selection={editor.selection} onChange={time.refresh}/>
+          </div>}
+          {simulation ? <div role={temporal ? 'tabpanel' : undefined} id="time-signals-panel" aria-labelledby={temporal ? 'time-signals-tab' : undefined} hidden={!!temporal && analysisTab !== 'signals'}>
+            <SimulationPanel circuit={editor.circuit} labels={labels} result={simulation} inputs={inputValues} sequential={hasSequential}
+            busy={busy} onInput={changeInput} onReset={() => { if (!time.running) setInputValues({}); }} onLocate={locateDiagnostic}/></div>
             : <p>상단 시뮬레이션을 켜면 확정된 회로의 신호와 진단을 확인할 수 있습니다.</p>}
         </div>
       </section>}
-      <StatusBar tool={editor.tool} operation={editor.operation} selection={editor.selection.length}
+      <StatusBar tool={editor.tool} operation={editor.operation} selection={editor.selection.length} sequential={hasSequential}
         zoom={editor.viewport.zoom} grid={grid} simulationEnabled={simulationEnabled} diagnostics={simulation?.diagnostics.length ?? 0}
         message={feedback.text} messageKind={feedback.kind} messageId={feedback.sequence} profile={resolver.profile.name} pending={resolver.pending} hint={hint} />
       {selectionChoice && <div className="overlay" onKeyDown={e => {
@@ -1431,6 +1481,7 @@ export function App() {
       {propertyComponent && editor.circuit.components[propertyComponent] && <ComponentProperties
         circuit={editor.circuit} componentId={propertyComponent} onClose={closeProperties}
         onApply={values => {
+          if (time.running) throw new Error('일시정지 후 속성을 변경하세요.');
           editor.updateProperties(propertyComponent, values);
           closeProperties();
           refresh();

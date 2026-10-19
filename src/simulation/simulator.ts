@@ -1,8 +1,9 @@
-import { gateKinds, isBinaryGate, MAX_GATE_INPUTS, type Circuit, type Component, type GateKind } from '../model/circuit';
+import { componentKinds, isGate, isBinaryGate, MAX_GATE_INPUTS, type Circuit, type Component, type GateKind } from '../model/circuit';
+import { temporalPropertyError } from '../model/temporal-properties';
 import { validateCircuit } from '../model/connections';
 import { evaluateGate, invert, logicValues, resolveDrivers, type LogicValue } from './logic';
 
-export type DiagnosticCode = 'FLOATING_INPUT' | 'MULTIPLE_DRIVERS' | 'DRIVE_CONFLICT' | 'COMBINATIONAL_FEEDBACK' | 'INVALID_CIRCUIT' | 'INVALID_INPUT';
+export type DiagnosticCode = 'FLOATING_INPUT' | 'MULTIPLE_DRIVERS' | 'DRIVE_CONFLICT' | 'COMBINATIONAL_FEEDBACK' | 'INVALID_CIRCUIT' | 'INVALID_INPUT' | 'SEQUENTIAL_LIMIT';
 export type Diagnostic = {
   code: DiagnosticCode;
   message: string;
@@ -70,11 +71,11 @@ export function compileCircuit(circuit: Circuit): Plan {
   catch (reason) { errors = [`회로 구조를 해석할 수 없습니다: ${reason instanceof Error ? reason.message : String(reason)}`]; }
   if (errors.length) return { circuit, signals, floating, pinSignals, order: [], cycles: [], errors };
   for (const component of Object.values(circuit.components)) {
-    const expected = component.kind === 'Input' || component.kind === 'Output' ? 1 : component.kind === 'NOT' ? 2 : component.pins.length;
-    if (!['Input', 'Output', ...gateKinds].includes(component.kind) || component.pins.length !== expected ||
+    const expected = ['Input', 'Output', 'Clock'].includes(component.kind) ? 1 : component.kind === 'NOT' ? 2 : component.kind === 'DFF' ? 3 : component.pins.length;
+    if (!componentKinds.includes(component.kind) || component.pins.length !== expected ||
       (isBinaryGate(component.kind) && (expected < 3 || expected > MAX_GATE_INPUTS + 1)) ||
       component.pins.some((id, i) => circuit.pins[id]?.index !== i || circuit.pins[id]?.direction !==
-        (component.kind === 'Input' || (component.kind !== 'Output' && i === expected - 1) ? 'out' : 'in')))
+        (component.kind === 'Input' || component.kind === 'Clock' || (component.kind !== 'Output' && i === expected - 1) ? 'out' : 'in')) || temporalPropertyError(component))
       errors.push(`지원하지 않거나 잘못된 부품 핀: ${component.name}`);
   }
   if (errors.length) return { circuit, signals, floating, pinSignals, order: [], cycles: [], errors };
@@ -95,7 +96,7 @@ export function compileCircuit(circuit: Circuit): Plan {
     floating.push(signal);
     pinSignals.set(pin.id, signal);
   }
-  const gates = Object.values(circuit.components).filter(c => c.kind !== 'Input' && c.kind !== 'Output');
+  const gates = Object.values(circuit.components).filter(c => isGate(c.kind));
   const edges = new Map(gates.map(c => [c.id, new Set<string>()]));
   for (const gate of gates) for (const pin of gate.pins.filter(id => circuit.pins[id].direction === 'in')) {
     for (const driver of pinSignals.get(pin)!.drivers) {
@@ -119,7 +120,7 @@ export function compileCircuit(circuit: Circuit): Plan {
   return { circuit, signals, floating, pinSignals, order, cycles, errors };
 }
 
-export function simulate(plan: Plan, inputs: Readonly<Record<string, LogicValue>> = {}): SimulationResult {
+export function simulate(plan: Plan, inputs: Readonly<Record<string, LogicValue>> = {}, state: Readonly<Record<string, LogicValue>> = {}): SimulationResult {
   const result: SimulationResult = { pins: {}, nets: {}, outputs: {}, diagnostics: [] };
   if (plan.errors.length) {
     result.diagnostics.push({ code: 'INVALID_CIRCUIT', severity: 'error', message: `회로 데이터 오류: ${plan.errors.join(' · ')}`, objects: [] });
@@ -146,7 +147,9 @@ export function simulate(plan: Plan, inputs: Readonly<Record<string, LogicValue>
   for (const component of Object.values(circuit.components)) {
     const provided = Object.hasOwn(values, component.id), value = values[component.id];
     for (const pin of component.pins) if (circuit.pins[pin].direction === 'out')
-      drives[pin] = component.kind === 'Input' ? (values !== inputs ? 'X' : provided ? logicValues.includes(value) ? value : 'X' : '0') : 'X';
+      drives[pin] = component.kind === 'Input' ? (values !== inputs ? 'X' : provided ? logicValues.includes(value) ? value : 'X' : '0')
+        : component.kind === 'Clock' ? state[component.id] ?? component.clock?.initial ?? '0'
+        : component.kind === 'DFF' ? state[component.id] ?? component.dff?.initial ?? 'X' : 'X';
   }
   const read = (pin: string) => resolveDrivers(pinSignals.get(pin)!.drivers.map(id => drives[id]));
   for (const gate of plan.order) {

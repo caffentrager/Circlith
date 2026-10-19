@@ -1,5 +1,6 @@
 import { clone, connect, id, mergeNets, type Circuit, type ConnectionTarget, type Endpoint, type Point } from "./circuit";
 import { endpointPosition } from "../geometry/geometry";
+import { temporalPropertyError } from './temporal-properties';
 import { anchorOffsets, clean, pointOnSegment, same, simplifyPath } from "../geometry/path";
 
 export const targetPosition = (c: Circuit, target: ConnectionTarget): Point =>
@@ -101,13 +102,15 @@ function validateRecords(c: Circuit): string[] {
       ids.add(key);
     }
   for (const comp of Object.values(c.components)) {
+    const temporalError = temporalPropertyError(comp);
+    if (temporalError) errors.push(temporalError);
     const p = c.geometry.components[comp.id];
     if (!p || !Number.isFinite(p.position.x) || !Number.isFinite(p.position.y) || !Number.isFinite(p.rotation)) errors.push("부품 좌표 오류");
     if (new Set(comp.pins).size !== comp.pins.length || comp.pins.some((key) => c.pins[key]?.component !== comp.id)) errors.push("부품 핀 참조 오류");
   }
   for (const pin of Object.values(c.pins)) {
     if (!c.components[pin.component]?.pins.includes(pin.id)) errors.push("핀 소유권 오류");
-    if (pin.inverted !== undefined && (typeof pin.inverted !== 'boolean' || pin.direction !== 'in' || ['Input', 'Output'].includes(c.components[pin.component]?.kind)))
+    if (pin.inverted !== undefined && (typeof pin.inverted !== 'boolean' || pin.direction !== 'in' || ['Input', 'Output', 'Clock', 'DFF'].includes(c.components[pin.component]?.kind)))
       errors.push('입력 반전 설정 오류');
   }
   for (const net of Object.values(c.nets)) {

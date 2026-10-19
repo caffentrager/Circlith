@@ -6,7 +6,8 @@ const operations: Record<string, string> = {
   WIRE_ROUTE: '경로 수정', SEGMENT_MOVE: '선분 편집', BOX_SELECT: '영역 선택', WIRE_CLEANUP: '중복 정리',
 };
 
-export function StatusBar({ tool, operation, selection, zoom, grid, simulationEnabled, message, messageKind, messageId, profile, pending }: {
+export function StatusBar({ tool, operation, selection, zoom, grid, simulationEnabled, message, messageKind, messageId, profile, pending, sequential = false }: {
+  sequential?: boolean;
   tool: string; operation: string; selection: number; zoom: number; grid: boolean;
   simulationEnabled: boolean; diagnostics: number; message: string; profile: string;
   pending: string[]; hint: (command: string) => string;
@@ -27,6 +28,6 @@ export function StatusBar({ tool, operation, selection, zoom, grid, simulationEn
     <span className="status-operation">{operations[operation] ?? operation}</span>
     <span className={`status-feedback ${messageKind === 'error' && visibleMessage ? 'status-error' : ''}`} title={feedback}>{messageKind === 'error' && visibleMessage ? '⚠ ' : ''}{feedback}</span>
     <span className="status-view">{Math.round(zoom * 100)}% · Grid {grid ? '10' : 'OFF'}</span>
-    {simulationAvailable && simulationEnabled && <span className="status-logic">조합논리</span>}
+    {simulationAvailable && simulationEnabled && <span className="status-logic">{sequential ? '시간 시뮬레이션' : '조합논리'}</span>}
   </footer>;
 }

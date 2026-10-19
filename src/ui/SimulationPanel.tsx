@@ -3,7 +3,8 @@ import { logicValues, type LogicValue } from '../simulation/logic';
 import type { Diagnostic, SimulationResult } from '../simulation/simulator';
 import type { CircuitLabels } from './circuit-labels';
 
-export function SimulationPanel({ circuit, labels, result, inputs, busy, onInput, onReset, onLocate }: {
+export function SimulationPanel({ circuit, labels, result, inputs, busy, onInput, onReset, onLocate, sequential = false }: {
+  sequential?: boolean;
   circuit: Circuit;
   labels: CircuitLabels;
   result: SimulationResult;
@@ -16,8 +17,8 @@ export function SimulationPanel({ circuit, labels, result, inputs, busy, onInput
   const sources = Object.values(circuit.components).filter(c => c.kind === 'Input');
   const sinks = Object.values(circuit.components).filter(c => c.kind === 'Output');
   const circuitInvalid = result.diagnostics.some(d => d.code === 'INVALID_CIRCUIT');
-  return <section className="simulation-panel" aria-label="조합논리 시뮬레이션">
-    <h2>조합논리 시뮬레이션</h2>
+  return <section className="simulation-panel" aria-label={sequential ? '시간 시뮬레이션' : '조합논리 시뮬레이션'}>
+    <h2>{sequential ? '시간 시뮬레이션' : '조합논리 시뮬레이션'}</h2>
     {busy && <p className="note">초안은 계산하지 않습니다. 확정하거나 취소하면 입력을 바꿀 수 있습니다.</p>}
     <p className="signal-legend">0 낮음 · 1 높음 · X 불명확 · Z 구동 없음</p>
     <div className="simulation-body">

@@ -18,6 +18,7 @@ export function fitView(
   width: number,
   height: number,
   selection?: string[],
+  padding = 40,
 ) {
   const chosen = selection ? new Set(selection) : null;
   const points: Point[] = [];
@@ -42,8 +43,8 @@ export function fitView(
     y1 = Math.min(...points.map((p) => p.y)),
     y2 = Math.max(...points.map((p) => p.y));
   const zoom = clampZoom(Math.min(
-    (width - 80) / Math.max(1, x2 - x1),
-    (height - 80) / Math.max(1, y2 - y1),
+    (width - 2 * padding) / Math.max(1, x2 - x1),
+    (height - 2 * padding) / Math.max(1, y2 - y1),
   ));
   return {
     zoom,

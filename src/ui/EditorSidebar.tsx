@@ -6,6 +6,7 @@ import type { CircuitLabels } from './circuit-labels';
 const categories: { name: string; kinds: Kind[] }[] = [
   { name: '논리 게이트', kinds: [...gateKinds] },
   { name: '입출력', kinds: ['Input', 'Output'] },
+  { name: '순차소자', kinds: ['Clock', 'DFF'] },
 ];
 
 export function EditorSidebar({ circuit, labels, selection, renderPart, searchCommand, onSelect, onReveal, onClose, busy, children }: {

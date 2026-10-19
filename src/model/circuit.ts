@@ -1,10 +1,11 @@
 export const gateKinds = ["AND", "OR", "NOT", "XOR", "NAND", "NOR", "XNOR"] as const;
 export type GateKind = typeof gateKinds[number];
-export type Kind = "Input" | GateKind | "Output";
-export const componentKinds: Kind[] = [...gateKinds, "Input", "Output"];
-export const isBinaryGate = (kind: Kind) => kind !== "Input" && kind !== "Output" && kind !== "NOT";
+export type Kind = "Input" | GateKind | "Output" | "Clock" | "DFF";
+export const componentKinds: Kind[] = [...gateKinds, "Input", "Output", "Clock", "DFF"];
+export const isGate = (kind: Kind) => (gateKinds as readonly string[]).includes(kind);
+export const isBinaryGate = (kind: Kind) => isGate(kind) && kind !== "NOT";
 export const MAX_GATE_INPUTS = 16;
-export const gateInputCount = (component: Component) => isBinaryGate(component.kind) ? component.pins.length - 1 : 1;
+export const gateInputCount = (component: Component) => component.kind === 'DFF' ? 2 : isBinaryGate(component.kind) ? component.pins.length - 1 : 1;
 export const gateHalfHeight = (count: number) => Math.max(20, count * 10);
 export const inputY = (index: number, count: number) => (index - (count - 1) / 2) * 20;
 export type Point = { x: number; y: number };
@@ -13,6 +14,8 @@ export type Component = {
   kind: Kind;
   name: string;
   pins: string[];
+  clock?: { period: number; duty: number; initial: '0' | '1' };
+  dff?: { edge: 'rising' | 'falling'; initial: '0' | '1' | 'X' };
 };
 export type Pin = {
   id: string;
@@ -55,7 +58,7 @@ export function addComponent(
   rotation = 0,
 ) {
   const key = id();
-  const count = isBinaryGate(kind) ? 3 : kind === "NOT" ? 2 : 1;
+  const count = kind === 'DFF' || isBinaryGate(kind) ? 3 : kind === "NOT" ? 2 : 1;
   const pins = Array.from({ length: count }, (_, index) => {
     const pin = id();
     c.pins[pin] = {
@@ -63,11 +66,13 @@ export function addComponent(
       component: key,
       index,
       direction:
-        kind === "Input" || (kind === "NOT" && index === 1) || (isBinaryGate(kind) && index === 2) ? "out" : "in",
+        kind === "Input" || kind === 'Clock' || (kind === "NOT" && index === 1) || ((kind === 'DFF' || isBinaryGate(kind)) && index === 2) ? "out" : "in",
     };
     return pin;
   });
-  c.components[key] = { id: key, kind, name: kind, pins };
+  c.components[key] = { id: key, kind, name: kind, pins,
+    ...(kind === 'Clock' ? { clock: { period: 10, duty: 50, initial: '0' as const } } : {}),
+    ...(kind === 'DFF' ? { dff: { edge: 'rising' as const, initial: 'X' as const } } : {}) };
   c.geometry.components[key] = { position, rotation };
   return key;
 }

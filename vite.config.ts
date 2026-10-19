@@ -6,6 +6,8 @@ const sourceCommit = () => {
 };
 
 export default defineConfig(({ command, mode }) => ({
+  esbuild: { jsx: "automatic" },
+  optimizeDeps: { include: ["react", "react-dom/client", "react/jsx-runtime", "react/jsx-dev-runtime"] },
   plugins: [{
     // Stamp every production build with the commit it was built from so Pages assembly can verify it.
     name: "circlith-build-info", apply: "build",

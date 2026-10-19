@@ -111,13 +111,14 @@ export function Symbols({
             <g
               key={c.id}
               data-component={c.id}
-              data-value={simulation ? (c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? circuitInvalid ? undefined : simulation.outputs[c.id] ?? 'X' : undefined) : undefined}
+              data-value={simulation ? (c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? circuitInvalid ? undefined : simulation.outputs[c.id] ?? 'X' : ['Clock', 'DFF'].includes(c.kind) ? simulation.pins[c.pins.at(-1)!] : undefined) : undefined}
               transform={`translate(${p.position.x} ${p.position.y}) rotate(${p.rotation})`}
             >
               <GateBody kind={c.kind} selected={selection.includes(c.id)} inputCount={gateInputCount(c)}
+                clockEdge={c.dff?.edge}
                 showPinLabels={zoom >= 1} zoom={zoom}
                 invertedInputs={c.pins.filter(id => circuit.pins[id].direction === 'in').map(id => !!circuit.pins[id].inverted)}
-                value={c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? circuitInvalid ? '오류' : simulation ? simulation.outputs[c.id] ?? 'X' : '—' : undefined}/>
+                value={c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? circuitInvalid ? '오류' : simulation ? simulation.outputs[c.id] ?? 'X' : '—' : ['Clock', 'DFF'].includes(c.kind) && simulation ? circuitInvalid ? '오류' : simulation.pins[c.pins.at(-1)!] : undefined}/>
               {simulation && c.kind === 'Input' && onToggleInput && <g role="button" tabIndex={0} aria-disabled={toggleDisabled || undefined}
                 aria-label={`입력 토글 ${inputIndex.get(c.id)}: ${inputs[c.id] ?? '0'}`}
                 data-input-toggle={c.id} className="input-toggle"

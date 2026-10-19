@@ -226,13 +226,14 @@ Circlith에 가져올 핵심은 다음이다.
 | DEC-010 | 0/1/X/Z resolution | `CURRENT` | 조합논리 브랜치는 §24의 4상태 논리·해석적 계산·보수적 피드백 진단을 사용. 물리적 전압·지연 모델 아님 |
 | DEC-011 | 미연결 배선 종료 | `PROVISIONAL` | v1에서 빈 공간 더블클릭 종료 제외. 필요 시 명시적 Finish Unconnected 명령 |
 | DEC-012 | 그룹/서브회로 | `DEFERRED` | 그룹=비전기적 편집 묶음, 서브회로=포트·내부 회로·저장 경계가 있는 전기적 단위 |
-| DEC-013 | 시간 Step | `DEFERRED` | 이벤트 Step과 clock edge/period를 분리. 동시 이벤트 semantics 이후 키 확정 |
+| DEC-013 | 시간 Step | `CURRENT` | 동일 시각 이벤트 묶음+안정화, 선택 Clock 상승엣지/주기 분리. UI 구현, 단축키는 후속. §25 |
 | DEC-014 | 성능 기준 | `PROVISIONAL` | 수치보다 측정 지표를 먼저 정의. 60Hz 16.7ms는 목표 후보, 기존 33ms는 과거 잠정안으로 보존 |
 | DEC-015 | 브라우저 억제 | `PROVISIONAL` | key/pointer × state/focus 매트릭스로 `preventDefault`/전파 종료를 관리 |
 | DEC-016 | 입력 프로필 | `CURRENT` | Command Registry → Binding → Preset 분리. Modern 기본, 버전 있는 외부 JSON, built-in + 사용자 override. 입력 재배정은 연결 유지 등 명령 불변식을 바꾸지 않음. 미지원 명령은 표시하며 실행하지 않음 |
 | DEC-017 | 현재 브랜치 우선순위 | `CURRENT` | `feat/editor-prototype`은 조작·제어·UI/UX 성숙을 우선한다. 미구현 기능 확장은 그 이후다. §5.1 |
 | DEC-018 | 단일 부품 속성 | `CURRENT` | 심벌 더블클릭 또는 Inspector의 속성 편집 버튼으로 동일 Properties를 열어 이름·가변 입력 수·입력 반전을 원자적으로 편집. §9.4 |
 | DEC-019 | 작업 영역 UI | `CURRENT` | 명령 그룹·상태바·읽기 Inspector·접을 수 있는 패널과 진단 도크. 기존 입력·회로·Undo 의미론 유지. §4.4 |
+| DEC-021 | 순차회로 MVP | `CURRENT` | Clock/DFF·동시 갱신·Run/Pause/Step/Reset·bounded 파형. 사용자 2026-10-19 구현 승인. §25. 저장·복구 DEC-020은 별도 브랜치와 통합 |
 
 ### 6.1 입력 프리셋 구현 결정
 
@@ -933,14 +934,21 @@ Properties 입력 수 변경으로 경유점 주변에 되짚는 배선이 생�
 
 ## 25. 시간 시뮬레이션
 
-**상태: `DEFERRED`.**
+**상태: `CURRENT` — 2026-10-19 사용자 승인, `codex/sequential-simulation`의 Clock/DFF MVP.**
 
-- 구조 edit 확정 전 running simulation 정지.
-- 새 구조에서 state/time/waveform 초기화.
-- 유효한 input ID의 current input value 유지 여부는 현재 제안대로 검토.
-- Run = 현재 시점에서 재개.
-- Reset = t=0, internal state/waveform reset.
-- 구조 Undo/Redo 시 simulation 정지·초기화.
+- 실행 중 구조 편집과 수동 Input 변경 잠금. 선택·화면 이동·줌·관측은 허용.
+- 일시정지/재개는 시간·Q·파형을 보존. 시뮬레이션 표시를 껐다 켜도 보존하며 숨겨진 탭에서는 일시정지.
+- 확정 구조·속성·경로·위치 변경 및 Undo/Redo는 정지 후 새 세션(t=0, 초기 Q, 파형 초기화). 초안·취소·선택·뷰 이동은 초기화하지 않음.
+- Reset은 시간·내부 상태·Clock 위상·파형 초기화, 외부 Input 값과 관측 목록 유지. 부품 Reset 핀과 구분.
+- 시간·Q·입력 변화·파형은 편집 history와 분리. Clock/DFF 설정과 초기 Q만 설계 속성.
+- Clock 기본 10 µs·50%·초기 0. 주기 2~1000000 정수 µs, 듀티 1~99 정수 %, 초기 레벨 0/1.
+- DFF 핀은 D/CLK/Q, 상승/하강엣지와 초기 Q=0/1/X(기본 상승/X). 동시 FF는 갱신 전 Q를 읽고 함께 갱신.
+- X/Z 데이터는 샘플링 때 Q=X, 불명 CLK의 가능한 활성 엣지도 보수적으로 X. 초기 레벨 자체에는 엣지 없음.
+- 이상적 논리 시간(내부 0.01 µs 정수)과 화면 재생 속도를 구분. 실제 지연·setup/hold·메타안정성은 미지원.
+- 관측 최대 32신호, 최근 512시각. 파형 커서는 과거 기록만 관측하며 현재 실행 상태를 되돌리지 않음.
+- 같은 시각 안정화 64회/Step 중간 timestamp 2048개 한도. 실패는 Step 전 상태로 복구·오류 정지.
+
+상세 모델·예외·저장 브랜치 통합 기준은 [SEQUENTIAL_SIMULATION.md](SEQUENTIAL_SIMULATION.md)를 따른다. 저장·복구 기능은 별도 진행 중이며 합칠 때 Clock/DFF kind와 속성의 파일 검증·호환 정책을 반영해야 한다. 되감기·조건 정지·추가 FF 변형·입력 시간표·파형 export/측정은 후속이다.
 
 ### 25.1 Step
 
@@ -950,7 +958,7 @@ Properties 입력 수 변경으로 경유점 주변에 되짚는 배선이 생�
 - clock edge 하나
 - clock period 하나
 
-현재 권장 방향은 **동일 timestamp의 이벤트 묶음을 처리하고 필요한 combinational stabilization까지 끝낸 결과를 한 Step으로 보여주는 것**이다. 단순 queue item 1개 처리 방식은 등록 순서에 따른 중간 상태를 사용자가 최종 결과로 오해할 수 있다.
+기본 다음 이벤트는 **동일 timestamp의 소스 이벤트 묶음과 필요한 조합/순차 delta 안정화까지 끝낸 결과를 한 Step으로 보여준다.** 선택 Clock 다음 상승엣지는 해당 엣지까지, 한 주기는 현재 시각에서 해당 Clock의 주기만큼 진행하며 중간의 다른 Clock 이벤트도 모두 처리한다.
 
 이벤트 Step과 clock edge/period command는 분리한다.
 
@@ -1180,7 +1188,7 @@ pointermove마다 전체 circuit을 재계산하지 않고, 필요하면 최신 
 | 다중 E 규칙 없음 | **정정**: 공통 속성 원칙은 있었음. semantic compatibility를 추가 |
 | 0/1/X/Z table | **조합논리 기준 확정**: §24와 DEC-010 참고 |
 | Group/Subcircuit | **DEFERRED** |
-| Step 의미 | **DEFERRED** |
+| Step 의미 | **CURRENT** — §25의 이벤트/상승엣지/주기. 단축키는 후속 |
 | dangling double-click | **v1 제외 권장** |
 | browser preventDefault | **matrix로 승격** |
 | p95 33ms | **수치 보류**, measurement definition 우선 |

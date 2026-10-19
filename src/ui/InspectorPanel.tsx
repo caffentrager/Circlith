@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { gateInputCount, type Circuit, type Endpoint } from '../model/circuit';
+import { gateInputCount, isGate, type Circuit, type Endpoint } from '../model/circuit';
+import { clockProperties, dffProperties } from '../model/temporal-properties';
 import type { SimulationResult } from '../simulation/simulator';
 import type { CircuitLabels } from './circuit-labels';
 
@@ -29,9 +30,11 @@ export function InspectorPanel({ circuit, labels, selection, simulation, busy, o
     </> : component ? <>
       <dl className="property-list">
         <dt>종류</dt><dd>{component.kind}</dd>
-        {component.kind !== 'Input' && component.kind !== 'Output' && <><dt>입력 수</dt><dd>{gateInputCount(component)}</dd></>}
+        {(isGate(component.kind) || component.kind === 'DFF') && <><dt>입력 수</dt><dd>{gateInputCount(component)}</dd></>}
         <dt>회전</dt><dd>{circuit.geometry.components[component.id].rotation}°</dd>
-        {component.kind !== 'Input' && component.kind !== 'Output' && <><dt>입력 반전</dt><dd>{component.pins.filter(id => circuit.pins[id].direction === 'in' && circuit.pins[id].inverted).map(id => labels.pins.get(id)).join(', ') || '없음'}</dd></>}
+        {isGate(component.kind) && <><dt>입력 반전</dt><dd>{component.pins.filter(id => circuit.pins[id].direction === 'in' && circuit.pins[id].inverted).map(id => labels.pins.get(id)).join(', ') || '없음'}</dd></>}
+        {component.kind === 'Clock' && <><dt>주기 / 듀티</dt><dd>{clockProperties(component).period} µs / {clockProperties(component).duty}%</dd><dt>초기 레벨</dt><dd>{clockProperties(component).initial}</dd><dt>현재 레벨</dt><dd>{signal(simulation?.pins[component.pins[0]])}</dd></>}
+        {component.kind === 'DFF' && <><dt>동작 엣지</dt><dd>{dffProperties(component).edge === 'rising' ? '상승엣지' : '하강엣지'}</dd><dt>초기 Q</dt><dd>{dffProperties(component).initial}</dd><dt>현재 Q</dt><dd>{signal(simulation?.pins[component.pins[2]])}</dd></>}
       </dl>
       <button className="primary-action" disabled={busy} onClick={() => onProperties(component.id)}>속성 편집…</button>
       <h3>핀과 연결</h3>

@@ -7,6 +7,7 @@ export function GateBody({
   invertedInputs = [],
   showPinLabels = false,
   zoom = 1,
+  clockEdge = 'rising',
 }: {
   kind: Kind;
   selected?: boolean;
@@ -15,6 +16,7 @@ export function GateBody({
   invertedInputs?: boolean[];
   showPinLabels?: boolean;
   zoom?: number;
+  clockEdge?: 'rising' | 'falling';
 }) {
   const className = selected ? "symbol selected" : "symbol";
   const inverted = kind === "NAND" || kind === "NOR" || kind === "XNOR";
@@ -34,6 +36,21 @@ export function GateBody({
     </g>;
   });
   const outputName = showPinLabels && <text data-pin-name="O" x="21" y="2.5" textAnchor="end" className="gate-pin-name">O</text>;
+  if (kind === 'Clock') return <>
+    <rect data-gate-shape="Clock" x="-26" y="-20" width="52" height="40" className={className}/>
+    <path d="M -18 7 H -8 V -7 H 4 V 7 H 16" className="gate-outline"/>
+    <path d="M 26 0 H 40" className="pin-lead"/>
+    {value !== undefined && <text x="0" y={zoom < 1 ? 20 + 12 / zoom : 34} style={{ fontSize: Math.max(10, 9 / zoom) }} textAnchor="middle" className="gate-pin-name">{value}</text>}
+  </>;
+  if (kind === 'DFF') return <>
+    <rect data-gate-shape="DFF" x="-26" y="-20" width="52" height="40" className={className}/>
+    <path d={`M -40 -10 H -26 M -40 10 H ${clockEdge === 'falling' ? -33 : -26} M 26 0 H 40`} className="pin-lead"/>
+    {clockEdge === 'falling' && <circle data-clock-edge="falling" cx="-30" cy="10" r="3" className="gate-bubble"/>}
+    <path d="M -26 5 L -19 10 L -26 15" className="gate-outline"/>
+    <text x="-20" y="-7" className="gate-pin-name">D</text>
+    <text x="20" y="3" textAnchor="end" className="gate-pin-name">Q</text>
+    {value !== undefined && <text x="0" y={zoom < 1 ? 20 + 12 / zoom : 34} style={{ fontSize: Math.max(10, 9 / zoom) }} textAnchor="middle" className="gate-pin-name">{value}</text>}
+  </>;
   if (kind === "AND" || kind === "NAND")
     return (
       <>

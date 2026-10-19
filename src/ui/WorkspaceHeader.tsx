@@ -1,6 +1,7 @@
 import { simulationAvailable } from '../config/app-mode';
 
-export function WorkspaceHeader({ tool, simulationEnabled, canUndo, canRedo, edits, projectName, onProjectName, hint, onCommand, onSimulation, onSettings }: {
+export function WorkspaceHeader({ tool, simulationEnabled, sequential = false, canUndo, canRedo, edits, projectName, onProjectName, hint, onCommand, onSimulation, onSettings }: {
+  sequential?: boolean;
   tool: 'SELECT' | 'WIRE';
   simulationEnabled: boolean;
   canUndo: boolean;
@@ -15,7 +16,7 @@ export function WorkspaceHeader({ tool, simulationEnabled, canUndo, canRedo, edi
 }) {
   return <header className="workspace-header" data-edit-count={edits}>
     <strong className="brand"><i aria-hidden="true" className="brand-mark">C</i>Circlith
-      <small>{simulationAvailable ? '조합논리 시뮬레이션' : '회로 편집기'}</small>
+      <small>{simulationAvailable ? sequential ? '시간 시뮬레이션' : '조합논리 시뮬레이션' : '회로 편집기'}</small>
     </strong>
     <div className="project-heading">
       <input aria-label="프로젝트 이름" value={projectName} onChange={e => onProjectName(e.target.value)} />
@@ -31,7 +32,7 @@ export function WorkspaceHeader({ tool, simulationEnabled, canUndo, canRedo, edi
     </div>
     <div className="header-group workspace-actions">
       {simulationAvailable && <button className="logic-switch" aria-pressed={simulationEnabled}
-        title={`조합논리 표시 ${simulationEnabled ? '켜짐' : '꺼짐'}`} onClick={onSimulation}>시뮬레이션<i aria-hidden="true" className="switch-track" /></button>}
+        title={`시뮬레이션 표시 ${simulationEnabled ? '켜짐' : '꺼짐'}`} onClick={onSimulation}>시뮬레이션<i aria-hidden="true" className="switch-track" /></button>}
       <button onClick={onSettings}><i aria-hidden="true">⚙</i> 설정</button>
     </div>
   </header>;

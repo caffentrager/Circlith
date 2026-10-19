@@ -1,5 +1,7 @@
 # Circlith
 
+순차회로 MVP 브랜치 `codex/sequential-simulation`: Clock·DFF, 실행/일시정지·세 가지 Step·초기화, 현재 시각, 관측 파형을 추가했습니다. Clock/DFF가 있는 도면에서 시뮬레이션을 켜면 실행바가 나타납니다. [동작·범위·저장 브랜치 통합 정책](docs/SEQUENTIAL_SIMULATION.md), [구현·검증 결과](review/SEQUENTIAL_IMPLEMENTATION_20261019.md).
+
 2026-10-19 UI 개선 브랜치 `codex/ui-workspace-refresh`: 명령을 묶은 헤더, 줌·그리드·패널 접기 도구, 선택 연동 Inspector, 하단 상태바와 접을 수 있는 진단 도크를 제공합니다. Inspector의 **속성 편집…**은 기존 Properties 창을 열어 같은 Apply/Undo를 사용합니다. 편집/시뮬레이션 모드에 공통 적용하며 [구현·검증 기록](review/UI_WORKSPACE_REFRESH_20261019.md)을 참고하세요.
 
 UX 감사 후속: 다른 연결망의 배선 겹침을 주황색 **도면 표시 경고**로 구분하고 같은 연결망을 강조합니다. 입력·출력·회로 진단은 Inspector와 독립된 하단 도크에 표시합니다. 이름·핀·연결망 표시를 통일하고, 입출력 본체 50%·최대 800%는 유지하면서 값 글자의 화면 최소 크기를 보장합니다. 헤더의 미저장 안내와 이탈 경고는 저장 기능을 대신하지 않습니다. [반영 범위와 검증](review/UI_AUDIT_RESPONSE_20261019.md).
