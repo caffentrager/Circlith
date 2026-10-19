@@ -1,29 +1,52 @@
-# GitHub Pages: main의 공통 소스를 두 모드로 배포
+# GitHub Pages: 단일 Circlith 앱
 
-| 모드 | 소스 | 주소 | 설정 키 prefix |
-|---|---|---|---|
-| editor | main의 같은 커밋 | `/Circlith/` | `circlith.` |
-| simulation | main의 같은 커밋 | `/Circlith/simulation/` | `circlith.simulation.` |
+2026-10-19 사용자의 단일 앱 배포 요청이 이전 두 모드 게시 정책을 대체한다.
+공개 주소는 https://caffentrager.github.io/Circlith/ 하나다.
+편집·조합논리·Clock/DFF 시간 시뮬레이션을 포함한 simulation 빌드를 루트에 배포한다.
+이전 /Circlith/simulation/과 별도 editor 디렉터리는 산출물에 포함하지 않으며 404로 종료한다.
+브랜치·개발 소스·Git 이력을 삭제하는 작업은 아니다.
 
-## 개발과 배포
+## 개발·배포 경계
 
-기능은 개발 브랜치에서 구현하고 main에 병합한다. `check.yml`은 기능 브랜치 push와 main 대상 PR에서 공통 단위·브라우저 검사 및 두 모드의 빌드·실행 검증을 수행하며 배포하지 않는다. `pages.yml`은 main push에서 같은 검증 후 두 모드를 한 산출물로 배포한다. 수동 실행도 main에서만 게시한다. Pages 환경은 main만 허용한다.
+기능 브랜치는 check.yml로 단위·브라우저·단일 생산 빌드·Pages 산출물을 검사하며 게시하지 않는다.
+pages.yml은 main push(또는 main에서 수동 실행)에 같은 검증을 수행한 뒤 Pages를 게시한다.
+검증 실패 시 새 산출물은 게시하지 않는다.
+로컬 editor 모드는 개발·회귀 검증 목적으로 유지하지만 별도 URL로 공개하지 않는다.
 
-공통 편집기는 한 코드이며 `src/config/app-mode.ts`에서 Vite mode에 따라 시뮬레이션 기능과 설정 namespace만 선택한다. 로컬 기본은 simulation이다. editor 모드는 `npm run dev -- --mode editor`로 실행한다. 과거 Phase 브랜치는 비교 기준으로 보존하고 서비스 소스로 사용하지 않는다. 편집 기능 수정이 main에 들어가면 두 URL에 함께 반영된다.
-
-## 빌드와 검증 명령
+## 빌드·조립·검사
 
 ```sh
-npm run build -- --mode editor --base=/Circlith/ --outDir build/editor-dist
-npm run build -- --mode simulation --base=/Circlith/simulation/ --outDir build/simulation-dist
-node scripts/assemble-pages.mjs build/editor-dist build/simulation-dist build/pages-site
+npm ci
+npm test
+npx playwright install chromium
+npm run test:browser
+npm run build -- --mode simulation --base=/Circlith/ --outDir build/circlith-dist
+node scripts/assemble-pages.mjs build/circlith-dist build/pages-site
 node scripts/check-pages.mjs build/pages-site
 ```
 
-조립 대상 디렉터리는 새 경로여야 한다. 모든 빌드는 `build-info.json`(commit·mode)을 포함하며 조립 스크립트는 두 base, 각 build-info의 mode, 두 commit의 일치와 현재 HEAD와의 일치를 검사하여 낡은 산출물을 거부하고 `/Circlith/deployment.json`에 version 2·source commit·각 mode를 기록한다. 브라우저 검사는 빌드 산출물의 두 URL, 계산 기능의 노출 차이, 공통 교차 점프, 설정의 상호 독립, 입력 변경에 따른 결과, 자산 로딩을 확인한다. 배포 후에는 `node scripts/check-pages.mjs https://caffentrager.github.io/Circlith/`로 같은 검사를 실행한다.
+조립 목적지는 새 경로여야 한다. 기존 산출물을 덮어 조립하지 않으며,
+입력 빌드 안에 simulation/editor 하위 앱이 있으면 거부한다.
+base=/Circlith/, mode=simulation, build-info.json의 commit=현재 HEAD를 검사한다.
+deployment.json은 version 3, source commit, 단일 application의 commit/mode/path와 제거한 경로를 기록한다.
 
-`build-pages.yml`은 테스트·두 빌드·조립·브라우저 검사를 공통 수행하며, `pages.yml`만 게시 권한을 사용한다. 한 모드가 실패하면 새 산출물을 게시하지 않는다. 복구할 때도 main의 검증된 커밋에서 두 모드를 함께 다시 빌드한다. 과거 브랜치의 이전 배포 워크플로를 실행하지 않는다.
+브라우저 검사는 build-info와 manifest, 자산 오류 없음, 기본 게이트·Clock/DFF·편집기 UI,
+설정 저장/복원, 실제 DFF 배선·엣지 샘플링·Step·Run/Pause/Reset,
+과거 파형 커서의 읽기 전용 동작, 이전 simulation/editor 경로 404를 확인한다.
+상태바 문구 대신 data-input-profile과 실제 설정값을 검사한다.
 
-## 설정과 데이터
+배포 후:
 
-두 주소는 같은 origin이지만 입력 프로필·경로 생성·교차 표시의 localStorage 키를 분리한다. 기존 editor 입력·배선 설정은 유지하며 새 교차 표시 설정은 `circlith.wire-display.v1`에 저장한다. simulation은 동일한 suffix에 `circlith.simulation.` prefix를 쓴다. 회로는 두 모드 모두 메모리에 유지되며 저장 기능과는 별개다.
+```sh
+CIRCLITH_EXPECT_COMMIT=<deployed-sha> node scripts/check-pages.mjs https://caffentrager.github.io/Circlith/
+```
+
+CIRCLITH_SCREENSHOT 환경변수를 지정하면 최종 화면을 해당 경로에 저장한다.
+Windows PowerShell은 환경변수를 $env:변수명으로 지정한다.
+
+## 설정·데이터
+
+앱을 root로 옮겨도 기존 simulation 설정 키인 circlith.simulation.*를 유지한다.
+기존 circlith.* editor 설정을 자동 복사·수정·삭제하지 않는다.
+회로와 실행 세션은 이 배포 기준에서 메모리에만 있으며 저장·복구는 별도 개발 브랜치다.
+새 배포는 브라우저에 이미 열린 미저장 도면을 서버에 저장해 주지 않는다.

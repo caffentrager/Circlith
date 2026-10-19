@@ -1,4 +1,4 @@
-name: Verify and build both Circlith modes
+name: Verify and build single Circlith application
 
 on:
   workflow_call:
@@ -21,13 +21,11 @@ jobs:
       - run: npx playwright install --with-deps chromium
       - name: Test editing and simulation interactions
         run: npm run test:browser
-      - name: Build editor mode
-        run: npm run build -- --mode editor --base=/Circlith/ --outDir build/editor-dist
-      - name: Build simulation mode
-        run: npm run build -- --mode simulation --base=/Circlith/simulation/ --outDir build/simulation-dist
-      - name: Assemble both modes from this commit
-        run: node scripts/assemble-pages.mjs build/editor-dist build/simulation-dist build/pages-site
-      - name: Verify both built modes and isolated settings
+      - name: Build Circlith with editing and sequential simulation
+        run: npm run build -- --mode simulation --base=/Circlith/ --outDir build/circlith-dist
+      - name: Assemble a fresh single application site
+        run: node scripts/assemble-pages.mjs build/circlith-dist build/pages-site
+      - name: Verify published paths and Clock DFF behavior
         run: node scripts/check-pages.mjs build/pages-site
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:

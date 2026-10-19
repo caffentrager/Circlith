@@ -202,9 +202,26 @@ Circlith에 가져올 핵심은 다음이다.
 
 ### 5.3 main 통합과 공통 편집기 — 2026-10-18 후속 사용자 요청
 
+**배포 주소와 산출물 구성은 §5.4의 단일 앱 요청으로 대체되었다.** 소스 공유·설정 격리 원칙은 유지하며 두 URL 동시 게시 정책은 종료한다.
+
 이 항목은 §5.2의 초기 브랜치별 배포 구성을 대체한다. 기능은 개발 브랜치에서 구현·검증한 뒤 main으로 병합하고 서비스는 main에서만 배포한다. 동일 소스·동일 커밋을 Vite editor/simulation 모드로 빌드한다. 두 모드는 7종 게이트와 동일한 편집·배선·교차 점프 기능을 공유한다. 편집 모드는 시뮬레이션 활성화 버튼·입력 토글·계산 결과·진단 패널을 제공하지 않는다. 계산 엔진은 별도 모듈로 유지한다.
 
 편집 모드 설정은 기존 `circlith.*`, 시뮬레이션 모드는 `circlith.simulation.*` 키를 쓴다. 입력 프로필·경로 생성·배선 표시 설정을 각각 저장하며 두 모드 사이에 자동 복사하지 않는다. `src/config/app-mode.ts`가 모드와 설정 namespace를 정하고 도면 모델에는 모드 필드를 추가하지 않는다. 과거 Phase 브랜치는 보존하되 서비스 배포 진입점으로 사용하지 않는다. 빌드 산출물에는 두 모드의 동일 source commit을 기록하고 실제 브라우저에서 모드 차이·공통 기능·설정 분리를 확인한다.
+
+---
+
+### 5.4 단일 Circlith 공개 앱 — 2026-10-19 사용자 요청
+
+“페이지스로 올려줘. 다 내리고 이거만 circlith로 올려”에 따라 순차회로 UI/엔진을 포함한 앱 하나를 `https://caffentrager.github.io/Circlith/`에 게시한다.
+
+- main 소스를 `--mode simulation --base=/Circlith/`로 한 번 빌드. 편집·조합논리·Clock/DFF 시간 시뮬레이션을 같은 앱에서 제공.
+- 기존 별도 `/Circlith/simulation/` 및 editor 앱 디렉터리는 새 Pages 산출물에서 제외하여 404로 종료. 예전 브랜치·소스 이력 삭제는 하지 않음.
+- 새 빈 디렉터리에 전체 산출물을 조립하며 단일 mode·base·HEAD stamp를 검사. deployment.json version 3에 source/application commit 기록.
+- 기존 simulation 설정 namespace `circlith.simulation.*` 유지. URL 이동 때문에 editor 설정을 자동 복사하거나 삭제하지 않음.
+- 배포 전 단위·브라우저·생산 빌드·산출물 검증. 배포 후 공개 주소에서 버전·자산·Clock/DFF·실행 제어와 이전 경로 404 확인.
+- 다른 에이전트의 저장·복구 개발 브랜치는 이번 게시에 포함하지 않음. 추후 통합 시 §25의 새 부품 파일 검증 정책 준수.
+
+구체적 명령·검증은 [PAGES_DEPLOYMENT.md](PAGES_DEPLOYMENT.md).
 
 ---
 
