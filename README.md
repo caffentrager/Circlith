@@ -1,5 +1,9 @@
 # Circlith
 
+> 2026-10-19 저장소 감사: 현재 `main@f59efd2`는 Logic 편집·조합논리·Clock/DFF 시간 시뮬레이션·파형을 제공하는 단일 앱입니다. 아래 날짜·브랜치별 설명에는 과거 단계의 기록이 포함됩니다. 현재 상태와 문서 권위는 [저장소 인덱스](docs/REPOSITORY_INDEX.md), [감사 보고서](docs/platform/REPOSITORY_AUDIT.md)를 먼저 확인하세요.
+>
+> Logic/Electronics 플랫폼 구조는 [미래 설계 제안](docs/platform/PLATFORM_ARCHITECTURE.md)이며 이번 단계에서 구현하지 않았습니다. 기존 Master Spec이 기준이며, 저장·복구/클립보드는 별도 개발 브랜치의 미통합 작업입니다.
+
 순차회로 MVP 브랜치 `codex/sequential-simulation`: Clock·DFF, 실행/일시정지·세 가지 Step·초기화, 현재 시각, 관측 파형을 추가했습니다. Clock/DFF가 있는 도면에서 시뮬레이션을 켜면 실행바가 나타납니다. [동작·범위·저장 브랜치 통합 정책](docs/SEQUENTIAL_SIMULATION.md), [구현·검증 결과](review/SEQUENTIAL_IMPLEMENTATION_20261019.md).
 
 2026-10-19 UI 개선 브랜치 `codex/ui-workspace-refresh`: 명령을 묶은 헤더, 줌·그리드·패널 접기 도구, 선택 연동 Inspector, 하단 상태바와 접을 수 있는 진단 도크를 제공합니다. Inspector의 **속성 편집…**은 기존 Properties 창을 열어 같은 Apply/Undo를 사용합니다. 편집/시뮬레이션 모드에 공통 적용하며 [구현·검증 기록](review/UI_WORKSPACE_REFRESH_20261019.md)을 참고하세요.
