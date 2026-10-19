@@ -51,7 +51,7 @@ test('scene rows and canvas share selection, Shift-selection, Delete and Undo wi
   await rows.nth(0).click();await expect(page.locator('main .symbol.selected')).toHaveCount(1);
   await rows.nth(1).click({modifiers:['Shift']});await expect(page.locator('main .symbol.selected')).toHaveCount(2);
   await expect(rows.nth(0)).toHaveAttribute('aria-pressed','true');
-  await expect(page.locator('header')).toContainText('2 committed edits');
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "2");
   await page.keyboard.press('Delete');await expect(rows).toHaveCount(0);
   await page.keyboard.press('Control+z');await expect(rows).toHaveCount(2);
   await point(page,500,200);await expect(rows.nth(1)).toHaveAttribute('aria-pressed','true');
@@ -59,7 +59,7 @@ test('scene rows and canvas share selection, Shift-selection, Delete and Undo wi
   const before=await page.locator('main svg > g').first().getAttribute('transform');
   await rows.nth(0).dblclick();
   expect(await page.locator('main svg > g').first().getAttribute('transform')).not.toBe(before);
-  await expect(page.locator('header')).toContainText('2 committed edits');
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "2");
 });
 
 test('connected wires appear under nets, filter by endpoint, and track deletion and Undo',async({page})=>{
@@ -93,5 +93,5 @@ test('tabs support arrow navigation, queries survive tab changes, and draft obje
   await expect(page.locator('[data-outline-object]')).toBeDisabled();
   await page.locator('main svg').focus();await page.keyboard.press('Escape');
   await expect(page.locator('[data-outline-object]')).toBeEnabled();
-  await expect(page.locator('header')).toContainText('1 committed edits');
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "1");
 });

@@ -30,6 +30,7 @@ test("routing choices change new routes, persist independently of controls, and 
   const wire = page.locator("main [data-wire]"); await expect(wire).toHaveAttribute("points", "140,100 360,100 360,300");
   await settings(page, "vertical"); await expect(wire).toHaveAttribute("points", "140,100 360,100 360,300");
   const p = await point(page, 220, 100); await page.mouse.click(p.x, p.y);
+  if (!await page.locator(".advanced-wire-tools").getAttribute("open").then(v => v !== null)) await page.locator(".advanced-wire-tools summary").click();
   await page.getByRole("button", { name: "설정대로 정리", exact: true }).click();
   await expect(wire).toHaveAttribute("points", "140,100 140,300 360,300");
   await page.keyboard.press("Control+z"); await expect(wire).toHaveAttribute("points", "140,100 360,100 360,300");
@@ -67,7 +68,7 @@ test("group drag rotates the selected components together and reverses the entir
   await expect(components.nth(0)).toHaveAttribute("transform", "translate(250 400) rotate(270)");
   await expect(components.nth(1)).toHaveAttribute("transform", "translate(350 100) rotate(270)");
   await expect(svg).toHaveAttribute("data-routing-blocked", "false"); await page.mouse.up();
-  await expect(page.getByText("4 committed edits")).toBeVisible(); await page.keyboard.press("Control+z");
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "4"); await page.keyboard.press("Control+z");
   expect(await components.evaluateAll((els) => els.map((e) => e.getAttribute("transform")))).toEqual(before);
   await expect(wire).toHaveAttribute("points", original!);
 });
@@ -91,10 +92,10 @@ test("dragging supports R and Shift+R, ignores repeats and composing keys, and c
   await svg.dispatchEvent("keydown", { key: "r", code: "KeyR", repeat: true });
   await svg.dispatchEvent("keydown", { key: "r", code: "KeyR", isComposing: true });
   await expect(comp).toHaveAttribute("transform", "translate(180 210) rotate(270)");
-  await expect(page.getByText("3 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
   await expect(wire).toHaveAttribute("points", /^180,170 /); await expect(svg).toHaveAttribute("data-routing-blocked", "false");
   await page.mouse.up(); const after = await wire.getAttribute("points");
-  await expect(page.getByText("4 committed edits")).toBeVisible(); await page.keyboard.press("Control+z");
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "4"); await page.keyboard.press("Control+z");
   await expect(comp).toHaveAttribute("transform", before!); await expect(wire).toHaveAttribute("points", original!);
   await page.keyboard.press("Control+y"); await expect(wire).toHaveAttribute("points", after!);
   await page.screenshot({ path: "build/drag-rotation.png" });
@@ -111,7 +112,7 @@ test("rotated drag cancels safely on Escape, Undo, Tab, capture loss, blur, and 
     else if (cancel === "outside") await page.mouse.move(20, 20);
     else await page.keyboard.press(cancel);
     await page.mouse.up(); await expect(comp).toHaveAttribute("transform", "translate(200 200) rotate(0)");
-    await expect(svg).toHaveAttribute("data-operation", "NONE"); await expect(page.getByText("1 committed edits")).toBeVisible();
+    await expect(svg).toHaveAttribute("data-operation", "NONE"); await expect(page.locator("header")).toHaveAttribute("data-edit-count", "1");
   }
 });
 
@@ -122,5 +123,5 @@ test("a trapped manual waypoint blocks commit with visible feedback and remains 
   await expect(page.locator("main [data-wire]")).toHaveCount(0);
   await expect(page.locator("main svg")).toHaveAttribute("data-routing-blocked", "true");
   await expect(page.getByRole("alert")).toContainText("우회할 수 없습니다");
-  await page.keyboard.press("Escape"); await expect(page.getByText("3 committed edits")).toBeVisible();
+  await page.keyboard.press("Escape"); await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
 });

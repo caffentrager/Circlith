@@ -46,9 +46,9 @@ test("Space left drag pans without changing selection, components or history; dr
   );
   await expect(comp).toHaveAttribute("transform", original!);
   await expect(page.getByRole("dialog", { name: "도면 메뉴" })).toHaveCount(0);
-  await expect(page.getByText("1 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "1");
   await page.keyboard.press("Escape");
-  await expect(page.locator(".properties")).toContainText("1개 부품");
+  await expect(page.locator("main .symbol.selected")).toHaveCount(1);
   await page.keyboard.press("Control+z");
   await expect(comp).toHaveCount(0);
 });
@@ -76,7 +76,7 @@ test("left box selects contained objects, right-to-left crosses objects, Shift a
   await page.mouse.up();
   await page.keyboard.up("Shift");
   await expect(selected).toHaveCount(2);
-  await expect(page.getByText("3 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
   const c = (await page.locator("main svg").boundingBox())!;
   await page.mouse.click(c.x + 700, c.y + 400);
   await expect(selected).toHaveCount(0);
@@ -106,5 +106,5 @@ test("selection rollback on Escape and capture loss restores selection and rotat
   await drag(page, { x: 395, y: 280 }, { x: 445, y: 320 });
   await page.mouse.up();
   await expect(page.locator("main .symbol.selected")).toHaveCount(1);
-  await expect(page.getByText("2 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "2");
 });

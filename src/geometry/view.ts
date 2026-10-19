@@ -1,5 +1,5 @@
 import { gateHalfHeight, gateInputCount, type Circuit, type Point } from "../model/circuit";
-export const MIN_ZOOM = 0.1, MAX_ZOOM = 2, ZOOM_STEP = 1.1;
+export const MIN_ZOOM = 0.1, MAX_ZOOM = 8, ZOOM_STEP = 1.1;
 const stable = (value: number) => Number(value.toFixed(12));
 const clampZoom = (zoom: number) => stable(Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, zoom)));
 export function wheelZoomFactor(delta: number, mode: number, height: number, reverse = false): number {

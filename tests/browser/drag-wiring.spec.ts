@@ -67,7 +67,7 @@ test("palette drag previews and drops exactly one component; Undo and Redo resto
     "data-operation",
     "NONE",
   );
-  await expect(page.getByText("1 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "1");
   await page.keyboard.press("Control+z");
   await expect(components).toHaveCount(0);
   await page.keyboard.press("Control+y");
@@ -105,7 +105,7 @@ test("drop outside canvas and interrupted palette drag never commit", async ({
   await expect(
     page.locator('main [data-layer="symbols"] [data-component]'),
   ).toHaveCount(1);
-  await expect(page.getByText("1 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "1");
 });
 
 test("pin click starts wire directly in Select tool and next pin click commits one wire", async ({
@@ -121,7 +121,7 @@ test("pin click starts wire directly in Select tool and next pin click commits o
   await expect(page.locator("main [data-wire]")).toHaveCount(0);
   await pins.nth(1).click();
   await expect(page.locator("main [data-wire]")).toHaveCount(1);
-  await expect(page.getByText("3 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
   await page.keyboard.press("Control+z");
   await expect(page.locator("main [data-wire]")).toHaveCount(0);
   await expect(
@@ -157,7 +157,7 @@ test("pin drag snaps at release, preserves orthogonal wire, and cancelled wire d
     "data-operation",
     "NONE",
   );
-  await expect(page.getByText("3 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
 });
 
 test("wire drag released in empty space continues as draft and Enter after canvas leave does not use stale hover", async ({
@@ -181,5 +181,5 @@ test("wire drag released in empty space continues as draft and Enter after canva
   await page.keyboard.press("Enter");
   await expect(page.locator("main [data-wire]")).toHaveCount(0);
   await page.keyboard.press("Escape");
-  await expect(page.getByText("2 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "2");
 });

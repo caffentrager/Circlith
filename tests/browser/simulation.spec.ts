@@ -24,11 +24,11 @@ test('input switches, output and wire values update without edits; display toggl
   await expect(panel(page).locator('[data-output]')).toHaveText('1');
   await expect(page.locator('main [data-wire]').nth(0)).toHaveAttribute('data-value', '0');
   await expect(page.locator('main [data-wire]').nth(1)).toHaveAttribute('data-value', '1');
-  const history = await page.locator('header span').innerText();
+  const history = await page.locator('header').getAttribute('data-edit-count');
   await page.getByRole('button', { name: '입력 토글 1: 0', exact: true }).click();
   await expect(panel(page).locator('[data-output]')).toHaveText('0');
   await expect(page.locator('main [data-wire]').nth(0)).toHaveAttribute('data-value', '1');
-  await expect(page.locator('header span')).toHaveText(history);
+  await expect(page.locator('header')).toHaveAttribute('data-edit-count', history!);
   await panel(page).getByRole('combobox', { name: 'Input 1 값', exact: true }).selectOption('Z');
   await expect(panel(page).locator('[data-output]')).toHaveText('X');
   await expect(panel(page).locator('[data-diagnostic-code="FLOATING_INPUT"]')).toHaveCount(1);

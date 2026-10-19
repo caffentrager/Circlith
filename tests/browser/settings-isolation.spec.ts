@@ -28,5 +28,5 @@ test('simulation settings ignore editor keys and never overwrite them', async ({
   expect(saved.simulationRouting.pathMode).toBe('horizontal');
   await page.reload();
   await expect(page.locator('main svg')).toHaveAttribute('data-routing-mode', 'horizontal');
-  await expect(page.getByRole('status')).toContainText('KiCad');
+  await expect(page.getByRole('status')).toHaveAttribute('data-input-profile', 'KiCad 9');
 });

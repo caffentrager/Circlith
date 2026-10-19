@@ -43,7 +43,7 @@ async function clickPin(page: Page, n: number) {
   const c = await pinCenter(pins(page).nth(n));
   await clickWorld(page, c.x, c.y);
 }
-const committed = async (page: Page) => Number(/(\d+) committed edits/.exec(await page.locator("header span").last().innerText())![1]);
+const committed = async (page: Page) => Number(await page.locator("header").getAttribute("data-edit-count"));
 const comps = (page: Page) => page.locator('main [data-layer="symbols"] [data-component]');
 const wires = (page: Page) => page.locator("main [data-wire]");
 async function openSettings(page: Page) {

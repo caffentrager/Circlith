@@ -6,6 +6,7 @@ export function GateBody({
   inputCount = 2,
   invertedInputs = [],
   showPinLabels = false,
+  zoom = 1,
 }: {
   kind: Kind;
   selected?: boolean;
@@ -13,6 +14,7 @@ export function GateBody({
   inputCount?: number;
   invertedInputs?: boolean[];
   showPinLabels?: boolean;
+  zoom?: number;
 }) {
   const className = selected ? "symbol selected" : "symbol";
   const inverted = kind === "NAND" || kind === "NOR" || kind === "XNOR";
@@ -88,18 +90,23 @@ export function GateBody({
     );
   return (
     <>
-      <path
-        data-port-shape={kind}
-        d="M -26 -11 H 12 L 26 0 L 12 11 H -26 Z"
-        className={className}
-      />
-      <path
-        d={kind === "Input" ? "M 26 0 H 40" : "M -40 0 H -26"}
-        className="pin-lead"
-      />
-      <text textAnchor="middle" x="-4" y="4" className={`port-value${value ? ` value-${value}` : ''}`}>
+      <g data-port-body="true" transform="scale(0.5)">
+        <path
+          data-port-shape={kind}
+          d="M -26 -11 H 12 L 26 0 L 12 11 H -26 Z"
+          className={className}
+        />
+      </g>
+      <text textAnchor="middle" x="-2" y={zoom < 1 ? 18 / zoom : 3.5}
+        style={{ fontSize: Math.max(10, 9 / zoom) }}
+        className={`port-value${value ? ` value-${value}` : ''}`}>
         {value ?? (kind === 'Input' ? 'I' : 'O')}
       </text>
+      {/* Keep the established pin coordinates so existing wire endpoints stay aligned. */}
+      <path
+        d={kind === "Input" ? "M 13 0 H 40" : "M -40 0 H -13"}
+        className="pin-lead"
+      />
     </>
   );
 }

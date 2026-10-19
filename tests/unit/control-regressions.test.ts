@@ -46,6 +46,16 @@ describe("audit coordinate and operation regressions", () => {
 });
 
 describe("normalized zoom", () => {
+  it("allows 800% zoom, preserves its anchor and clamps both manual and fit zoom", () => {
+    const view = { x: 40, y: -30, zoom: 2 }, anchor = { x: 320, y: 200 };
+    const next = zoomView(view, 100, anchor);
+    expect(next.zoom).toBe(8);
+    expect((anchor.x - next.x) / next.zoom).toBe((anchor.x - view.x) / view.zoom);
+    expect((anchor.y - next.y) / next.zoom).toBe((anchor.y - view.y) / view.zoom);
+    expect(zoomView(next, 2, anchor)).toEqual(next);
+    const c = emptyCircuit(); addComponent(c, 'Input', { x: 0, y: 0 });
+    expect(fitView(c, 1920, 1080)!.zoom).toBe(8);
+  });
   it("scales with total wheel distance, supports reverse/line/page input and bounds single impulses", () => {
     const whole = wheelZoomFactor(-100, 0, 700), small = wheelZoomFactor(-10, 0, 700);
     expect(whole).toBeCloseTo(1.1, 12); expect(small ** 10).toBeCloseTo(whole, 12);

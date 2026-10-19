@@ -30,9 +30,9 @@ test("the reported loop previews red removal and green retention, then cleans in
   await expect(page.locator("[data-cleanup-keep]")).toHaveCount(1); expect(await wires(page)).toEqual(before);
   await expect(page.getByRole("region", { name: "중복 우회 정리 미리보기" })).toBeVisible();
   await expect(page.getByText("제거할 배선 1개의 수동 경유점도 함께 정리합니다.")).toBeVisible();
-  await expect(page.getByText("6 committed edits")).toBeVisible(); await page.screenshot({ path: "build/wire-cleanup-preview.png" });
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "6"); await page.screenshot({ path: "build/wire-cleanup-preview.png" });
   await page.keyboard.press("Enter"); await expect(svg).toHaveAttribute("data-operation", "NONE");
-  await expect(page.locator("main [data-wire]")).toHaveCount(3); await expect(page.getByText("7 committed edits")).toBeVisible();
+  await expect(page.locator("main [data-wire]")).toHaveCount(3); await expect(page.locator("header")).toHaveAttribute("data-edit-count", "7");
   expect(await wires(page)).toEqual(before.filter((w) => w.id !== selected));
   expect(await page.locator("main [data-junction]").evaluateAll((els) => els.map((e) => e.outerHTML))).toEqual(junctions);
   await expect(svg).toHaveAttribute("data-net-count", "1"); await expect(page.locator("main .pin.connected")).toHaveCount(2);
@@ -49,14 +49,14 @@ test("Escape, draft Undo and the cancel button discard only the cleanup preview"
     else if (cancel === "focused-button") { await page.getByRole("button", { name: "정리 적용", exact: true }).focus(); await page.keyboard.press("Escape"); }
     else await page.keyboard.press(cancel);
     await expect(svg).toHaveAttribute("data-operation", "NONE"); expect(await wires(page)).toEqual(before);
-    await expect(page.getByText("6 committed edits")).toBeVisible(); await expect(page.locator("[data-cleanup-remove]")).toHaveCount(0);
+    await expect(page.locator("header")).toHaveAttribute("data-edit-count", "6"); await expect(page.locator("[data-cleanup-remove]")).toHaveCount(0);
   }
   await page.getByRole("button", { name: /^연결망 중복 정리/ }).click();
   await page.getByRole("button", { name: "정리 적용", exact: true }).click();
   await expect(page.locator("main [data-wire]")).toHaveCount(3);
   await page.getByRole("button", { name: /^연결망 중복 정리/ }).click();
   await expect(page.getByRole("status")).toContainText("중복 배선이 없습니다");
-  await expect(page.getByText("7 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "7");
 });
 
 test("a real branch on the detour is preserved and cannot be mistaken for a redundant parallel edge", async ({ page }) => {

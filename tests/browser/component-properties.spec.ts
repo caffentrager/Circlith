@@ -16,7 +16,7 @@ test('wire mode empty click clears selection; active wire empty click remains a 
   await point(page, 650, 400);
   await expect(page.locator('main .symbol.selected')).toHaveCount(0);
   await expect(page.getByRole('button', { name: /^배선 / })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.locator('header span')).toHaveText('1 committed edits');
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "1");
   await page.locator('main [data-pin]').click(); await point(page, 350, 180);
   await expect(page.locator('main svg')).toHaveAttribute('data-operation', 'WIRE_DRAFT');
   await expect(page.locator('[data-draft-waypoint]')).toHaveCount(1);
@@ -32,7 +32,7 @@ test('entering simulation cancels pending work and switches from wire to selecti
   await expect(page.locator('header').getByRole('button', { name: /^선택 / })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('main svg')).toHaveAttribute('data-operation', 'NONE');
   await expect(page.locator('main [data-wire]')).toHaveCount(0);
-  await expect(page.locator('header span')).toHaveText('1 committed edits');
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "1");
 });
 
 test('double-click properties changes gate name, inputs and per-pin bubbles with exact undo/redo', async ({ page }) => {
@@ -50,9 +50,9 @@ test('double-click properties changes gate name, inputs and per-pin bubbles with
   await expect(gate.locator('.label')).toHaveText('ENABLE');
   await expect(page.locator('main [data-pin]')).toHaveCount(5);
   await expect(gate.locator('[data-input-bubble]')).toHaveCount(2);
-  await expect(page.locator('header span')).toHaveText('2 committed edits');
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "2");
   await page.keyboard.press('Control+z');
-  await expect(gate.locator('.label')).toHaveText('AND2');
+  await expect(gate.locator('.label')).toHaveText('AND 1');
   await expect(page.locator('main [data-pin]')).toHaveCount(3);
   await expect(gate.locator('[data-input-bubble]')).toHaveCount(0);
   await page.keyboard.press('Control+Shift+z');
@@ -62,7 +62,7 @@ test('double-click properties changes gate name, inputs and per-pin bubbles with
   await dialog(page).getByLabel('이름', { exact: true }).fill('Discard me');
   await page.keyboard.press('Escape');
   await expect(gate.locator('.label')).toHaveText('ENABLE');
-  await expect(page.locator('header span')).toHaveText('2 committed edits');
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "2");
   await page.screenshot({ path: 'build/component-properties-gate.png' });
   // Modal ownership still applies if external code moves focus back to the canvas.
   await gate.locator('[data-gate-shape]').dblclick();
@@ -104,10 +104,10 @@ test('resized and inverted connected gate evaluates immediately in simulation', 
   await expect(page.locator('[data-output]')).toHaveText('0');
   await gate.locator('[data-gate-shape]').dblclick();
   await dialog(page).getByLabel('입력 수', { exact: true }).fill('2');
-  const history = await page.locator('header span').innerText();
+  const history = await page.locator('header').getAttribute('data-edit-count');
   await dialog(page).getByRole('button', { name: '적용', exact: true }).click();
   await expect(dialog(page).getByRole('alert')).toContainText('배선이 연결');
-  await expect(page.locator('header span')).toHaveText(history);
+  await expect(page.locator('header')).toHaveAttribute('data-edit-count', history!);
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: '입력 토글 1: 1', exact: true }).dblclick();
   await expect(dialog(page)).toBeVisible();

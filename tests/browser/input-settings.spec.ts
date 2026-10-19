@@ -237,9 +237,7 @@ test("mix navigation and reverse wheel persist while leaving Altium accelerators
   await page.keyboard.press("w");
   await expect(page.locator("main svg")).toHaveAttribute("data-tool", "WIRE");
   await page.reload();
-  await expect(page.locator("footer")).toContainText(
-    "Altium Designer 2026 (Modified)",
-  );
+  await expect(page.locator("footer")).toHaveAttribute("data-input-profile", "Altium Designer 2026 (Modified)");
 });
 
 test("storage corruption recovers safely and storage write failure is visible", async ({

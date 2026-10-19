@@ -29,7 +29,7 @@ test('axis and On/Off change only display, persist and preserve the original rou
   const box = (await page.locator('main svg').boundingBox())!;
   await page.screenshot({ path: 'build/bridge-horizontal.png', clip: { x: box.x + 280, y: box.y + 150, width: 100, height: 100 } });
   const geometry = await page.locator('main [data-wire]').evaluateAll(els => els.map(e => e.getAttribute('points')));
-  const history = await page.locator('header span').innerText();
+  const history = await page.locator('header').getAttribute('data-edit-count');
   const dialog = await settings(page);
   await dialog.getByLabel('점프할 배선', { exact: true }).selectOption('vertical');
   await expect(bridges).toHaveAttribute('data-bridge-axis', 'vertical');
@@ -40,7 +40,7 @@ test('axis and On/Off change only display, persist and preserve the original rou
   await dialog.getByRole('button', { name: '닫기', exact: true }).click();
   await page.screenshot({ path: 'build/bridge-vertical.png', clip: { x: box.x + 280, y: box.y + 150, width: 100, height: 100 } });
   expect(await page.locator('main [data-wire]').evaluateAll(els => els.map(e => e.getAttribute('points')))).toEqual(geometry);
-  await expect(page.locator('header span')).toHaveText(history);
+  await expect(page.locator('header')).toHaveAttribute('data-edit-count', history!);
   await expect(page.locator('main svg')).toHaveAttribute('data-net-count', '2');
   await expect(page.locator('main svg')).toHaveAttribute('data-junction-count', '0');
   await page.reload(); const restored = await settings(page);

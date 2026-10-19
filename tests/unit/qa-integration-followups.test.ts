@@ -1,3 +1,4 @@
+import { CircuitLabelRegistry } from '../../src/ui/circuit-labels';
 import { describe, expect, it } from 'vitest';
 import { createElement } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -138,7 +139,7 @@ describe('diagnostics identify objects and preserve severity and complete feedba
     expect(svg).toContain('오류'); expect(svg).toContain('계산 중단');
     expect(svg).not.toContain('signal-X'); expect(svg).not.toContain('data-wire-value=');
     const panel = renderToStaticMarkup(createElement(SimulationPanel, {
-      circuit: c, result, inputs: {}, busy: false, onInput: () => {}, onReset: () => {}, onLocate: () => {},
+      circuit: c, labels: new CircuitLabelRegistry().labels(c), result, inputs: {}, busy: false, onInput: () => {}, onReset: () => {}, onLocate: () => {},
     }));
     expect(panel).toContain('signal-badge signal-invalid'); expect(panel).toContain('>오류</output>');
   });

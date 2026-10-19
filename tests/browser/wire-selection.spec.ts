@@ -25,7 +25,7 @@ test("wire click, Shift selection, Escape and Undo preserve circuit and history"
   // SELECT clicks select; WIRE clicks now explicitly start a branch.
   await clickCanvas(page, 240, 104);
   await expect(wire).toHaveClass(/selected/);
-  await expect(page.locator(".properties")).toContainText("1개 배선");
+  await expect(page.locator("main .wire.selected")).toHaveCount(1);
   await expect(page.locator("main .symbol.selected")).toHaveCount(0);
   await expect(page.locator("main svg")).toHaveAttribute("data-operation", "NONE");
   await page.keyboard.down("Shift");
@@ -43,11 +43,11 @@ test("wire click, Shift selection, Escape and Undo preserve circuit and history"
   await page.keyboard.press("Escape");
   await expect(wire).not.toHaveClass(/selected/);
   await expect(wire).toHaveAttribute("points", points!);
-  await expect(page.getByText("3 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
   await clickCanvas(page, 240, 100);
   await page.keyboard.press("Control+z");
   await expect(wire).toHaveCount(0);
-  await expect(page.locator(".properties")).toContainText("0개 배선");
+  await expect(page.locator("main .wire.selected")).toHaveCount(0);
   await page.keyboard.press("Control+y");
   await expect(wire).toHaveAttribute("points", points!);
 });
@@ -98,5 +98,5 @@ test("wire hit tolerance stays in screen pixels after zoom and pan; pins still s
   await page.locator('main [data-layer="pins"] [data-pin]').first().click();
   await expect(page.locator("main svg")).toHaveAttribute("data-operation", "WIRE_DRAFT");
   await page.keyboard.press("Escape");
-  await expect(page.getByText("3 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
 });

@@ -38,15 +38,15 @@ test("text, settings and search retain ownership while normal buttons return to 
   const name = page.getByRole("textbox", { name: "프로젝트 이름" }); await name.fill("Editing R");
   await name.press("r"); await name.press("Control+z"); await wheel(page, -100);
   expect(await readZoom(page)).toBe(1); await expect(name).toBeFocused();
-  await expect(page.getByText("1 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "1");
   await page.getByRole("button", { name: "설정", exact: true }).click();
   const dialog = page.getByRole("dialog", { name: "Input & Controls" });
   await expect(dialog.getByRole("button", { name: "닫기", exact: true })).toBeFocused();
   await svg.focus(); await wheel(page, -100); await page.keyboard.press("Control+z");
-  expect(await readZoom(page)).toBe(1); await expect(page.getByText("1 committed edits")).toBeVisible();
+  expect(await readZoom(page)).toBe(1); await expect(page.locator("header")).toHaveAttribute("data-edit-count", "1");
   await dialog.getByRole("button", { name: "닫기", exact: true }).focus();
   await page.keyboard.press("Escape"); await expect(dialog).toHaveCount(0); await expect(svg).toBeFocused();
-  await page.getByRole("button", { name: /^검색 / }).click(); await expect(page.getByRole("textbox", { name: "부품 검색어" })).toBeFocused();
+  await page.getByRole("button", { name: /^빠른 부품 검색 / }).click(); await expect(page.getByRole("textbox", { name: "부품 검색어" })).toBeFocused();
   await page.keyboard.press("Escape"); await expect(svg).toBeFocused();
 });
 
@@ -57,7 +57,7 @@ test("a blocked wire drop rolls back and stops following the cursor without losi
   await drag(page, 350, 200, 400, 200); await expect(svg).toHaveAttribute("data-routing-blocked", "true"); await page.mouse.up();
   await expect(svg).toHaveAttribute("data-operation", "NONE"); await expect(wire).toHaveAttribute("points", original!);
   await expect(page.getByRole("status")).toContainText("우회 경로가 없습니다");
-  await point(page, 320, 200, false); await expect(wire).toHaveAttribute("points", original!); await expect(page.getByText("3 committed edits")).toBeVisible();
+  await point(page, 320, 200, false); await expect(wire).toHaveAttribute("points", original!); await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
   await drag(page, 350, 200, 320, 200); await page.mouse.up(); const valid = await wire.getAttribute("points"); expect(valid).not.toBe(original);
   await page.keyboard.press("Control+z"); await drag(page, 350, 200, 400, 200); await page.mouse.up();
   await expect(svg).toHaveAttribute("data-operation", "NONE"); await page.keyboard.press("Control+y"); await expect(wire).toHaveAttribute("points", valid!);
@@ -72,12 +72,12 @@ test("failed one-shot rotation and blocked component drop leave no cursor-follow
   await page.keyboard.press("r"); await expect(page.getByRole("status")).toContainText("우회 경로가 없습니다");
   await expect(svg).toHaveAttribute("data-operation", "NONE"); await point(page, 350, 250, false);
   await expect(components.first()).toHaveAttribute("transform", "translate(100 100) rotate(0)"); await expect(wire).toHaveAttribute("points", original!);
-  await expect(page.getByText("3 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
   await part(page, "AND", 300, 350); await drag(page, 300, 350, 120, 150);
   await expect(svg).toHaveAttribute("data-routing-blocked", "true"); await page.mouse.up();
   await expect(svg).toHaveAttribute("data-operation", "NONE"); await point(page, 400, 400, false);
   await expect(components.last()).toHaveAttribute("transform", "translate(300 350) rotate(0)"); await expect(wire).toHaveAttribute("points", original!);
-  await expect(page.getByText("4 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "4");
 });
 
 test("wheel distance is proportional, horizontal input is ignored, and line/page impulses are bounded", async ({ page }) => {
@@ -101,5 +101,5 @@ test("wheel and keyboard zoom remain directional below 50% after fitting a wide 
   await wheel(page, 100); const out = await readZoom(page); expect(out).toBeLessThan(fit);
   await page.keyboard.press("-"); const keyOut = await readZoom(page); expect(keyOut).toBeLessThan(out);
   await page.keyboard.press("+"); const keyIn = await readZoom(page); expect(keyIn).toBeGreaterThan(keyOut); expect(keyIn).toBeCloseTo(out, 10);
-  await expect(page.getByText("2 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "2");
 });

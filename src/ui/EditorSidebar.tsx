@@ -1,19 +1,22 @@
 import { useState, type ReactNode } from 'react';
 import type { Circuit, Kind } from '../model/circuit';
 import { gateKinds } from '../model/circuit';
+import type { CircuitLabels } from './circuit-labels';
 
 const categories: { name: string; kinds: Kind[] }[] = [
   { name: '논리 게이트', kinds: [...gateKinds] },
   { name: '입출력', kinds: ['Input', 'Output'] },
 ];
 
-export function EditorSidebar({ circuit, selection, renderPart, searchCommand, onSelect, onReveal, busy, children }: {
+export function EditorSidebar({ circuit, labels, selection, renderPart, searchCommand, onSelect, onReveal, onClose, busy, children }: {
   circuit: Circuit;
+  labels: CircuitLabels;
   selection: string[];
   renderPart: (kind: Kind) => ReactNode;
   searchCommand: ReactNode;
   onSelect: (key: string, additive: boolean) => void;
   onReveal: (key: string) => void;
+  onClose: () => void;
   busy: boolean;
   children: ReactNode;
 }) {
@@ -25,16 +28,10 @@ export function EditorSidebar({ circuit, selection, renderPart, searchCommand, o
   const components = Object.values(circuit.components);
   const nets = Object.values(circuit.nets);
   const wires = Object.values(circuit.geometry.wires);
-  const componentNames = new Map<string, string>();
-  const counts = new Map<string, number>();
-  for (const component of components) {
-    const n = (counts.get(component.kind) ?? 0) + 1;
-    counts.set(component.kind, n);
-    componentNames.set(component.id, component.name === component.kind ? `${component.name} ${n}` : component.name);
-  }
+  const componentNames = labels.components;
   const pinName = (id: string) => {
     const pin = circuit.pins[id];
-    return `${componentNames.get(pin.component)} · ${pin.direction === 'in' ? 'IN' : 'OUT'}${pin.index + 1}`;
+    return `${componentNames.get(pin.component)} · ${labels.pins.get(id)}`;
   };
   const wireName = (wire: typeof wires[number]) => {
     const name = (end: typeof wire.from) => end.type === 'pin' ? pinName(end.id) : '접속점';
@@ -53,7 +50,7 @@ export function EditorSidebar({ circuit, selection, renderPart, searchCommand, o
   const row = (key: string, name: string, type: string) => <li key={key}>
     <button className={`outline-object${selection.includes(key) ? ' active' : ''}`}
       data-outline-object={key} aria-pressed={selection.includes(key)} disabled={busy}
-      title={`${name}\n${key}\n클릭: 선택 · Shift+클릭: 추가/해제 · 더블클릭: 화면 맞춤`}
+      title={`${name}\n클릭: 선택 · Shift+클릭: 추가/해제 · 더블클릭: 화면 맞춤`}
       onClick={e => onSelect(key, e.shiftKey)} onDoubleClick={() => onReveal(key)}>
       <span className="outline-type" aria-hidden="true">{type}</span>
       <span className="outline-name">{name}</span>
@@ -61,15 +58,16 @@ export function EditorSidebar({ circuit, selection, renderPart, searchCommand, o
   </li>;
   const visibleComponents = components.filter(c => match(`${componentNames.get(c.id)} ${c.kind} 부품`));
   const visibleNets = nets.map((net, i) => {
-    const label = `연결망 ${i + 1}`;
-    const items = wires.filter(w => w.net === net.id && (match(label) || match(`배선 ${wireName(w)}`)));
+    const label = labels.nets.get(net.id)!;
+    const items = wires.filter(w => w.net === net.id && (match(`${label} 연결망 ${i + 1}`) || match(`배선 ${wireName(w)}`)));
     return { net, label, items };
   }).filter(n => n.items.length);
   const visibleCategories = categories.map(category => ({ ...category,
     kinds: category.kinds.filter(kind => match(category.name) || match(kind)),
   })).filter(category => category.kinds.length);
 
-  return <aside className="library editor-sidebar" aria-label="에디터 탐색">
+  return <aside id="workspace-library" className="library editor-sidebar" aria-label="에디터 탐색">
+    <div className="panel-heading"><strong>탐색</strong><button aria-label="라이브러리 닫기" onClick={onClose}>×</button></div>
     <div className="sidebar-tabs" role="tablist" aria-label="탐색 패널">
       {(['library', 'scene'] as const).map((value, index, values) => <button key={value}
         id={`sidebar-${value}-tab`} role="tab" aria-selected={tab === value}
@@ -111,6 +109,6 @@ export function EditorSidebar({ circuit, selection, renderPart, searchCommand, o
         <p className="sidebar-empty">Shift+클릭: 추가 선택<br/>더블클릭: 선택 항목 화면 맞춤</p>
       </>}
     </div>
-    <details className="sidebar-help" open><summary>조작 안내</summary>{children}</details>
+    <details className="sidebar-help"><summary>조작 안내</summary>{children}</details>
   </aside>;
 }

@@ -114,7 +114,7 @@ test("click checkpoints are visible and Backspace/Escape remove draft markers wi
   await page.keyboard.press("Escape");
   await expect(page.locator("[data-draft-waypoint]")).toHaveCount(0);
   await expect(page.locator("main [data-wire]")).toHaveCount(0);
-  await expect(page.getByText("2 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "2");
 });
 test("selecting a finished corner and Delete removes only that corner and one Undo restores geometry", async ({
   page,

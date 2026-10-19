@@ -41,11 +41,11 @@ test("direct segment dragging previews, preserves pins, and has exact single-ste
   const wire = await setup(page), original = await wire.getAttribute("points");
   await dragTo(page, 200, 100, 200, 160);
   await expect(page.locator("main svg")).toHaveAttribute("data-operation", "SEGMENT_MOVE");
-  await expect(page.getByText("3 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
   await page.mouse.up();
   const changed = await wire.getAttribute("points");
   expect(changed).not.toBe(original); assertPath(changed);
-  await expect(page.getByText("4 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "4");
   await page.keyboard.press("Control+z"); await expect(wire).toHaveAttribute("points", original!);
   await page.keyboard.press("Control+y"); await expect(wire).toHaveAttribute("points", changed!);
 });
@@ -76,12 +76,13 @@ test("Escape, Ctrl+Z, Tab, capture loss, blur and outside release roll back only
     await page.mouse.up();
     await expect(wire).toHaveAttribute("points", original!);
     await expect(page.locator("main svg")).toHaveAttribute("data-operation", "NONE");
-    await expect(page.getByText("3 committed edits")).toBeVisible();
+    await expect(page.locator("header")).toHaveAttribute("data-edit-count", "3");
   }
 });
 
 test("redraw supports checkpoints and bend switching, fixes endpoints, and tidies with Undo", async ({ page }) => {
   const wire = await setup(page), original = await wire.getAttribute("points");
+  if (!await page.locator(".advanced-wire-tools").getAttribute("open").then(v => v !== null)) await page.locator(".advanced-wire-tools summary").click();
   await page.getByRole("button", { name: "경로 다시 그리기", exact: true }).click();
   await expect(page.locator("main svg")).toHaveAttribute("data-operation", "WIRE_ROUTE");
   let p = await canvasPoint(page, 220, 200); await page.mouse.click(p.x, p.y);
@@ -92,12 +93,14 @@ test("redraw supports checkpoints and bend switching, fixes endpoints, and tidie
   await page.mouse.click(p.x, p.y); await page.keyboard.press("Backspace");
   await page.keyboard.press("Enter");
   const redrawn = await wire.getAttribute("points"); assertPath(redrawn);
-  await expect(page.getByText("4 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "4");
+  if (!await page.locator(".advanced-wire-tools").getAttribute("open").then(v => v !== null)) await page.locator(".advanced-wire-tools summary").click();
   await page.getByRole("button", { name: "세로 우선 정리", exact: true }).click();
   await expect(wire).toHaveAttribute("points", "140,100 140,300 360,300");
   await page.locator("main svg").focus(); await page.keyboard.press("Control+z");
   await expect(wire).toHaveAttribute("points", redrawn!);
   await page.keyboard.press("Control+z"); await expect(wire).toHaveAttribute("points", original!);
+  if (!await page.locator(".advanced-wire-tools").getAttribute("open").then(v => v !== null)) await page.locator(".advanced-wire-tools summary").click();
   await page.getByRole("button", { name: "경로 다시 그리기", exact: true }).click();
   await page.keyboard.press("Escape"); await expect(wire).toHaveAttribute("points", original!);
   await page.keyboard.press("Control+y"); await expect(wire).toHaveAttribute("points", redrawn!);

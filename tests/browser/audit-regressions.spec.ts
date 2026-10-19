@@ -21,7 +21,7 @@ const state = (page: Page) => page.evaluate(() => ({
   selected: document.querySelectorAll('main .symbol.selected').length,
   menu: !!document.querySelector('[role=dialog][aria-label="도면 메뉴"]'),
   value: document.querySelector('main [data-layer="symbols"] [data-component]')?.getAttribute('data-value'),
-  history: document.querySelector('header span')?.textContent,
+  history: document.querySelector('header')?.getAttribute('data-edit-count'),
   operation: document.querySelector('main svg')?.getAttribute('data-operation'),
 }));
 const drag = async (page: Page, x: number, y: number, button: 'left' | 'middle' | 'right') => {

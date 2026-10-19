@@ -5,6 +5,7 @@ import type { SimulationResult } from '../simulation/simulator';
 import type { LogicValue } from '../simulation/logic';
 import { useId, useMemo } from 'react';
 import { defaultWireDisplay, wireBridges, type WireDisplaySettings } from '../geometry/wire-bridges';
+import type { CircuitLabels } from '../ui/circuit-labels';
 export const path = (points: Point[]) =>
   points.map((p) => `${p.x},${p.y}`).join(" ");
 export function Symbols({
@@ -16,6 +17,8 @@ export function Symbols({
   onToggleInput,
   toggleDisabled = false,
   wireDisplay = defaultWireDisplay,
+  labels,
+  highlightedNets = new Set<string>(),
 }: {
   circuit: Circuit;
   selection: string[];
@@ -25,6 +28,8 @@ export function Symbols({
   onToggleInput?: (id: string) => void;
   toggleDisabled?: boolean;
   wireDisplay?: WireDisplaySettings;
+  labels?: CircuitLabels;
+  highlightedNets?: ReadonlySet<string>;
 }) {
   const maskPrefix = useId().replace(/:/g, '');
   const circuitInvalid = !!simulation?.diagnostics.some(d => d.code === 'INVALID_CIRCUIT');
@@ -58,6 +63,7 @@ export function Symbols({
       <g data-layer="wires">
         {Object.values(circuit.geometry.wires).map((w) => (
           <g key={w.id}>
+            {highlightedNets.has(w.net) && <polyline data-net-highlight={w.id} points={path(w.points)} className="net-highlight" pointerEvents="none"/>}
             <polyline
               data-wire-hit={w.id}
               points={path(w.points)}
@@ -65,6 +71,7 @@ export function Symbols({
             />
             <polyline
               data-wire={w.id}
+              data-net-id={w.net}
               data-value={simulation?.nets[w.net]}
               mask={byWire.has(w.id) ? `url(#${maskPrefix}-wire-${w.id})` : undefined}
               points={path(w.points)}
@@ -108,7 +115,7 @@ export function Symbols({
               transform={`translate(${p.position.x} ${p.position.y}) rotate(${p.rotation})`}
             >
               <GateBody kind={c.kind} selected={selection.includes(c.id)} inputCount={gateInputCount(c)}
-                showPinLabels
+                showPinLabels={zoom >= 1} zoom={zoom}
                 invertedInputs={c.pins.filter(id => circuit.pins[id].direction === 'in').map(id => !!circuit.pins[id].inverted)}
                 value={c.kind === 'Input' ? inputs[c.id] ?? '0' : c.kind === 'Output' ? circuitInvalid ? '오류' : simulation ? simulation.outputs[c.id] ?? 'X' : '—' : undefined}/>
               {simulation && c.kind === 'Input' && onToggleInput && <g role="button" tabIndex={0} aria-disabled={toggleDisabled || undefined}
@@ -119,16 +126,16 @@ export function Symbols({
                 // Pointer input is resolved by the canvas (a click without movement toggles). Only the keyboard path lives here,
                 // and only Enter is consumed so Space keeps driving temporary panning.
                 onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); e.stopPropagation(); if (!e.repeat && !toggleDisabled) onToggleInput(c.id); } }}>
-                <path d="M -24 -10 H 11 L 24 0 L 11 10 H -24 Z" fill="transparent"/>
+                <path d="M -24 -10 H 11 L 24 0 L 11 10 H -24 Z" transform="scale(0.5)" fill="transparent"/>
                 <title>클릭 또는 Enter: 입력 0/1 전환 · 오른쪽 패널에서 X/Z 지정</title>
               </g>}
-              {selection.includes(c.id) && <rect data-symbol-selection={c.id} x="-45" y={-gateHalfHeight(gateInputCount(c)) - 5}
-                width="90" height={gateHalfHeight(gateInputCount(c)) * 2 + 10} className="symbol-selection" pointerEvents="none"/>}
+              {selection.includes(c.id) && <rect data-symbol-selection={c.id} x="-45" y={c.kind === 'Input' || c.kind === 'Output' ? -10.5 : -gateHalfHeight(gateInputCount(c)) - 5}
+                width="90" height={c.kind === 'Input' || c.kind === 'Output' ? 21 : gateHalfHeight(gateInputCount(c)) * 2 + 10} className="symbol-selection" pointerEvents="none"/>}
               <text textAnchor={c.kind === 'Input' ? 'end' : c.kind === 'Output' ? 'start' : 'middle'}
-                x={c.kind === 'Input' ? -34 : c.kind === 'Output' ? 34 : 0}
+                x={c.kind === 'Input' ? -21 : c.kind === 'Output' ? 21 : 0}
                 y={c.kind === 'Input' || c.kind === 'Output' ? 4 : -gateHalfHeight(gateInputCount(c)) - 11}
                 className={`label${c.kind === 'Input' || c.kind === 'Output' ? ' port-label' : ''}`}>
-                {c.name === c.kind && isBinaryGate(c.kind) ? `${c.kind}${gateInputCount(c)}` : c.name}
+                {labels?.components.get(c.id) ?? (c.name === c.kind && isBinaryGate(c.kind) ? `${c.kind}${gateInputCount(c)}` : c.name)}
               </text>
             </g>
           );
@@ -149,7 +156,7 @@ export function Symbols({
               className={connectedPins.has(pin.id) ? "pin connected" : "pin"}
             >
               <title>
-                {`${pin.direction} ${pin.index + 1}${simulation ? circuitInvalid ? ' · 계산 중단' : ` · ${simulation.pins[pin.id] ?? 'X'}` : ''}`}
+                {`${labels?.pins.get(pin.id) ?? (pin.direction === 'out' ? 'O' : `I${pin.index}`)}${simulation ? circuitInvalid ? ' · 계산 중단' : ` · ${simulation.pins[pin.id] ?? 'X'}` : ''}`}
               </title>
             </circle>
           </g>;

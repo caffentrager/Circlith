@@ -29,7 +29,7 @@ test("a real right click cancels the browser menu even when pointerup opens the 
   expect(await page.evaluate(() => (window as any).__contextBubbles)).toBe(0);
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: "도면 메뉴" })).toHaveCount(0);
-  await expect(page.getByText("0 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "0");
 });
 
 test("repeated right clicks over menu, settings, and app chrome never open a native menu", async ({ page }) => {
@@ -44,7 +44,7 @@ test("repeated right clicks over menu, settings, and app chrome never open a nat
   await page.locator("header strong").click({ button: "right" });
   await expect.poll(async () => (await records(page)).length).toBe(5);
   expect((await records(page)).every((r) => r.prevented)).toBe(true);
-  await expect(page.getByText("0 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "0");
 });
 
 test("text fields retain native editing menus and compatible right-drag pan remains isolated", async ({ page }) => {
@@ -65,7 +65,7 @@ test("text fields retain native editing menus and compatible right-drag pan rema
   await expect(page.locator("main svg > g").first()).toHaveAttribute("transform", "translate(60 30) scale(1)");
   await expect.poll(async () => (await records(page)).length).toBeGreaterThan(0);
   expect((await records(page)).every((r) => r.prevented)).toBe(true);
-  await expect(page.getByText("0 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "0");
 });
 
 test("opening and dismissing the app menu keeps a stable wire draft and history intact", async ({ page }) => {
@@ -82,6 +82,6 @@ test("opening and dismissing the app menu keeps a stable wire draft and history 
   await expect(svg).toHaveAttribute("data-operation", "WIRE_DRAFT");
   await expect(preview).toHaveAttribute("points", points!);
   await expect(page.locator("main [data-wire]")).toHaveCount(0);
-  await expect(page.getByText("1 committed edits")).toBeVisible();
+  await expect(page.locator("header")).toHaveAttribute("data-edit-count", "1");
   await page.keyboard.press("Escape"); await expect(svg).toHaveAttribute("data-operation", "NONE");
 });

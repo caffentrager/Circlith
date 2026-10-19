@@ -28,7 +28,7 @@ it("wire boxes test every segment, distinguishing containment, crossing and empt
   expect(boxWires(c, { x: 280, y: 120 }, { x: 200, y: 80 })).toEqual([wire]);
   expect(boxWires(c, { x: 280, y: 240 }, { x: 200, y: 160 })).toEqual([]);
   expect(boxWires(c, { x: 380, y: 240 }, { x: 340, y: 160 })).toEqual([wire]);
-  expect(fitView(c, 800, 600, [wire])).toEqual({ zoom: 2, x: -100, y: -100 });
+  expect(fitView(c, 800, 600, [wire])).toEqual({ zoom: 2.6, x: -250, y: -220 });
 });
 
 it("wire selection survives edits and Undo, excludes component transforms and prunes removed wires", () => {
