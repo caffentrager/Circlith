@@ -1,7 +1,8 @@
-import type { Circuit, Component } from '../model/circuit';
-import { clockProperties, dffProperties } from '../model/temporal-properties';
+import { isMemory, isFlipFlop, clockPinIndex, isSequential, type Circuit, type Component } from '../model/circuit';
+import { clockProperties, memoryProperties } from '../model/temporal-properties';
 import { compileCircuit, simulate, type SimulationResult } from './simulator';
 import type { LogicValue } from './logic';
+import { nextMemory, conflictingSetReset } from './memory';
 
 export type TimeStep = 'event' | 'rising' | 'period';
 export type TraceSample = { time: number; values: Record<string, LogicValue> };
@@ -31,7 +32,7 @@ export class TimeSession {
   constructor(readonly circuit: Circuit, inputs: Readonly<Record<string, LogicValue>> = {}) {
     this.plan = compileCircuit(circuit);
     this.inputs = Object.fromEntries(Object.entries(inputs).filter(([id]) => circuit.components[id]?.kind === 'Input'));
-    this.watch = Object.values(circuit.components).filter(p => ['Clock', 'Input', 'DFF', 'Output'].includes(p.kind))
+    this.watch = Object.values(circuit.components).filter(p => isSequential(p.kind) || p.kind === 'Input' || p.kind === 'Output')
       .slice(0, WATCH_LIMIT).map(p => 'pin:' + (p.kind === 'Output' ? p.pins[0] : p.pins.at(-1)!));
     this.reset();
   }
@@ -41,21 +42,27 @@ export class TimeSession {
     this.error = null; this.dropped = 0; this.samples = [];
     // Invalid circuits are displayed as errors and never scheduled.
     const initial = simulate(this.plan, this.inputs);
-    if (!initial.diagnostics.some(d => d.code === 'INVALID_CIRCUIT')) {
-      for (const part of Object.values(this.circuit.components)) {
-        if (part.kind === 'Clock') {
-          const p = clockProperties(part);
-          this.state[part.id] = p.initial;
-          this.clocks.push({ part, level: p.initial, next: p.period * (p.initial === '1' ? p.duty : 100 - p.duty) });
-        } else if (part.kind === 'DFF') this.state[part.id] = dffProperties(part).initial;
-      }
+    if (initial.diagnostics.some(d => d.code === 'INVALID_CIRCUIT')) { this.result = initial; this.record(); return; }
+    for (const part of Object.values(this.circuit.components)) {
+      if (part.kind === 'Clock') {
+        const p = clockProperties(part);
+        this.state[part.id] = p.initial;
+        this.clocks.push({ part, level: p.initial, next: p.period * (p.initial === '1' ? p.duty : 100 - p.duty) });
+      } else if (isMemory(part.kind)) this.state[part.id] = memoryProperties(part).initial;
     }
-    this.result = simulate(this.plan, this.inputs, this.state);
-    for (const part of this.flipflops()) this.previousClocks[part.id] = this.result.pins[part.pins[1]];
+    this.result = this.evaluate();
+    const saved = this.checkpoint();
+    try { this.settle(true); }
+    catch (reason) { this.fail(saved, reason); }
     this.record();
   }
 
-  private flipflops() { return Object.values(this.circuit.components).filter(p => p.kind === 'DFF'); }
+  private memories() { return Object.values(this.circuit.components).filter(p => isMemory(p.kind)); }
+  private evaluate() {
+    const result = simulate(this.plan, this.inputs, this.state, true);
+    for (const gate of this.plan.feedbackGates) this.state[gate.id] = result.pins[gate.pins.at(-1)!] ?? 'X';
+    return result;
+  }
   private readSignal(key: string): LogicValue | undefined {
     return key.startsWith('pin:') ? this.result.pins[key.slice(4)] : key.startsWith('net:') ? this.result.nets[key.slice(4)] : undefined;
   }
@@ -88,30 +95,28 @@ export class TimeSession {
       { code: 'SEQUENTIAL_LIMIT', severity: 'error', message: this.error, objects: [] }] };
     return false;
   }
-  private settle() {
-    this.result = simulate(this.plan, this.inputs, this.state);
-    const parts = this.flipflops();
+  private settle(initializing = false) {
+    this.result = this.evaluate();
+    const parts = this.memories();
     for (let delta = 0; delta < 64; delta++) {
       const next = { ...this.state };
       let changed = false;
       // Every FF samples the same settled pre-update result. Commit all Qs together.
       for (const part of parts) {
-        const previous = this.previousClocks[part.id], current = this.result.pins[part.pins[1]];
-        const { edge } = dffProperties(part), from = edge === 'rising' ? '0' : '1', to = edge === 'rising' ? '1' : '0';
-        const definite = previous === from && current === to;
-        const uncertain = previous !== current && (previous === from || previous === 'X' || previous === 'Z') &&
-          (current === to || current === 'X' || current === 'Z');
-        this.previousClocks[part.id] = current;
-        if (definite || uncertain) {
-          const data = this.result.pins[part.pins[0]];
-          const value = definite && (data === '0' || data === '1') ? data : 'X';
-          changed ||= value !== next[part.id];
-          next[part.id] = value;
-        }
+        const inputs = part.pins.slice(0, -1).map(id => this.result.pins[id]);
+        const value = nextMemory(part, inputs, this.state[part.id], this.previousClocks[part.id], initializing);
+        if (isFlipFlop(part.kind)) this.previousClocks[part.id] = inputs[clockPinIndex(part.kind)];
+        changed ||= value !== next[part.id];
+        next[part.id] = value;
       }
-      if (!changed) return;
+      if (!changed) {
+        for (const part of parts) if (conflictingSetReset(part, part.pins.slice(0, -1).map(id => this.result.pins[id])))
+          this.result.diagnostics.push({ code: 'INVALID_SEQUENTIAL_INPUT', severity: 'warning', objects: [part.id],
+            message: `${part.name}: S와 R이 동시에 1입니다. SR 래치·비동기 S/R은 즉시, SR 플립플롭은 동작 엣지에서 Q=X가 됩니다.` });
+        return;
+      }
       this.state = next;
-      this.result = simulate(this.plan, this.inputs, this.state);
+      this.result = this.evaluate();
     }
     throw new Error('동일 시각의 순차 상태가 64회 안에 안정되지 않았습니다. 마지막 확정 상태로 돌아갑니다.');
   }

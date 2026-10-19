@@ -4,6 +4,7 @@ import {
   gateInputCount,
   gateHalfHeight,
   inputY,
+  isMemory,
   type Circuit,
   type Endpoint,
   type Point,
@@ -29,7 +30,7 @@ export function pinPosition(c: Circuit, key: string): Point {
     comp = c.components[pin.component],
     place = c.geometry.components[comp.id];
   const local =
-    isBinaryGate(comp.kind) || comp.kind === 'DFF'
+    isBinaryGate(comp.kind) || isMemory(comp.kind)
       ? pin.direction === "out"
         ? { x: 40, y: 0 }
         : { x: -40, y: inputY(pin.index, gateInputCount(comp)) }

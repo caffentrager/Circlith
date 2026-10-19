@@ -15,6 +15,7 @@
 | 배선·선택·연결 유지 수정 | [Wire Editing](WIRE_EDITING.md), [Delete and Symbols](DELETE_AND_SYMBOLS.md), 구현 기록 |
 | 4상태 조합 계산 | [Simulation](SIMULATION.md), 조합 단계 범위. 순차 미지원 설명은 당시 단계에 한정 |
 | Clock/DFF·시간·파형 | [Sequential Simulation](SEQUENTIAL_SIMULATION.md), [구현 검증](../review/SEQUENTIAL_IMPLEMENTATION_20261019.md) |
+| 후속 순차소자 확장·게이트 래치 | [Sequential Components](SEQUENTIAL_COMPONENTS.md), JK/T/SR FF·D/SR 래치·Enable/비동기 S/R DFF의 기능 브랜치 기록 |
 | 현재 단일 앱 배포 | [Pages Deployment](PAGES_DEPLOYMENT.md), 현재 운영 절차 |
 | 저장소 현황·테스트·파일 분류 | [Repository Audit](platform/REPOSITORY_AUDIT.md), 기준 SHA snapshot |
 | 모든 branch와 고유 변경 | [Branch Audit](platform/BRANCH_AUDIT.md), 보존·통합 권고 |

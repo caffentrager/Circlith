@@ -1,5 +1,7 @@
 # 순차회로·시간 인터페이스 MVP
 
+> 아래 본문은 Clock/DFF 최초 MVP 기록이다. 2026-10-19 후속 요청으로 추가한 7종 순차소자와 게이트 피드백의 현재 동작은 [Master Spec §25.2](CIRCLITH_MASTER_SPEC.md#252-순차소자-확장과-게이트-피드백--2026-10-19), [순차소자 확장](SEQUENTIAL_COMPONENTS.md)을 따른다. 본문의 “추가 FF 후속/피드백 미지원”은 최초 단계 범위에 한정한다.
+
 2026-10-19 사용자 “진행해” 승인으로 Clock/DFF, 실행 제어, 기본 관측 파형을 구현한다.
 기준은 UI 인계 커밋 fc6520c이며 브랜치는 codex/sequential-simulation이다.
 별도 worktree에서 진행 중인 claude/storage-recovery를 변경하지 않는다.

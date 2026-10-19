@@ -1,5 +1,5 @@
-import { clone, gateInputCount, id, isGate, isBinaryGate, MAX_GATE_INPUTS, type Circuit, type Component } from './circuit';
-import { temporalPropertyError, clockProperties, dffProperties } from './temporal-properties';
+import { clone, gateInputCount, id, isGate, isMemory, isBinaryGate, MAX_GATE_INPUTS, type Circuit, type Component } from './circuit';
+import { temporalPropertyError, clockProperties, dffProperties, memoryProperties } from './temporal-properties';
 import { endpointPosition, pinPosition, route } from '../geometry/geometry';
 import { anchorOffsets, clean, same, simplifyPath } from '../geometry/path';
 import { collidingSegmentsWith, componentObstacles, defaultRouting, planRoute, type RoutingSettings } from '../geometry/routing';
@@ -12,7 +12,7 @@ const retraces = (points: Circuit['geometry']['wires'][string]['points']) => poi
     (a.y === b.y && b.y === c.y && (b.x - a.x) * (c.x - b.x) < 0);
 });
 
-export type ComponentProperties = { name: string; inputCount: number; invertedInputs: boolean[]; clock?: Component['clock']; dff?: Component['dff'] };
+export type ComponentProperties = { name: string; inputCount: number; invertedInputs: boolean[]; clock?: Component['clock']; dff?: Component['dff']; memory?: Component['memory'] };
 
 /** Preserve retained pin IDs (including the output), nets and manually fixed wire anchors. */
 export function updateComponentProperties(circuit: Circuit, key: string, properties: ComponentProperties, routing: RoutingSettings = defaultRouting): Circuit {
@@ -21,11 +21,12 @@ export function updateComponentProperties(circuit: Circuit, key: string, propert
   const name = properties.name.trim(), variable = isBinaryGate(original.kind);
   const count = properties.inputCount;
   if (!name || name.length > 80) throw new Error('이름은 1~80자로 입력하세요.');
-  if (!Number.isInteger(count) || (variable ? count < 2 || count > MAX_GATE_INPUTS : count !== (original.kind === 'DFF' ? 2 : 1)))
+  if (!Number.isInteger(count) || (variable ? count < 2 || count > MAX_GATE_INPUTS : count !== gateInputCount(original)))
     throw new Error(`입력 수는 2~${MAX_GATE_INPUTS}개로 지정하세요.`);
   const next = clone(circuit), component = next.components[key];
   if (component.kind === 'Clock') component.clock = { ...(properties.clock ?? clockProperties(component)) };
   if (component.kind === 'DFF') component.dff = { ...(properties.dff ?? dffProperties(component)) };
+  if (isMemory(component.kind) && component.kind !== 'DFF') component.memory = { ...(properties.memory ?? memoryProperties(component)) };
   const temporalError = temporalPropertyError(component);
   if (temporalError) throw new Error(temporalError);
   if (variable) {

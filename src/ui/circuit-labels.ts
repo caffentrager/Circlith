@@ -1,4 +1,4 @@
-import type { Circuit, Kind } from '../model/circuit';
+import { isMemory, memoryPorts, type Circuit, type Kind } from '../model/circuit';
 
 export type CircuitLabels = { components: Map<string, string>; pins: Map<string, string>; nets: Map<string, string> };
 
@@ -15,7 +15,7 @@ export class CircuitLabelRegistry {
         this.counts.set(c.kind, n); this.components.set(c.id, n);
       }
       components.set(c.id, c.name === c.kind ? `${c.kind} ${this.components.get(c.id)}` : c.name);
-      for (const id of c.pins) pins.set(id, c.kind === 'DFF' ? ['D', 'CLK', 'Q'][circuit.pins[id].index] : circuit.pins[id].direction === 'out' ? 'O' : `I${circuit.pins[id].index}`);
+      for (const id of c.pins) pins.set(id, isMemory(c.kind) ? memoryPorts[c.kind][circuit.pins[id].index] : circuit.pins[id].direction === 'out' ? 'O' : `I${circuit.pins[id].index}`);
     }
     for (const net of Object.values(circuit.nets)) {
       if (!this.nets.has(net.id)) this.nets.set(net.id, this.nets.size + 1);

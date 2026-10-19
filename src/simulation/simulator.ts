@@ -1,9 +1,9 @@
-import { componentKinds, isGate, isBinaryGate, MAX_GATE_INPUTS, type Circuit, type Component, type GateKind } from '../model/circuit';
-import { temporalPropertyError } from '../model/temporal-properties';
+import { componentKinds, isGate, isMemory, memoryPorts, isBinaryGate, MAX_GATE_INPUTS, type Circuit, type Component, type GateKind } from '../model/circuit';
+import { temporalPropertyError, memoryProperties } from '../model/temporal-properties';
 import { validateCircuit } from '../model/connections';
 import { evaluateGate, invert, logicValues, resolveDrivers, type LogicValue } from './logic';
 
-export type DiagnosticCode = 'FLOATING_INPUT' | 'MULTIPLE_DRIVERS' | 'DRIVE_CONFLICT' | 'COMBINATIONAL_FEEDBACK' | 'INVALID_CIRCUIT' | 'INVALID_INPUT' | 'SEQUENTIAL_LIMIT';
+export type DiagnosticCode = 'FLOATING_INPUT' | 'MULTIPLE_DRIVERS' | 'DRIVE_CONFLICT' | 'COMBINATIONAL_FEEDBACK' | 'INVALID_CIRCUIT' | 'INVALID_INPUT' | 'SEQUENTIAL_LIMIT' | 'INVALID_SEQUENTIAL_INPUT';
 export type Diagnostic = {
   code: DiagnosticCode;
   message: string;
@@ -25,6 +25,7 @@ type Plan = {
   pinSignals: Map<string, Signal>;
   order: Component[];
   cycles: string[][];
+  feedbackGates: Component[];
   errors: string[];
 };
 
@@ -69,16 +70,16 @@ export function compileCircuit(circuit: Circuit): Plan {
   let errors: string[];
   try { errors = validateCircuit(circuit); }
   catch (reason) { errors = [`회로 구조를 해석할 수 없습니다: ${reason instanceof Error ? reason.message : String(reason)}`]; }
-  if (errors.length) return { circuit, signals, floating, pinSignals, order: [], cycles: [], errors };
+  if (errors.length) return { circuit, signals, floating, pinSignals, order: [], cycles: [], feedbackGates: [], errors };
   for (const component of Object.values(circuit.components)) {
-    const expected = ['Input', 'Output', 'Clock'].includes(component.kind) ? 1 : component.kind === 'NOT' ? 2 : component.kind === 'DFF' ? 3 : component.pins.length;
+    const expected = ['Input', 'Output', 'Clock'].includes(component.kind) ? 1 : component.kind === 'NOT' ? 2 : isMemory(component.kind) ? memoryPorts[component.kind].length : component.pins.length;
     if (!componentKinds.includes(component.kind) || component.pins.length !== expected ||
       (isBinaryGate(component.kind) && (expected < 3 || expected > MAX_GATE_INPUTS + 1)) ||
       component.pins.some((id, i) => circuit.pins[id]?.index !== i || circuit.pins[id]?.direction !==
         (component.kind === 'Input' || component.kind === 'Clock' || (component.kind !== 'Output' && i === expected - 1) ? 'out' : 'in')) || temporalPropertyError(component))
       errors.push(`지원하지 않거나 잘못된 부품 핀: ${component.name}`);
   }
-  if (errors.length) return { circuit, signals, floating, pinSignals, order: [], cycles: [], errors };
+  if (errors.length) return { circuit, signals, floating, pinSignals, order: [], cycles: [], feedbackGates: [], errors };
   const netWires = new Map<string, string[]>();
   for (const wire of Object.values(circuit.geometry.wires)) {
     const members = netWires.get(wire.net) ?? [];
@@ -117,10 +118,10 @@ export function compileCircuit(circuit: Circuit): Plan {
       if (pending.get(target) === 0) queue.push(target);
     }
   }
-  return { circuit, signals, floating, pinSignals, order, cycles, errors };
+  return { circuit, signals, floating, pinSignals, order, cycles, feedbackGates: gates.filter(gate => cyclic.has(gate.id)), errors };
 }
 
-export function simulate(plan: Plan, inputs: Readonly<Record<string, LogicValue>> = {}, state: Readonly<Record<string, LogicValue>> = {}): SimulationResult {
+export function simulate(plan: Plan, inputs: Readonly<Record<string, LogicValue>> = {}, state: Readonly<Record<string, LogicValue>> = {}, settleFeedback = false): SimulationResult {
   const result: SimulationResult = { pins: {}, nets: {}, outputs: {}, diagnostics: [] };
   if (plan.errors.length) {
     result.diagnostics.push({ code: 'INVALID_CIRCUIT', severity: 'error', message: `회로 데이터 오류: ${plan.errors.join(' · ')}`, objects: [] });
@@ -149,18 +150,41 @@ export function simulate(plan: Plan, inputs: Readonly<Record<string, LogicValue>
     for (const pin of component.pins) if (circuit.pins[pin].direction === 'out')
       drives[pin] = component.kind === 'Input' ? (values !== inputs ? 'X' : provided ? logicValues.includes(value) ? value : 'X' : '0')
         : component.kind === 'Clock' ? state[component.id] ?? component.clock?.initial ?? '0'
-        : component.kind === 'DFF' ? state[component.id] ?? component.dff?.initial ?? 'X' : 'X';
+        : isMemory(component.kind) ? state[component.id] ?? memoryProperties(component).initial : settleFeedback ? state[component.id] ?? 'X' : 'X';
   }
   const read = (pin: string) => resolveDrivers(pinSignals.get(pin)!.drivers.map(id => drives[id]));
-  for (const gate of plan.order) {
+  const evaluate = (gate: Component) => {
     const inputs = gate.pins.filter(id => circuit.pins[id].direction === 'in')
       .map(id => circuit.pins[id].inverted ? invert(read(id)) : read(id));
-    const output = gate.pins.find(id => circuit.pins[id].direction === 'out')!;
-    drives[output] = evaluateGate(gate.kind as GateKind, inputs);
+    return evaluateGate(gate.kind as GateKind, inputs);
+  };
+  const ordered = () => { for (const gate of plan.order) drives[gate.pins.at(-1)!] = evaluate(gate); };
+  ordered();
+  const stableGroups = new Set<string>();
+  if (settleFeedback) {
+    // Kosaraju emits source SCCs first. Isolate each SCC so an unstable loop cannot poison an independent latch.
+    for (const group of plan.cycles) {
+      const gates = group.map(id => circuit.components[id]);
+      for (let round = 0; round < 64; round++) {
+        const next = gates.map(gate => evaluate(gate));
+        const stable = gates.every((gate, i) => drives[gate.pins.at(-1)!] === next[i]);
+        gates.forEach((gate, i) => { drives[gate.pins.at(-1)!] = next[i]; });
+        ordered();
+        if (stable) { stableGroups.add(group[0]); break; }
+      }
+      if (!stableGroups.has(group[0])) {
+        for (const gate of gates) drives[gate.pins.at(-1)!] = 'X';
+        ordered();
+      }
+    }
   }
   for (const group of plan.cycles) {
+    if (settleFeedback && stableGroups.has(group[0]) && group.every(id => drives[circuit.components[id].pins.at(-1)!] !== 'X')) continue;
     result.diagnostics.push({ code: 'COMBINATIONAL_FEEDBACK', severity: 'warning', objects: group,
-      message: `조합 피드백: ${group.length}개 게이트의 출력을 X로 처리합니다. 기억 상태·발진 여부는 계산하지 않습니다.` });
+      message: settleFeedback ? stableGroups.has(group[0])
+        ? `피드백 상태 미확정: ${group.length}개 게이트의 상태를 결정할 수 없습니다. Set/Reset 입력으로 초기화하세요. 임의의 0/1은 선택하지 않습니다.`
+        : `피드백 안정화 실패: 64회 안에 안정되지 않아 ${group.length}개 게이트를 X로 처리합니다. 실제 발진 주파수·전파 지연은 계산하지 않습니다.`
+        : `조합 피드백: ${group.length}개 게이트의 출력을 X로 처리합니다. 기억 상태·발진 여부는 계산하지 않습니다.` });
   }
   for (const signal of [...signals.values(), ...floating]) {
     const values = signal.drivers.map(id => drives[id]), resolved = resolveDrivers(values);

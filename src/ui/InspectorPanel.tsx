@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { gateInputCount, isGate, type Circuit, type Endpoint } from '../model/circuit';
-import { clockProperties, dffProperties } from '../model/temporal-properties';
+import { gateInputCount, isGate, isMemory, isFlipFlop, type Circuit, type Endpoint } from '../model/circuit';
+import { clockProperties, memoryProperties } from '../model/temporal-properties';
 import type { SimulationResult } from '../simulation/simulator';
 import type { CircuitLabels } from './circuit-labels';
 
@@ -30,12 +30,17 @@ export function InspectorPanel({ circuit, labels, selection, simulation, busy, o
     </> : component ? <>
       <dl className="property-list">
         <dt>종류</dt><dd>{component.kind}</dd>
-        {(isGate(component.kind) || component.kind === 'DFF') && <><dt>입력 수</dt><dd>{gateInputCount(component)}</dd></>}
+        {(isGate(component.kind) || isMemory(component.kind)) && <><dt>입력 수</dt><dd>{gateInputCount(component)}</dd></>}
         <dt>회전</dt><dd>{circuit.geometry.components[component.id].rotation}°</dd>
         {isGate(component.kind) && <><dt>입력 반전</dt><dd>{component.pins.filter(id => circuit.pins[id].direction === 'in' && circuit.pins[id].inverted).map(id => labels.pins.get(id)).join(', ') || '없음'}</dd></>}
         {component.kind === 'Clock' && <><dt>주기 / 듀티</dt><dd>{clockProperties(component).period} µs / {clockProperties(component).duty}%</dd><dt>초기 레벨</dt><dd>{clockProperties(component).initial}</dd><dt>현재 레벨</dt><dd>{signal(simulation?.pins[component.pins[0]])}</dd></>}
-        {component.kind === 'DFF' && <><dt>동작 엣지</dt><dd>{dffProperties(component).edge === 'rising' ? '상승엣지' : '하강엣지'}</dd><dt>초기 Q</dt><dd>{dffProperties(component).initial}</dd><dt>현재 Q</dt><dd>{signal(simulation?.pins[component.pins[2]])}</dd></>}
+        {isMemory(component.kind) && <>
+          {isFlipFlop(component.kind) && <><dt>동작 엣지</dt><dd>{memoryProperties(component).edge === 'rising' ? '상승엣지' : '하강엣지'}</dd></>}
+          {component.kind === 'DLatch' && <><dt>활성 레벨</dt><dd>EN={memoryProperties(component).activeLevel === 'high' ? '1' : '0'}</dd></>}
+          <dt>초기 Q</dt><dd>{memoryProperties(component).initial}</dd><dt>현재 Q</dt><dd>{signal(simulation?.pins[component.pins.at(-1)!])}</dd>
+        </>}
       </dl>
+      {isMemory(component.kind) && memoryProperties(component).initial === 'X' && <p className="note">초기 Q=X입니다. Toggle·유지만으로는 값이 정해지지 않습니다. 초기 Q를 0/1로 지정하거나 Set/Reset·데이터 캡처로 초기화하세요.</p>}
       <button className="primary-action" disabled={busy} onClick={() => onProperties(component.id)}>속성 편집…</button>
       <h3>핀과 연결</h3>
       <ul className="inspector-pins">{component.pins.map(id => {

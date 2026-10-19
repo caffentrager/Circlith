@@ -1,11 +1,22 @@
 export const gateKinds = ["AND", "OR", "NOT", "XOR", "NAND", "NOR", "XNOR"] as const;
 export type GateKind = typeof gateKinds[number];
-export type Kind = "Input" | GateKind | "Output" | "Clock" | "DFF";
-export const componentKinds: Kind[] = [...gateKinds, "Input", "Output", "Clock", "DFF"];
+export const memoryPorts = {
+  DFF: ['D', 'CLK', 'Q'], JKFF: ['J', 'K', 'CLK', 'Q'], TFF: ['T', 'CLK', 'Q'],
+  SRFF: ['S', 'R', 'CLK', 'Q'], DFFE: ['D', 'EN', 'CLK', 'Q'], DFFSR: ['D', 'CLK', 'S', 'R', 'Q'],
+  DLatch: ['D', 'EN', 'Q'], SRLatch: ['S', 'R', 'Q'],
+} as const;
+export type MemoryKind = keyof typeof memoryPorts;
+export type Kind = "Input" | GateKind | "Output" | "Clock" | MemoryKind;
+export const memoryKinds = Object.keys(memoryPorts) as MemoryKind[];
+export const isMemory = (kind: Kind): kind is MemoryKind => Object.hasOwn(memoryPorts, kind);
+export const isFlipFlop = (kind: Kind) => isMemory(kind) && kind !== 'DLatch' && kind !== 'SRLatch';
+export const clockPinIndex = (kind: Kind) => isMemory(kind) ? (memoryPorts[kind] as readonly string[]).indexOf('CLK') : -1;
+export const isSequential = (kind: Kind) => kind === 'Clock' || isMemory(kind);
+export const componentKinds: Kind[] = [...gateKinds, "Input", "Output", "Clock", ...memoryKinds];
 export const isGate = (kind: Kind) => (gateKinds as readonly string[]).includes(kind);
 export const isBinaryGate = (kind: Kind) => isGate(kind) && kind !== "NOT";
 export const MAX_GATE_INPUTS = 16;
-export const gateInputCount = (component: Component) => component.kind === 'DFF' ? 2 : isBinaryGate(component.kind) ? component.pins.length - 1 : 1;
+export const gateInputCount = (component: Component) => isMemory(component.kind) ? memoryPorts[component.kind].length - 1 : isBinaryGate(component.kind) ? component.pins.length - 1 : 1;
 export const gateHalfHeight = (count: number) => Math.max(20, count * 10);
 export const inputY = (index: number, count: number) => (index - (count - 1) / 2) * 20;
 export type Point = { x: number; y: number };
@@ -16,6 +27,7 @@ export type Component = {
   pins: string[];
   clock?: { period: number; duty: number; initial: '0' | '1' };
   dff?: { edge: 'rising' | 'falling'; initial: '0' | '1' | 'X' };
+  memory?: { edge: 'rising' | 'falling'; initial: '0' | '1' | 'X'; activeLevel: 'high' | 'low' };
 };
 export type Pin = {
   id: string;
@@ -58,7 +70,7 @@ export function addComponent(
   rotation = 0,
 ) {
   const key = id();
-  const count = kind === 'DFF' || isBinaryGate(kind) ? 3 : kind === "NOT" ? 2 : 1;
+  const count = isMemory(kind) ? memoryPorts[kind].length : isBinaryGate(kind) ? 3 : kind === "NOT" ? 2 : 1;
   const pins = Array.from({ length: count }, (_, index) => {
     const pin = id();
     c.pins[pin] = {
@@ -66,13 +78,14 @@ export function addComponent(
       component: key,
       index,
       direction:
-        kind === "Input" || kind === 'Clock' || (kind === "NOT" && index === 1) || ((kind === 'DFF' || isBinaryGate(kind)) && index === 2) ? "out" : "in",
+        kind === "Input" || kind === 'Clock' || (kind === "NOT" && index === 1) || ((isMemory(kind) || isBinaryGate(kind)) && index === count - 1) ? "out" : "in",
     };
     return pin;
   });
   c.components[key] = { id: key, kind, name: kind, pins,
     ...(kind === 'Clock' ? { clock: { period: 10, duty: 50, initial: '0' as const } } : {}),
-    ...(kind === 'DFF' ? { dff: { edge: 'rising' as const, initial: 'X' as const } } : {}) };
+    ...(kind === 'DFF' ? { dff: { edge: 'rising' as const, initial: 'X' as const } } : {}),
+    ...(isMemory(kind) && kind !== 'DFF' ? { memory: { edge: 'rising' as const, initial: 'X' as const, activeLevel: 'high' as const } } : {}) };
   c.geometry.components[key] = { position, rotation };
   return key;
 }
